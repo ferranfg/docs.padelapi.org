@@ -28,6 +28,18 @@
         ]
       },
       {
+        "tab": "Padel Analyst",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "icon": "robot",
+            "pages": [
+              "padel-analyst/index"
+            ]
+          }
+        ]
+      },
+      {
         "tab": "Blog",
         "groups": [
           {

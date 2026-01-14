@@ -1,0 +1,175 @@
+---
+title: "About the Padel Analyst"
+description: "Connect AI assistants like Claude, ChatGPT, and VS Code to professional padel data through the Padel API MCP Server"
+---
+
+## What is Padel Analyst?
+
+Padel Analyst is an [MCP (Model Context Protocol)](https://modelcontextprotocol.io/introduction) server that connects AI assistants to professional padel data. It allows you to ask natural language questions about players, tournaments, matches, and statistics without writing any code.
+
+<CardGroup cols={3}>
+  <Card title="Natural Language" icon="message">
+    Ask questions like "Who won the last Major?" or "Compare Lebron vs Galan"
+  </Card>
+  <Card title="Real-time Data" icon="bolt">
+    Access live scores, recent results, and up-to-date statistics
+  </Card>
+  <Card title="Multiple AI Hosts" icon="robot">
+    Works with Claude, ChatGPT, VS Code, and any MCP-compatible client
+  </Card>
+</CardGroup>
+
+## Prerequisites
+
+<Steps>
+  <Step title="Subscribe to the Analyst Plan">
+    Sign up for the [Analyst plan](https://padelapi.org/billing) (€9/month) which includes:
+    - Up to 50K requests/month
+    - MCP Server Access
+    - Works with ChatGPT
+    - Natural language queries
+    - Basic support
+  </Step>
+  <Step title="Create an API Token">
+    Generate your personal API token from the [API Tokens](https://padelapi.org/user/api-tokens) page. You'll need this to authenticate MCP requests.
+  </Step>
+</Steps>
+
+## Available Tools
+
+The Padel Analyst MCP server provides 12 tools for querying padel data:
+
+| Tool | Description |
+|------|-------------|
+| `search-players` | Search players by name, nationality, category, or side |
+| `search-tournaments` | Find tournaments by name, level, or date range |
+| `search-matches` | Search for matches with various filters |
+| `search-matches-related` | Find matches related to specific players or tournaments |
+| `search-seasons` | Browse available seasons and competitions |
+| `list-player-matches` | Get all matches for a specific player |
+| `list-pair-matches` | Get all matches for a specific pair of players |
+| `list-tournament-matches` | Get all matches from a tournament |
+| `show-player-stats` | Display detailed statistics for a player |
+| `show-pair-stats` | Display statistics for a pair of players |
+| `show-match-stats` | Get detailed match statistics including point-by-point data |
+| `simulate-match` | Simulate a match outcome based on player statistics |
+
+## Available Prompts
+
+Pre-configured prompts help structure common analysis tasks:
+
+| Prompt | Description |
+|--------|-------------|
+| `head-to-head` | Compare historical results between two players/pairs |
+| `match-preview` | Generate a preview for an upcoming match |
+| `pair-analysis` | Analyze a pair's performance and playing style |
+| `player-comparison` | Side-by-side comparison of two players |
+| `player-profile` | Comprehensive profile of a player |
+| `recent-results` | Summary of recent match results |
+| `season-overview` | Overview of a complete season |
+| `tournament-summary` | Summary of a tournament with results |
+
+## Installation
+
+### VS Code / GitHub Copilot
+
+Click the button below to install the Padel API MCP server in VS Code:
+
+[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_Server-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=padel-api&config=%7B%22type%22%3A%20%22http%22%2C%22url%22%3A%20%22https%3A%2F%2Fpadelapi.org%2Fmcp%22%7D)
+
+Or manually add the following to your VS Code `settings.json`:
+
+```json
+{
+  "mcp": {
+    "servers": {
+      "padel-api": {
+        "type": "http",
+        "url": "https://padelapi.org/mcp",
+        "headers": {
+          "Authorization": "Bearer YOUR_API_TOKEN"
+        }
+      }
+    }
+  }
+}
+```
+
+### Claude Desktop
+
+Add the following to your Claude Desktop configuration file:
+
+<Tabs>
+  <Tab title="macOS">
+    Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+    ```json
+    {
+      "mcpServers": {
+        "padel-api": {
+          "type": "http",
+          "url": "https://padelapi.org/mcp",
+          "headers": {
+            "Authorization": "Bearer YOUR_API_TOKEN"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Windows">
+    Edit `%APPDATA%\Claude\claude_desktop_config.json`:
+    ```json
+    {
+      "mcpServers": {
+        "padel-api": {
+          "type": "http",
+          "url": "https://padelapi.org/mcp",
+          "headers": {
+            "Authorization": "Bearer YOUR_API_TOKEN"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Other MCP Clients
+
+For any MCP-compatible client, use these connection details:
+
+| Setting | Value |
+|---------|-------|
+| Server URL | `https://padelapi.org/mcp` |
+| Transport | HTTP (Streamable) |
+| Authentication | Bearer token in `Authorization` header |
+
+## Example Queries
+
+Once connected, you can ask your AI assistant questions like:
+
+<AccordionGroup>
+  <Accordion title="Player information">
+    - "Who is Arturo Coello? Give me his profile and recent results"
+    - "List the top 10 ranked women players"
+    - "Find all Spanish players who play on the backhand side"
+  </Accordion>
+  <Accordion title="Match analysis">
+    - "What were the results of the last Premier Padel Major?"
+    - "Show me the head-to-head record between Lebron/Galan and Coello/Tapia"
+    - "Get the point-by-point statistics from yesterday's final"
+  </Accordion>
+  <Accordion title="Tournament data">
+    - "List all P1 tournaments this season"
+    - "Who won the Qatar Major 2024?"
+    - "Show me the draw and results from the Paris Premier Padel"
+  </Accordion>
+  <Accordion title="Predictions">
+    - "Simulate a match between Coello/Tapia vs Lebron/Galan"
+    - "Based on recent form, who would win: Sanchez/Josemaria or Triay/Fernandez?"
+  </Accordion>
+</AccordionGroup>
+
+## Support
+
+Need help? Contact us at [ferran@padelapi.org](mailto:ferran@padelapi.org) or check the [API documentation](/index) for more details on available data.
