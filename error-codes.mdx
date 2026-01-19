@@ -1,0 +1,194 @@
+---
+title: "Error Codes"
+description: "Understanding Padel API error responses and how to handle them"
+---
+
+The Padel API uses conventional HTTP response codes to indicate the success or failure of an API request.
+
+| Code Range | Description |
+|------------|-------------|
+| `2xx` | Success — The request was successful |
+| `3xx` | Redirection — The resource has moved |
+| `4xx` | Client Error — Something is wrong with the request |
+| `5xx` | Server Error — Something went wrong on our end |
+
+---
+
+## Success Codes
+
+### 200 - OK
+
+The request was successful and the response contains the requested data.
+
+```json
+{
+  "data": [...],
+  "meta": {
+    "current_page": 1,
+    "total": 42
+  }
+}
+```
+
+---
+
+## Redirection Codes
+
+### 302 - Found (Redirect)
+
+The requested resource has been moved to a new location. This typically happens when a player or tournament record has been updated or merged with new data.
+
+**How to handle:**
+- Follow the redirect URL provided in the `Location` header
+- Update any cached references to use the new URL
+- Most HTTP clients handle redirects automatically
+
+```bash
+# Example: Player data was merged
+curl -i 'https://padelapi.org/api/players/123'
+
+HTTP/1.1 302 Found
+Location: https://padelapi.org/api/players/456
+```
+
+---
+
+## Client Error Codes
+
+### 401 - Unauthenticated
+
+Authentication failed. Your API token is missing, invalid, or has been revoked.
+
+**How to fix:**
+1. Verify you're including the `Authorization` header in your request
+2. Check that your token format is correct: `Bearer YOUR_API_TOKEN`
+3. Generate a new token at [API Tokens](https://padelapi.org/user/api-tokens) if needed
+
+```bash
+# Correct format
+curl -X GET 'https://padelapi.org/api/seasons' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+```json
+{
+  "message": "Unauthenticated."
+}
+```
+
+<Warning>
+  Never share your API token publicly or commit it to version control.
+</Warning>
+
+### 402 - Payment Required
+
+Your current subscription plan does not include access to this resource or you have exceeded your plan limits.
+
+**How to fix:**
+1. Check your current plan at [padelapi.org/billing](https://padelapi.org/billing)
+2. Upgrade your subscription to access premium endpoints
+3. Review the [pricing plans](https://padelapi.org/pricing) for available features
+
+```json
+{
+  "message": "Subscription required.",
+  "contact_email": "ferran@padelapi.org",
+  "error_time": "2026-01-19 15:42:31"
+}
+```
+
+### 404 - Not Found
+
+The requested resource does not exist. This can happen when:
+- The ID doesn't exist in the database
+- The resource was deleted
+- There's a typo in the endpoint URL
+
+**How to fix:**
+1. Verify the resource ID is correct
+2. Check the endpoint URL for typos
+3. Use a list endpoint to find valid IDs
+
+```json
+{
+  "message": "Not found.",
+  "contact_email": "ferran@padelapi.org",
+  "error_time": "2026-01-19 15:42:31"
+}
+```
+
+### 429 - Rate Limit Exceeded
+
+You have exceeded the rate limit of 60 requests per minute.
+
+**How to handle:**
+1. Implement request throttling in your application
+2. Wait before retrying (check the `Retry-After` header if provided)
+3. Consider caching responses to reduce API calls
+
+```json
+{
+  "message": "Too Many Attempts."
+}
+```
+
+<Tip>
+  Use caching strategies to minimize repeated requests for the same data.
+</Tip>
+
+### 422 - Unprocessable Entity
+
+The request parameters failed validation. The response includes details about which parameters are invalid.
+
+**How to fix:**
+1. Review the error message for specific validation failures
+2. Check parameter types (string vs integer)
+3. Verify required parameters are included
+4. Ensure values are within allowed ranges
+
+```json
+{
+  "message": "The selected category is invalid.",
+  "errors": {
+    "category": [
+      "The selected category is invalid."
+    ]
+  }
+}
+```
+
+---
+
+## Server Error Codes
+
+### 500 - Internal Server Error
+
+Something went wrong on our servers. We automatically log all errors and work to fix them as quickly as possible.
+
+**How to handle:**
+1. Wait a few moments and retry your request
+2. If the error persists, contact us with the **error_time** included in the response
+
+```json
+{
+  "message": "Server Error",
+  "contact_email": "ferran@padelapi.org",
+  "error_time": "2026-01-19 15:42:31"
+}
+```
+
+<Note>
+  When reporting a 500 error, please include the `error_time` from the response. This helps us locate and fix the issue faster.
+</Note>
+
+**Contact support:** [ferran@padelapi.org](mailto:ferran@padelapi.org)
+
+---
+
+## Best Practices
+
+1. **Always check the status code** before processing the response body
+2. **Handle redirects** — Configure your HTTP client to follow 302 redirects
+3. **Implement retry logic** for 500 errors with exponential backoff
+4. **Log error responses** to help debug integration issues
+5. **Include `error_time`** when reporting server errors to support
