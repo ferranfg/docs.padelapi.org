@@ -17,7 +17,8 @@
             "group": "Overview",
             "icon": "book-open",
             "pages": [
-              "index"
+              "index",
+              "getting-started"
             ]
           },
           {
@@ -31,7 +32,7 @@
         "tab": "Padel Analyst",
         "groups": [
           {
-            "group": "Getting Started",
+            "group": "Overview",
             "icon": "robot",
             "pages": [
               "padel-analyst/index"

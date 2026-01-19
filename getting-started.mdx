@@ -1,0 +1,156 @@
+---
+title: "Your First Padel API Call"
+description: "Get up and running with Padel API in just a few minutes"
+---
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- A Padel API account ([sign up here](https://padelapi.org/register))
+- An API token from your [API Tokens](https://padelapi.org/user/api-tokens) page
+
+## Step 1: Get Your API Token
+
+1. Log in to your [Padel API account](https://padelapi.org/login)
+2. Navigate to [API Tokens](https://padelapi.org/user/api-tokens)
+3. Click **Create Token** and give it a descriptive name
+4. Copy your token and store it securely—you won't be able to see it again
+
+<Warning>
+  Keep your API token secret. Never share it publicly or commit it to version control.
+</Warning>
+
+## Step 2: Make Your First Request
+
+Let's fetch the list of available seasons. This is a simple endpoint that returns all padel seasons available in the API.
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET \
+  'https://padelapi.org/api/seasons' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+```javascript JavaScript
+const response = await fetch('https://padelapi.org/api/seasons', {
+  headers: {
+    'Authorization': 'Bearer YOUR_API_TOKEN'
+  }
+});
+
+const seasons = await response.json();
+console.log(seasons);
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    'https://padelapi.org/api/seasons',
+    headers={'Authorization': 'Bearer YOUR_API_TOKEN'}
+)
+
+seasons = response.json()
+print(seasons)
+```
+
+```php PHP
+$ch = curl_init();
+
+curl_setopt($ch, CURLOPT_URL, 'https://padelapi.org/api/seasons');
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_HTTPHEADER, [
+    'Authorization: Bearer YOUR_API_TOKEN'
+]);
+
+$response = curl_exec($ch);
+$seasons = json_decode($response, true);
+
+print_r($seasons);
+```
+
+</CodeGroup>
+
+## Step 3: Explore the Response
+
+A successful response returns a JSON array with season data:
+
+```json
+{
+  "data": [
+    {
+      "id": 5,
+      "self": "/api/seasons/5",
+      "name": "Premier Padel 2026",
+      "tournaments_count": 28,
+      "status": "upcoming",
+      "start_date": "2026-02-09",
+      "end_date": "2026-12-13",
+      "year": 2026,
+      "connections": {
+        "tournaments": "/api/seasons/5/tournaments"
+      }
+    },
+    {
+      "id": 3,
+      "self": "/api/seasons/3",
+      "name": "Padel FIP 2025",
+      "tournaments_count": 40,
+      "status": "finished",
+      "start_date": "2025-02-08",
+      "end_date": "2025-12-14",
+      "year": 2025,
+      "connections": {
+        "tournaments": "/api/seasons/3/tournaments"
+      }
+    }
+  ],
+  "links": {
+    "first": "https://padelapi.org/api/seasons?page=1",
+    "last": "https://padelapi.org/api/seasons?page=1",
+    "prev": null,
+    "next": null
+  },
+  "meta": {
+    "current_page": 1,
+    "last_page": 1,
+    "per_page": 15,
+    "total": 6
+  }
+}
+```
+
+## Step 4: Fetch Player Rankings
+
+Now let's try something more interesting—fetching the current player rankings:
+
+```bash
+curl -X GET \
+  'https://padelapi.org/api/rankings?category=male' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+You can filter rankings by category (`male` or `female`) and paginate results using the `page` and `per_page` parameters.
+
+## Next Steps
+
+You've successfully made your first Padel API calls. Here's what you can explore next:
+
+<CardGroup cols={2}>
+  <Card title="API Reference" icon="book" href="/index">
+    Explore all available endpoints and their parameters
+  </Card>
+  <Card title="Tournament Data" icon="trophy" href="/index#tournaments-coverage">
+    Learn about tournament coverage and data availability
+  </Card>
+</CardGroup>
+
+## Need Help?
+
+If you run into any issues or have questions:
+
+- Check our [API Reference](/index) for detailed endpoint documentation
+- Contact support at [ferran@padelapi.org](mailto:ferran@padelapi.org)
+- Report issues on [GitHub](https://github.com/ferranfg/padelapi.org/issues)
