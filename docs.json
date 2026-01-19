@@ -34,7 +34,7 @@
         "groups": [
           {
             "group": "Overview",
-            "icon": "robot",
+            "icon": "book-open",
             "pages": [
               "padel-analyst/index"
             ]
@@ -45,16 +45,18 @@
         "tab": "Blog",
         "groups": [
           {
-            "group": "Latest Post",
+            "group": "Updates",
             "icon": "newspaper",
             "pages": [
-              "blog/20251022-whats-new-in-padel-api-oct-2025-new-paid-plan-expanded-coverage-and-more"
+              "blog/changelog"
             ]
           },
           {
-            "group": "Archive",
+            "group": "Latest Posts",
             "icon": "archive",
-            "pages": []
+            "pages": [
+              "blog/20251022-whats-new-in-padel-api-oct-2025-new-paid-plan-expanded-coverage-and-more"
+            ]
           }
         ]
       }
@@ -79,8 +81,7 @@
      "copy",
      "view",
      "chatgpt",
-     "claude",
-     "perplexity"
+     "claude"
    ]
   },
   "footer": {
