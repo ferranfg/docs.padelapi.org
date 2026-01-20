@@ -5,94 +5,94 @@ rss: true
 ---
 
 <Update label="January 2026" description="Padel Analyst & Live Improvements">
-  - Fixed timezone bug in live match point-by-point data retrieval
-  - Improved error handling for live endpoint
-  - Added MCP prompts for common Padel API workflows
+  - Fixed timezone bug in [live match](/api-reference/live/get-live-matches) point-by-point data retrieval
+  - Improved error handling for [live endpoint](/api-reference/live/get-live-matches)
+  - Added MCP prompts for common [Padel Analyst](/padel-analyst) workflows
   - Added `cancelled` status support for matches
-  - **Docs:** Added Padel Analyst section with Claude.ai integration guide
-  - **Docs:** Added error codes reference page
-  - **Docs:** Added getting started guide
-  - **Docs:** Added rate limits documentation
+  - **Docs:** Added [Padel Analyst](/padel-analyst) section with [Claude.ai integration guide](/padel-analyst/claude)
+  - **Docs:** Added [error codes](/error-codes) reference page
+  - **Docs:** Added [getting started](/getting-started) guide
+  - **Docs:** Added [rate limits](/getting-started#rate-limits) documentation
 </Update>
 
 <Update label="December 2025" description="2026 Season Preparation">
   - Prepared API for 2026 Premier Padel season
   - Added `per_page` parameter to list endpoints
-  - Added new MCP tool parameters
+  - Added new [MCP tool](/padel-analyst) parameters
   - Filtered private tournaments from public responses
 </Update>
 
 <Update label="November 2025" description="Pairs & Statistics Endpoints">
-  - **New:** Pairs endpoint (`/pairs`) with full pair information
-  - **New:** Pair statistics endpoint with match history
-  - **New:** Player statistics resource (`/players/{id}/stats`)
-  - Added date filters for matches endpoint
+  - **New:** [Pairs endpoint](/api-reference/pairs/get-pairs) with full pair information
+  - **New:** [Pair statistics endpoint](/api-reference/pairs/get-pair-stats) with match history
+  - **New:** [Player statistics resource](/api-reference/players/get-player-stats)
+  - Added date filters for [matches endpoint](/api-reference/matches/get-matches)
   - Added filters to pair endpoints (matches, statistics)
   - Added FIP Gold and FIP Silver tournament levels
-  - Added Fantasy integration to Season API
-  - Improved error responses: 422 for unsupported tournament levels
+  - Added Fantasy integration to [Season API](/api-reference/seasons/get-seasons)
+  - Improved [error responses](/error-codes): 422 for unsupported tournament levels
 </Update>
 
 <Update label="October 2025" description="CSV Export & Match Enhancements">
   - **New:** CSV export feature (PRO plan)
-  - **New:** Match head-to-head endpoint (`/matches/{id}/h2h`)
+  - **New:** [Match head-to-head endpoint](/api-reference/matches/get-match-h2h)
   - **New:** Previous and next match relations
   - **New:** Match video relation
   - Added `language` parameter to news endpoint
-  - Added `round_name` field to match response
-  - Added `court` parameter to matches list
+  - Added `round_name` field to [match response](/api-reference/matches/get-match)
+  - Added `court` parameter to [matches list](/api-reference/matches/get-matches)
   - Added player and tournament links/URLs
   - Improved tournament error handling
   - Renamed court order fields for consistency
 </Update>
 
 <Update label="September 2025" description="Match Status & Videos">
-  - **New:** Tournament videos endpoint
+  - **New:** [Tournament videos endpoint](/api-reference/tournaments/get-tournament-videos)
   - Added `retired` status for incomplete matches
   - Improved match duration calculation
 </Update>
 
 <Update label="August 2025" description="Player Search Improvements">
-  - Fixed point-by-point live scores
-  - Added additional player search parameters
-  - Added more sorting options for players endpoint
+  - Fixed [point-by-point](/api-reference/live/get-live-matches) live scores
+  - Added additional [player search](/api-reference/players/get-players) parameters
+  - Added more sorting options for [players endpoint](/api-reference/players/get-players)
 </Update>
 
 <Update label="July 2025" description="Live Scores Enhancement">
-  - Added `winner` attribute to match response
-  - Added `channel` information to live resource
+  - Added `winner` attribute to [match response](/api-reference/matches/get-match)
+  - Added `channel` information to [live resource](/api-reference/live/get-live-matches)
   - Improved score format to include tie-break details
 </Update>
 
 <Update label="June 2025" description="Match Simulator & Elo History">
-  - **New:** Match simulator endpoint (`POST /matches/simulate`)
-  - **New:** Elo history endpoint for players
+  - **New:** [Match simulator endpoint](/api-reference/matches/simulate-match) (`POST /matches/simulate`)
+  - **New:** [Elo history endpoint](/api-reference/players/get-player-elo) for players
   - **New:** Match category filter
   - Added match index to API response
-  - Updated MCP integration to version 1.1
+  - Updated [MCP integration](/padel-analyst) to version 1.1
   - Added configurable tournament level support
 </Update>
 
 <Update label="May 2025" description="MCP Tools & Related Matches">
-  - **New:** Related matches endpoint (`/matches/{id}/related`)
-  - **New:** Head-to-head (H2H) endpoint
-  - **New:** MCP tools for Claude Desktop integration
-  - Added player search by name with unaccent support
-  - Added tournament search by name
+  - **New:** [Related matches endpoint](/api-reference/matches/get-match-related)
+  - **New:** [Head-to-head (H2H) endpoint](/api-reference/matches/get-match-h2h)
+  - **New:** [MCP tools](/padel-analyst) for Claude Desktop integration
+  - Added [player search](/api-reference/players/get-players) by name with unaccent support
+  - Added [tournament search](/api-reference/tournaments/get-tournaments) by name
   - Added match sorting and ordering parameters
-  - Added `page` parameter to player matches
+  - Added `page` parameter to [player matches](/api-reference/players/get-player-matches)
   - Moved players data to subproperty in match response
 </Update>
 
 <Update label="April 2025" description="Live Scores Launch">
-  - **New:** Live scores endpoint (`/live`)
+  - **New:** [Live scores endpoint](/api-reference/live/get-live-matches)
   - **New:** Point-by-point match details
   - Real-time match data with 4-second cache
   - API request logging infrastructure
 </Update>
 
 <Update label="March 2025" description="Match Statistics">
-  - **New:** Match statistics resource (`/matches/{id}/stats`)
+  - **New:** [Match statistics resource](/api-reference/matches/get-match-stats)
   - Added statistics translations
   - Added match name field
   - Improved tournament name formatting
