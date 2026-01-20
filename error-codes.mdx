@@ -117,14 +117,9 @@ The requested resource does not exist. This can happen when:
 }
 ```
 
-### 429 - Rate Limit Exceeded
+### 429 - Too Many Requests
 
-You have exceeded the rate limit of 60 requests per minute.
-
-**How to handle:**
-1. Implement request throttling in your application
-2. Wait before retrying (check the `Retry-After` header if provided)
-3. Consider caching responses to reduce API calls
+You have exceeded the API rate limit.
 
 ```json
 {
@@ -132,9 +127,12 @@ You have exceeded the rate limit of 60 requests per minute.
 }
 ```
 
-<Tip>
-  Use caching strategies to minimize repeated requests for the same data.
-</Tip>
+**How to handle:**
+1. Wait until the next minute before retrying
+2. Monitor the `X-RateLimit-Remaining` header to avoid hitting the limit
+3. Implement request throttling in your application
+
+See [Rate Limits](/#rate-limits) for details on limits and available headers.
 
 ### 422 - Unprocessable Entity
 
