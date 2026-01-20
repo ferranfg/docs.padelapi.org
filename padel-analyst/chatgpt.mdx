@@ -1,0 +1,126 @@
+---
+title: "Install in ChatGPT"
+description: "Step-by-step guide to connect Padel Analyst to ChatGPT using Developer mode"
+---
+
+This guide shows you how to install Padel Analyst in [ChatGPT](https://chatgpt.com), allowing you to query professional padel data directly in your conversations.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+<CardGroup cols={2}>
+  <Card title="ChatGPT Plus/Pro Account" icon="user">
+    MCP connectors require a ChatGPT Plus or Pro subscription
+  </Card>
+  <Card title="Padel API Token" icon="key">
+    Get your token from the [API Tokens](https://padelapi.org/user/api-tokens) page
+  </Card>
+</CardGroup>
+
+## Installation Steps
+
+<Steps>
+  <Step title="Open ChatGPT Settings">
+    Click on your profile icon in the bottom-left corner of ChatGPT and select **Settings** from the menu.
+
+    <Frame>
+      <img src="/images/chatgpt/chatgpt-step-1.webp" alt="ChatGPT settings menu" />
+    </Frame>
+  </Step>
+
+  <Step title="Navigate to Apps">
+    In the Settings panel, click on **Apps** in the left sidebar. Then click on **Advanced settings**.
+
+    <Frame>
+      <img src="/images/chatgpt/chatgpt-step-2.webp" alt="Apps settings page" />
+    </Frame>
+  </Step>
+
+  <Step title="Enable Developer Mode">
+    Toggle **Developer mode** to enable it. This allows you to add custom MCP servers to ChatGPT.
+
+    Then click the **Create app** button in the top-right corner.
+
+    <Frame>
+      <img src="/images/chatgpt/chatgpt-step-3.webp" alt="Developer mode toggle" />
+    </Frame>
+  </Step>
+
+  <Step title="Add Padel Analyst">
+    In the "New App" dialog, enter the following details:
+
+    | Field | Value |
+    |-------|-------|
+    | **Name** | `Padel Analyst` |
+    | **MCP Server URL** | `https://padelapi.org/mcp?token=YOUR_API_TOKEN` |
+    | **Authentication** | `No Auth` |
+
+    Replace `YOUR_API_TOKEN` with your actual API token from the [API Tokens page](https://padelapi.org/user/api-tokens).
+
+    Check the box **"I understand and want to continue"** to acknowledge the warning about custom MCP servers.
+
+    Click **Save** to add the connector.
+
+    <Frame>
+      <img src="/images/chatgpt/chatgpt-step-4.webp" alt="New App configuration dialog" />
+    </Frame>
+  </Step>
+
+  <Step title="Start Using Padel Analyst">
+    In any chat, click the **+** button next to the message input. Navigate to **More** and select **Padel Analyst** from the list.
+
+    <Frame>
+      <img src="/images/chatgpt/chatgpt-step-5.webp" alt="Enable Padel Analyst in chat" />
+    </Frame>
+  </Step>
+</Steps>
+
+## Using Padel Analyst
+
+Once enabled, you can ask ChatGPT questions about professional padel. ChatGPT will automatically use Padel Analyst tools to fetch the data.
+
+### Example Response
+
+Here's an example of ChatGPT fetching match data using Padel Analyst:
+
+<Frame>
+  <img src="/images/chatgpt/chatgpt-step-6.webp" alt="Example match query response" />
+</Frame>
+
+You can expand the "Called tool" section to see the exact request and response from the Padel API.
+
+## Example Questions
+
+Try asking ChatGPT questions like:
+
+- "Who won the last Premier Padel Major?"
+- "Show me the head-to-head between Lebron/Galan and Coello/Tapia"
+- "What are Arturo Coello's statistics this season?"
+- "List all P1 tournaments in 2025"
+- "Simulate a match between the top two ranked pairs"
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Developer mode not available">
+    Make sure you have a ChatGPT Plus or Pro subscription. Free accounts don't have access to Developer mode.
+  </Accordion>
+  <Accordion title="Authentication errors">
+    Verify that your API token is correct and included in the MCP Server URL. The token should be passed as a query parameter: `?token=YOUR_API_TOKEN`
+  </Accordion>
+  <Accordion title="Padel Analyst not appearing in menu">
+    Make sure Developer mode is enabled and that you saved the app correctly. Try refreshing the page.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Available Tools" icon="wrench" href="/padel-analyst/index#available-tools">
+    See all 12 tools available for querying padel data
+  </Card>
+  <Card title="Example Queries" icon="magnifying-glass" href="/padel-analyst/index#example-queries">
+    Explore more example questions to ask
+  </Card>
+</CardGroup>

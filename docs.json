@@ -43,6 +43,7 @@
             "group": "Installation",
             "icon": "download",
             "pages": [
+              "padel-analyst/chatgpt",
               "padel-analyst/claude"
             ]
           }
