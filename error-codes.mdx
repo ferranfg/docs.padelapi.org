@@ -117,23 +117,6 @@ The requested resource does not exist. This can happen when:
 }
 ```
 
-### 429 - Too Many Requests
-
-You have exceeded the API rate limit.
-
-```json
-{
-  "message": "Too Many Attempts."
-}
-```
-
-**How to handle:**
-1. Wait until the next minute before retrying
-2. Monitor the `X-RateLimit-Remaining` header to avoid hitting the limit
-3. Implement request throttling in your application
-
-See [Rate Limits](/#rate-limits) for details on limits and available headers.
-
 ### 422 - Unprocessable Entity
 
 The request parameters failed validation. The response includes details about which parameters are invalid.
@@ -154,6 +137,23 @@ The request parameters failed validation. The response includes details about wh
   }
 }
 ```
+
+### 429 - Too Many Requests
+
+You have exceeded the API rate limit.
+
+```json
+{
+  "message": "Too Many Attempts."
+}
+```
+
+**How to handle:**
+1. Wait until the next minute before retrying
+2. Monitor the `X-RateLimit-Remaining` header to avoid hitting the limit
+3. Implement request throttling in your application
+
+See [Rate Limits](/#rate-limits) for details on limits and available headers.
 
 ---
 
