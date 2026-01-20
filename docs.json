@@ -43,18 +43,18 @@
         ]
       },
       {
-        "tab": "Blog",
+        "tab": "What's New",
         "groups": [
           {
-            "group": "Updates",
-            "icon": "newspaper",
+            "group": "Changelog",
+            "icon": "clock-rotate-left",
             "pages": [
               "blog/changelog"
             ]
           },
           {
-            "group": "Latest Posts",
-            "icon": "archive",
+            "group": "News",
+            "icon": "newspaper",
             "pages": [
               "blog/20251022-whats-new-in-padel-api-oct-2025-new-paid-plan-expanded-coverage-and-more"
             ]
