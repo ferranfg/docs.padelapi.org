@@ -74,6 +74,27 @@ By default, the **Padel API** only returns the first 15 results for those endpoi
 | `per_page` | Number of results to return per page (default: 15, min: 1, max: 50) |
 | `page`     | Page number to retrieve                                             |
 
+## Rate Limits
+
+The **Padel API** limits the number of requests you can make to protect the service and ensure fair usage for all users.
+
+| Limit              | Value            |
+|--------------------|------------------|
+| Requests per minute | 60              |
+
+When you exceed the rate limit, the API returns a [`429 Too Many Requests`](/error-codes#429-too-many-requests) error. Wait until the next minute before making additional requests.
+
+The API includes the following headers in responses to help you track your usage:
+
+| Header                  | Description                                      |
+|-------------------------|--------------------------------------------------|
+| `X-RateLimit-Limit`     | Maximum number of requests allowed per minute    |
+| `X-RateLimit-Remaining` | Number of requests remaining in the current window |
+
+<Tip>
+  Use caching strategies and monitor `X-RateLimit-Remaining` to avoid hitting the limit.
+</Tip>
+
 ## Status Codes
 
 The **Padel API** uses conventional [HTTP response codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) to indicate whether a request was successful (`2XX` codes) or resulted in an error (`4XX` and `5XX` codes).
