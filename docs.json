@@ -36,7 +36,13 @@
             "group": "Overview",
             "icon": "book-open",
             "pages": [
-              "padel-analyst/index",
+              "padel-analyst/index"
+            ]
+          },
+          {
+            "group": "Installation",
+            "icon": "download",
+            "pages": [
               "padel-analyst/claude"
             ]
           }
