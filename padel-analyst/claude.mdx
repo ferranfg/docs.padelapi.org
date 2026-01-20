@@ -1,0 +1,127 @@
+---
+title: "Install in Claude"
+description: "Step-by-step guide to connect Padel Analyst to Claude.ai using the Connectors feature"
+---
+
+This guide shows you how to install Padel Analyst as a connector in [Claude.ai](https://claude.ai), allowing you to query professional padel data directly in your conversations.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+<CardGroup cols={2}>
+  <Card title="Claude Pro/Team Account" icon="user">
+    Connectors require a Claude Pro or Team subscription
+  </Card>
+  <Card title="Padel API Token" icon="key">
+    Get your token from the [API Tokens](https://padelapi.org/user/api-tokens) page
+  </Card>
+</CardGroup>
+
+## Installation Steps
+
+<Steps>
+  <Step title="Open Claude Settings">
+    Click on your profile icon in the bottom-left corner of Claude and select **Settings** from the menu.
+
+    <Frame>
+      <img src="/images/claude/claude-step-1.webp" alt="Claude settings menu" />
+    </Frame>
+  </Step>
+
+  <Step title="Navigate to Connectors">
+    In the Settings panel, click on **Connectors** in the left sidebar. Then click the **Add custom connector** button.
+
+    <Frame>
+      <img src="/images/claude/claude-step-2.webp" alt="Connectors settings page" />
+    </Frame>
+  </Step>
+
+  <Step title="Add Padel Analyst">
+    In the "Add custom connector" dialog, enter the following details:
+
+    | Field | Value |
+    |-------|-------|
+    | **Name** | `Padel Analyst` |
+    | **URL** | `https://padelapi.org/mcp?token=YOUR_API_TOKEN` |
+
+    Replace `YOUR_API_TOKEN` with your actual API token from the [API Tokens page](https://padelapi.org/user/api-tokens).
+
+    Click **Add** to save the connector.
+
+    <Frame>
+      <img src="/images/claude/claude-step-3.webp" alt="Add custom connector dialog" />
+    </Frame>
+  </Step>
+
+  <Step title="Configure Permissions (Optional)">
+    After adding the connector, you can configure tool permissions. Click on **Padel Analyst** in your connectors list to see all available tools.
+
+    Select **Always allow** from the dropdown to skip permission prompts for each tool, or leave the default settings to approve tools individually.
+
+    <Frame>
+      <img src="/images/claude/claude-optional-4.webp" alt="Tool permissions configuration" />
+    </Frame>
+  </Step>
+
+  <Step title="Start Using Padel Analyst">
+    In any chat, click the **+** button and hover over **Add from Padel Analyst** to enable the connector. Make sure the **Padel Analyst** toggle is turned on.
+
+    <Frame>
+      <img src="/images/claude/claude-step-5.webp" alt="Enable Padel Analyst in chat" />
+    </Frame>
+  </Step>
+</Steps>
+
+## Using Padel Analyst
+
+Once installed, you can ask Claude questions about professional padel. When Claude needs to fetch data, you'll see a permission request (unless you enabled "Always allow").
+
+<Frame>
+  <img src="/images/claude/claude-optional-6.webp" alt="Permission request for Padel Analyst" />
+</Frame>
+
+Click **Allow once** or **Always allow** to let Claude access the padel data.
+
+### Example Response
+
+Here's an example of Claude analyzing a match using Padel Analyst:
+
+<Frame>
+  <img src="/images/claude/claude-finish-7.webp" alt="Example match analysis response" />
+</Frame>
+
+## Example Questions
+
+Try asking Claude questions like:
+
+- "Who won the last Premier Padel Major?"
+- "Show me the head-to-head between Lebron/Galan and Coello/Tapia"
+- "What are Arturo Coello's statistics this season?"
+- "List all P1 tournaments in 2025"
+- "Simulate a match between the top two ranked pairs"
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Connector not appearing">
+    Make sure you have a Claude Pro or Team subscription. Free accounts don't have access to custom connectors.
+  </Accordion>
+  <Accordion title="Authentication errors">
+    Verify that your API token is correct and that you have an active Analyst plan subscription.
+  </Accordion>
+  <Accordion title="Tools not working">
+    Check that the connector is enabled in your chat (the toggle should be on). Also verify your token hasn't expired.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Available Tools" icon="wrench" href="/padel-analyst/index#available-tools">
+    See all 12 tools available for querying padel data
+  </Card>
+  <Card title="Example Queries" icon="magnifying-glass" href="/padel-analyst/index#example-queries">
+    Explore more example questions to ask
+  </Card>
+</CardGroup>
