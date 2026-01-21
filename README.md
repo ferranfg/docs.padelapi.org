@@ -1,6 +1,6 @@
 ---
 title: "About the Padel API"
-description: "Learn how to access, authenticate with, and use the [Padel API](https://padelapi.org)"
+description: "Discover how to access and use the Padel API for professional padel data. Learn about authentication, coverage, rate limits, and supported tournaments."
 ---
 
 ## Roadmap & Issues
