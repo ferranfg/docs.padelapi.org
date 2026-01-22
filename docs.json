@@ -18,8 +18,7 @@
             "icon": "book-open",
             "pages": [
               "index",
-              "error-codes",
-              "getting-started"
+              "error-codes"
             ]
           },
           {
@@ -45,6 +44,19 @@
             "pages": [
               "padel-analyst/chatgpt",
               "padel-analyst/claude"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Guides",
+        "groups": [
+          {
+            "group": "Guides",
+            "icon": "book-open",
+            "pages": [
+              "guides/your-first-api-call",
+              "guides/use-cases-showcase"
             ]
           }
         ]
