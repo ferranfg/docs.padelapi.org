@@ -56,7 +56,8 @@
             "icon": "book-open",
             "pages": [
               "guides/your-first-api-call",
-              "guides/use-cases-showcase"
+              "guides/use-cases-showcase",
+              "guides/consulting"
             ]
           }
         ]
