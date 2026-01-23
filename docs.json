@@ -109,7 +109,22 @@
     "socials": {
       "github": "https://github.com/ferranfg/padelapi.org",
       "website": "https://padelapi.org"
-    }
+    },
+    "links": [
+      {
+        "header": "Legal",
+        "items": [
+          {
+            "label": "Privacy Policy",
+            "href": "https://padelapi.org/privacy-policy"
+          },
+          {
+            "label": "Terms of Service",
+            "href": "https://padelapi.org/terms-of-service"
+          }
+        ]
+      }
+    ]
   },
   "description": "First-ever API for professional padel data. Get access to the latest padel player stats, rankings, and more.",
   "appearance": {
