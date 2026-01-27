@@ -7,7 +7,7 @@ description: "Discover how to access and use the Padel API for professional pade
 
 ❇️ View the official [Padel API public roadmap](https://github.com/users/ferranfg/projects/2).
 
-Our product roadmap is where you can learn about what features we're working on, what stage they're in, and when we expect to bring them to you. Have any questions or comments about items on the roadmap? Share your feedback via [Padel API public issues](https://github.com/ferranfg/padelapi.org/issues).
+Our product roadmap is where you can learn about what features we're working on, what stage they're in, and when we expect to bring them to you. Have any questions or comments about items on the roadmap? Share your feedback via [Padel API public issues](https://github.com/ferranfg/docs.padelapi.org/issues).
 
 ## Tournaments Coverage
 
@@ -21,7 +21,7 @@ Feature availability varies by tournament level. Refer to the tables below for t
 
 Lower-tier events (such as FIP Rise, FIP Promises, national or exhibition events, and qualifiers) may have incomplete or inconsistent data at the source, so we cannot guarantee the same quality.
 
-![Padel API](https://raw.githubusercontent.com/ferranfg/padelapi.org/refs/heads/master/images/padelapi-padelfip-2.jpeg)
+![Padel API](https://raw.githubusercontent.com/ferranfg/docs.padelapi.org/refs/heads/master/images/padelapi-padelfip-2.jpeg)
 
 | Level           | Score | Stats   | Point by point |
 |-----------------|-------|---------|----------------|
