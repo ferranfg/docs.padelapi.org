@@ -89,6 +89,28 @@ Follow our [step-by-step installation guide](/padel-analyst/chatgpt) to add Pade
 
 Follow our [step-by-step installation guide](/padel-analyst/claude) to add Padel Analyst as a connector in Claude.ai. This is the easiest way to get started - no configuration files needed.
 
+### Cursor
+
+Click the button below to install the Padel API MCP server in Cursor:
+
+[![Install in Cursor](https://img.shields.io/badge/Cursor-Install_Server-000000?style=flat-square&logo=cursor&logoColor=white)](cursor://anysphere.cursor-deeplink/mcp/install?name=Padel%20API&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vcGFkZWxhcGkub3JnL21jcCJ9)
+
+Or manually add the following to your Cursor MCP settings (`~/.cursor/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "padel-api": {
+      "type": "http",
+      "url": "https://padelapi.org/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_TOKEN"
+      }
+    }
+  }
+}
+```
+
 ### VS Code / GitHub Copilot
 
 Click the button below to install the Padel API MCP server in VS Code:
@@ -112,6 +134,26 @@ Or manually add the following to your VS Code `settings.json`:
   }
 }
 ```
+
+### Windsurf
+
+Add the following to your Windsurf MCP configuration file (`~/.codeium/windsurf/mcp_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "padel-api": {
+      "type": "http",
+      "url": "https://padelapi.org/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_TOKEN"
+      }
+    }
+  }
+}
+```
+
+You can also install via the MCP Marketplace: open Windsurf Settings → Cascade → MCP Servers, and search for "Padel API".
 
 ### Claude Desktop
 
