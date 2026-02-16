@@ -128,11 +128,11 @@ Now let's try something more interesting. Fetching the current player rankings:
 
 ```bash
 curl -X GET \
-  'https://padelapi.org/api/rankings?category=male' \
+  'https://padelapi.org/api/players?category=men&sort_by=ranking&order_by=asc' \
   -H 'Authorization: Bearer YOUR_API_TOKEN'
 ```
 
-You can filter rankings by category (`male` or `female`) and paginate results using the `page` and `per_page` parameters.
+You can filter players by category (`men` or `women`) and paginate results using the `page` and `per_page` parameters.
 
 ## Next Steps
 

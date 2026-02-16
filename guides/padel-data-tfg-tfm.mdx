@@ -136,7 +136,11 @@ BASE_URL = "https://padelapi.org/api"
 headers = {"Authorization": f"Bearer {API_TOKEN}"}
 
 # Obtener rankings masculinos
-response = requests.get(f"{BASE_URL}/rankings", params={"category": "male"}, headers=headers)
+response = requests.get(
+    f"{BASE_URL}/players",
+    params={"category": "men", "sort_by": "ranking", "order_by": "asc", "per_page": 50},
+    headers=headers
+)
 data = response.json()
 
 # Convertir a DataFrame
