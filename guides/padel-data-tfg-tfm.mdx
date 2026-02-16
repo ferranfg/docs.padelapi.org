@@ -1,0 +1,242 @@
+---
+title: "Datos de Pádel para tu TFG/TFM"
+description: "Guía en español para estudiantes universitarios que buscan datos deportivos para su Trabajo Final de Grado o Máster. Aprende a usar Padel API como fuente de datos para proyectos de Data Science, Machine Learning e Inteligencia Artificial."
+---
+
+<Info>
+  Esta guía está escrita en español para estudiantes de universidades hispanohablantes. El resto de la documentación de Padel API está disponible en inglés.
+</Info>
+
+## ¿Por qué datos de pádel para tu proyecto?
+
+Si estás buscando un dataset deportivo para tu TFG o TFM, probablemente ya has visto que todo el mundo hace proyectos con datos de fútbol. Los datasets de La Liga, Premier League o Champions están explotados — hay cientos de trabajos académicos prediciéndolos con las mismas técnicas y los mismos datos.
+
+El pádel profesional te ofrece algo distinto:
+
+- **Originalidad.** No hay prácticamente datasets públicos de pádel. Tu trabajo será uno de los primeros en explotar estos datos, algo que un tribunal valora.
+- **Datos limpios y accesibles.** Padel API te da acceso estructurado vía REST API. Sin web scraping, sin limpiar HTMLs, sin que se rompa el scraper a mitad de proyecto.
+- **Scope acotado.** El circuito profesional tiene un volumen de datos manejable para un TFG/TFM — suficiente para análisis significativos sin necesitar infraestructura de Big Data.
+- **Deporte de dobles.** El pádel se juega en parejas, lo que añade una dimensión analítica que no existe en tenis: cambios de pareja, compatibilidad entre jugadores, dinámicas de equipo.
+- **Deporte en crecimiento.** El pádel es el deporte de raqueta con mayor crecimiento global. Contextualizar tu trabajo en un deporte con relevancia actual refuerza la motivación del proyecto.
+
+---
+
+## Qué datos ofrece Padel API
+
+Padel API cubre el circuito profesional: **Premier Padel** (Major, P1, P2, Finals) y **World Padel Tour** (temporada 2023). Estos son los tipos de datos disponibles:
+
+<CardGroup cols={2}>
+  <Card title="Jugadores" icon="user">
+    Perfiles completos: nombre, nacionalidad, fecha de nacimiento, posición de juego (drive/revés), mano dominante y foto.
+  </Card>
+  <Card title="Rankings" icon="ranking-star">
+    Rankings oficiales actualizados con posición, puntos y categoría (masculino/femenino). Histórico por temporada.
+  </Card>
+  <Card title="Torneos" icon="trophy">
+    Todos los torneos del circuito con fechas, nivel, ubicación y cuadros completos.
+  </Card>
+  <Card title="Partidos" icon="table-tennis-paddle-ball">
+    Resultados de partidos con marcador, ronda, parejas y fecha. Incluye cuadros completos de cada torneo.
+  </Card>
+  <Card title="Estadísticas" icon="chart-bar">
+    Estadísticas detalladas de partido: puntos ganados, winners, errores no forzados, break points, aces y más.
+  </Card>
+  <Card title="Punto a punto" icon="timeline">
+    Secuencia completa de puntos de cada partido disponible para torneos Major, P1, P2 y Finals.
+  </Card>
+</CardGroup>
+
+<Tip>
+  Consulta la [referencia completa de la API](/index) para ver todos los endpoints, parámetros y formatos de respuesta disponibles.
+</Tip>
+
+---
+
+## Ideas de proyecto
+
+Estas son ideas concretas de proyectos que puedes desarrollar con datos de Padel API, organizadas por tipo de técnica.
+
+### Predicción y clasificación
+
+| Proyecto | Técnicas | Datos necesarios |
+|---|---|---|
+| Predecir el ganador de un partido | Logistic Regression, Random Forest, XGBoost, Neural Networks | Rankings, head-to-head, estadísticas de partidos |
+| Predecir el número de sets de un partido | Regresión ordinal, clasificación multiclase | Marcadores históricos, nivel de torneo, rankings |
+| Clasificar partidos por competitividad | SVM, Decision Trees | Estadísticas de partido, marcadores punto a punto |
+
+### Sistemas de rating
+
+| Proyecto | Técnicas | Datos necesarios |
+|---|---|---|
+| Sistema ELO para parejas de pádel | Algoritmo ELO adaptado a dobles | Resultados de partidos, parejas |
+| Comparar ELO propio vs ranking oficial | Análisis de correlación, métricas de evaluación | Rankings, resultados históricos |
+| TrueSkill para pádel (rating bayesiano) | Inferencia bayesiana, TrueSkill | Resultados de partidos |
+
+<Tip>
+  El **sistema ELO para dobles** es especialmente interesante como TFG porque adaptar ELO de un deporte individual (ajedrez) a un deporte de parejas con cambios frecuentes de compañero es un problema no trivial. Requiere decidir cómo repartir el rating entre los dos jugadores de una pareja, lo que da pie a comparar múltiples enfoques.
+</Tip>
+
+### Aprendizaje no supervisado
+
+| Proyecto | Técnicas | Datos necesarios |
+|---|---|---|
+| Clustering de jugadores por estilo de juego | K-Means, DBSCAN, Hierarchical Clustering | Estadísticas de partidos, posición de juego |
+| Detección de anomalías en rendimiento | Isolation Forest, DBSCAN | Series temporales de estadísticas |
+| Segmentación de torneos por competitividad | K-Means, PCA | Estadísticas agregadas por torneo |
+
+### Series temporales y regresión
+
+| Proyecto | Técnicas | Datos necesarios |
+|---|---|---|
+| Predecir la evolución del ranking de un jugador | ARIMA, Prophet, LSTM | Rankings históricos por temporada |
+| Análisis del efecto "home advantage" | Regresión, tests estadísticos | Resultados de partidos, nacionalidad, ubicación del torneo |
+| Impacto de la densidad de torneos en el rendimiento | Regresión, análisis de correlación | Calendario de torneos, estadísticas de partido |
+
+### Análisis de redes y grafos
+
+| Proyecto | Técnicas | Datos necesarios |
+|---|---|---|
+| Red de cambios de pareja en el circuito | Network Analysis, Community Detection | Parejas por torneo |
+| Influencia de la pareja en el rendimiento | Graph metrics, regresión | Resultados, parejas, estadísticas |
+
+<Note>
+  El análisis de **redes de parejas** es un proyecto muy original y específico del pádel. No existe equivalente en tenis u otros deportes individuales, y los cambios frecuentes de pareja en el circuito profesional generan grafos interesantes para analizar.
+</Note>
+
+### Visualización y dashboards
+
+| Proyecto | Técnicas | Datos necesarios |
+|---|---|---|
+| Dashboard interactivo del circuito profesional | Streamlit, Plotly Dash, Power BI | Cualquier combinación de endpoints |
+| Visualización de trayectorias de jugadores | D3.js, Matplotlib, Plotly | Rankings, resultados, torneos |
+
+---
+
+## Cómo empezar con Python
+
+### 1. Crea tu cuenta y obtén un API token
+
+1. Regístrate en [padelapi.org/register](https://padelapi.org/register)
+2. Ve a [API Tokens](https://padelapi.org/user/api-tokens) y crea un token
+3. Guarda el token — no podrás verlo de nuevo
+
+<Warning>
+  No subas tu token a GitHub ni lo incluyas directamente en el código de tu TFG. Usa variables de entorno o un archivo `.env` que esté en tu `.gitignore`.
+</Warning>
+
+### 2. Tu primera llamada a la API
+
+```python
+import requests
+import pandas as pd
+
+API_TOKEN = "tu_token_aquí"
+BASE_URL = "https://padelapi.org/api"
+
+headers = {"Authorization": f"Bearer {API_TOKEN}"}
+
+# Obtener rankings masculinos
+response = requests.get(f"{BASE_URL}/rankings", params={"category": "male"}, headers=headers)
+data = response.json()
+
+# Convertir a DataFrame
+df = pd.DataFrame(data["data"])
+print(df.head())
+```
+
+### 3. Recopilar datos con paginación
+
+La API devuelve resultados paginados (15 por defecto, máximo 50). Para obtener todos los resultados necesitas recorrer las páginas:
+
+```python
+def get_all_pages(endpoint, params={}):
+    """Obtiene todos los resultados de un endpoint paginado."""
+    all_data = []
+    page = 1
+
+    while True:
+        response = requests.get(
+            f"{BASE_URL}/{endpoint}",
+            params={**params, "page": page, "per_page": 50},
+            headers=headers
+        )
+        result = response.json()
+        all_data.extend(result["data"])
+
+        if page >= result["meta"]["last_page"]:
+            break
+        page += 1
+
+    return pd.DataFrame(all_data)
+
+# Ejemplo: obtener todos los torneos de una temporada
+tournaments = get_all_pages("seasons/3/tournaments")
+print(f"Total torneos: {len(tournaments)}")
+```
+
+### 4. Exportar a CSV
+
+```python
+# Guardar para uso offline (no necesitas llamar a la API cada vez)
+tournaments.to_csv("data/tournaments.csv", index=False)
+
+# Cargar desde CSV
+tournaments = pd.read_csv("data/tournaments.csv")
+```
+
+<Tip>
+  Descarga los datos una vez y trabaja con los CSV localmente. Así no dependes de la conexión a internet, no consumes tu cuota de requests innecesariamente y garantizas la reproducibilidad de tu análisis.
+</Tip>
+
+---
+
+## Cómo incluir Padel API en tu TFG/TFM
+
+### Sección de metodología
+
+Tu TFG/TFM necesita explicar cómo has obtenido los datos. Aquí tienes una plantilla que puedes adaptar:
+
+> Los datos utilizados en este trabajo se han obtenido a través de **Padel API** (https://padelapi.org), una API REST que proporciona acceso estructurado a datos del circuito profesional de pádel, incluyendo torneos Premier Padel y World Padel Tour. Los datos incluyen [rankings de jugadores / resultados de partidos / estadísticas detalladas / ...] correspondientes a las temporadas [2023-2026].
+>
+> La recopilación de datos se realizó mediante peticiones HTTP autenticadas a los endpoints de la API, procesando las respuestas en formato JSON con la librería `pandas` de Python. Se recopilaron un total de [N] registros de [partidos / jugadores / torneos / ...].
+>
+> Los datos fueron almacenados localmente en formato CSV para garantizar la reproducibilidad del análisis, de acuerdo con las condiciones de uso de la API.
+
+### Cómo citar Padel API
+
+**Formato APA:**
+```
+Padel API. (2026). Padel API: Professional padel data API [API REST].
+https://padelapi.org
+```
+
+**Formato IEEE:**
+```
+Padel API, "Padel API: Professional padel data API," 2026.
+[Online]. Available: https://padelapi.org
+```
+
+---
+
+## Planes y precios
+
+Padel API ofrece un plan gratuito que incluye acceso a jugadores, rankings y torneos — suficiente para muchos proyectos académicos. Para acceder a estadísticas detalladas de partidos y datos punto a punto, necesitarás un plan de pago.
+
+Consulta los [planes disponibles en padelapi.org](https://padelapi.org/pricing).
+
+<Info>
+  Si eres estudiante y necesitas acceso a datos avanzados para tu TFG/TFM, contacta en **ferran@padelapi.org** indicando tu universidad y una breve descripción de tu proyecto.
+</Info>
+
+---
+
+## Siguientes pasos
+
+<CardGroup cols={2}>
+  <Card title="Tu primera llamada a la API" icon="code" href="/guides/your-first-api-call">
+    Guía paso a paso para autenticarte y hacer tu primera petición
+  </Card>
+  <Card title="Referencia de la API" icon="book" href="/index">
+    Documentación completa de todos los endpoints disponibles
+  </Card>
+</CardGroup>
