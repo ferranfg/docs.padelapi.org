@@ -57,9 +57,9 @@
             "pages": [
               "guides/your-first-api-call",
               "guides/padel-statistics",
-              "guides/use-cases-showcase",
               "guides/best-padel-player",
               "guides/padel-data-tfg-tfm",
+              "guides/use-cases-showcase",
               "guides/padel-fan-index",
               "guides/consulting"
             ]
