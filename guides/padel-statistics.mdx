@@ -1,0 +1,316 @@
+---
+title: "Padel Statistics API"
+seo:
+  title: "Padel Statistics API - Match, Player & Pair Stats"
+  description: "Access professional padel statistics through the Padel API. Match stats (serve %, break points, streaks), player career stats, and pair performance data."
+description: "Three levels of statistics to analyze professional padel: match-level, player career, and pair performance."
+---
+
+Professional padel generates detailed statistics for every match. The Padel API organizes this data at three levels: **match**, **player**, and **pair**. Each level answers different questions.
+
+<CardGroup cols={3}>
+  <Card title="Match Stats" icon="chart-bar">
+    Point-by-point breakdown: serve %, break points, streaks, set-by-set data.
+  </Card>
+  <Card title="Player Stats" icon="user">
+    Career aggregates: win rate, titles, finals, best round.
+  </Card>
+  <Card title="Pair Stats" icon="people-group">
+    Combined performance: how a specific duo performs together.
+  </Card>
+</CardGroup>
+
+---
+
+## Match statistics
+
+The most granular level. Every match with available data includes stats for both teams, broken down by set.
+
+```bash
+curl -X GET \
+  'https://padelapi.org/api/matches/{match_id}/stats' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+A match stats response includes overall totals plus per-set breakdowns:
+
+```json
+{
+  "id": 1216,
+  "match": {
+    "total_points_won": { "team_1": "50%", "team_2": "50%" },
+    "break_points_converted": { "team_1": "33%", "team_2": "22%" },
+    "longest_streak": { "team_1": "5", "team_2": "7" },
+    "won_on_1st_serve": { "team_1": "67%", "team_2": "65%" },
+    "won_on_2nd_serve": { "team_1": "54%", "team_2": "55%" },
+    "total_won_on_serve": { "team_1": "66%", "team_2": "64%" },
+    "total_won_on_return": { "team_1": "36%", "team_2": "34%" },
+    "service_games": { "team_1": "15", "team_2": "15" },
+    "return_games": { "team_1": "15", "team_2": "15" }
+  },
+  "set_1": { ... },
+  "set_2": { ... },
+  "set_3": { ... }
+}
+```
+
+### Available metrics per set
+
+| Metric | Description |
+|--------|-------------|
+| `total_points_won` | Percentage of total points won |
+| `break_points_converted` | Break point conversion rate |
+| `longest_streak` | Longest consecutive points won |
+| `aces` | Number of aces |
+| `double_faults` | Number of double faults |
+| `won_on_1st_serve` | Win % on first serve |
+| `won_on_2nd_serve` | Win % on second serve |
+| `total_won_on_serve` | Overall serve win % |
+| `won_on_1st_return` | Win % returning first serve |
+| `won_on_2nd_return` | Win % returning second serve |
+| `total_won_on_return` | Overall return win % |
+| `service_games` | Number of service games played |
+| `return_games` | Number of return games played |
+
+<Tip>
+  Set-by-set data lets you track momentum shifts. A team winning 77% on serve in set 3 after 59% in set 1 tells a story that the match total alone doesn't.
+</Tip>
+
+---
+
+## Player statistics
+
+Career-level aggregates for any player. Useful for comparing trajectories, building rankings models, or analyzing form over specific periods.
+
+```bash
+curl -X GET \
+  'https://padelapi.org/api/players/{player_id}/stats' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+```json
+{
+  "id": 65,
+  "matches_played": 160,
+  "matches_won": 147,
+  "win_percentage": 91.88,
+  "sets_won": 303,
+  "sets_lost": 49,
+  "avg_sets_per_match": 2.2,
+  "games_won": 2062,
+  "games_lost": 1186,
+  "avg_games_per_match": 20.3,
+  "titles": 23,
+  "finals": 30,
+  "semifinals": 33,
+  "best_round": 1
+}
+```
+
+### Filtering by date range
+
+Player stats accept `after_date` and `before_date` parameters to calculate stats over a specific period. This is useful for season-by-season comparisons or tracking form over time.
+
+```bash
+# Stats for the 2025 season only
+curl -X GET \
+  'https://padelapi.org/api/players/65/stats?after_date=2025-01-01&before_date=2025-12-31' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+### Filtering by round
+
+Use the `round` parameter to isolate performance at specific tournament stages.
+
+```bash
+# Stats in finals only
+curl -X GET \
+  'https://padelapi.org/api/players/65/stats?round=1' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+| Round value | Stage |
+|-------------|-------|
+| `1` | Final |
+| `2` | Semifinal |
+| `4` | Quarterfinal |
+| `8` | Round of 16 |
+| `16` | Round of 32 |
+| `32` | Round of 64 |
+
+<Tip>
+  Comparing a player's win percentage in early rounds vs finals reveals how they perform under pressure. Some players dominate early rounds but underperform in decisive matches, and vice versa.
+</Tip>
+
+---
+
+## Pair statistics
+
+Padel is a doubles sport, and individual numbers only tell part of the story. Pair stats measure how two specific players perform **together**.
+
+```bash
+curl -X GET \
+  'https://padelapi.org/api/pairs/{player_1_id}-{player_2_id}/stats' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+```json
+{
+  "id": "65-66",
+  "matches_played": 302,
+  "matches_won": 276,
+  "win_percentage": 91.39,
+  "sets_won": 567,
+  "sets_lost": 101,
+  "avg_sets_per_match": 2.21,
+  "games_won": 3892,
+  "games_lost": 2341,
+  "avg_games_per_match": 20.64,
+  "titles": 43,
+  "finals": 57,
+  "semifinals": 62,
+  "best_round": 1
+}
+```
+
+Pair stats also support `after_date`, `before_date`, and `round` filters, just like player stats.
+
+### What pair stats reveal
+
+The gap between a player's individual stats and their pair stats exposes partner chemistry. A player with an 80% win rate overall but 90% with a specific partner suggests that pairing is greater than the sum of its parts.
+
+Compare pairs across:
+- **Win percentage** to find the most dominant duos
+- **Titles vs finals** to measure conversion rate in decisive matches
+- **Average games per match** as a proxy for match difficulty (lower = more dominant wins)
+
+---
+
+## Common use cases
+
+### Building a player comparison dashboard
+
+Combine player stats with date filters to create season-by-season comparisons:
+
+<CodeGroup>
+
+```python Python
+import requests
+
+API_TOKEN = "YOUR_API_TOKEN"
+HEADERS = {"Authorization": f"Bearer {API_TOKEN}"}
+BASE_URL = "https://padelapi.org/api"
+
+player_id = 65
+seasons = [
+    ("2023-01-01", "2023-12-31"),
+    ("2024-01-01", "2024-12-31"),
+    ("2025-01-01", "2025-12-31"),
+]
+
+for start, end in seasons:
+    response = requests.get(
+        f"{BASE_URL}/players/{player_id}/stats",
+        headers=HEADERS,
+        params={"after_date": start, "before_date": end}
+    )
+    stats = response.json()
+    print(f"{start[:4]}: {stats['matches_won']}/{stats['matches_played']} "
+          f"({stats['win_percentage']}%) - {stats['titles']} titles")
+```
+
+```javascript JavaScript
+const API_TOKEN = "YOUR_API_TOKEN";
+const BASE_URL = "https://padelapi.org/api";
+const headers = { Authorization: `Bearer ${API_TOKEN}` };
+
+const playerId = 65;
+const seasons = [
+  ["2023-01-01", "2023-12-31"],
+  ["2024-01-01", "2024-12-31"],
+  ["2025-01-01", "2025-12-31"],
+];
+
+for (const [start, end] of seasons) {
+  const params = new URLSearchParams({ after_date: start, before_date: end });
+  const response = await fetch(
+    `${BASE_URL}/players/${playerId}/stats?${params}`,
+    { headers }
+  );
+  const stats = await response.json();
+  console.log(`${start.slice(0, 4)}: ${stats.matches_won}/${stats.matches_played} ` +
+    `(${stats.win_percentage}%) - ${stats.titles} titles`);
+}
+```
+
+</CodeGroup>
+
+### Analyzing serve dominance in a match
+
+Extract serve and return metrics to understand match dynamics:
+
+<CodeGroup>
+
+```python Python
+response = requests.get(
+    f"{BASE_URL}/matches/1216/stats",
+    headers=HEADERS
+)
+stats = response.json()
+
+for set_key in ["set_1", "set_2", "set_3"]:
+    if set_key in stats:
+        s = stats[set_key]
+        print(f"{set_key}: Team 1 serve {s['total_won_on_serve']['team_1']} "
+              f"| Team 2 serve {s['total_won_on_serve']['team_2']}")
+```
+
+```javascript JavaScript
+const response = await fetch(
+  `${BASE_URL}/matches/1216/stats`,
+  { headers }
+);
+const stats = await response.json();
+
+for (const setKey of ["set_1", "set_2", "set_3"]) {
+  if (stats[setKey]) {
+    const s = stats[setKey];
+    console.log(`${setKey}: Team 1 serve ${s.total_won_on_serve.team_1} ` +
+      `| Team 2 serve ${s.total_won_on_serve.team_2}`);
+  }
+}
+```
+
+</CodeGroup>
+
+---
+
+## Tips
+
+<AccordionGroup>
+  <Accordion title="Not all matches have stats">
+    Match statistics depend on official data availability. Major and P1 tournaments typically have full stats coverage, while lower-level tournaments may not. Check the response before assuming data exists.
+  </Accordion>
+  <Accordion title="Player IDs can change">
+    When two player records are merged, the API returns a `302` redirect to the canonical player. Handle redirects in your HTTP client to avoid broken references.
+  </Accordion>
+  <Accordion title="Use Padel Analyst for exploration">
+    Before writing code, you can explore stats interactively using [Padel Analyst](/padel-analyst/index). Ask questions like *"What's Coello's win percentage in finals?"* or *"Show me match stats for the latest Major final"* to find what you need.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next steps
+
+<CardGroup cols={3}>
+  <Card title="Your First API Call" icon="rocket" href="/guides/your-first-api-call">
+    Get set up with authentication and basic requests
+  </Card>
+  <Card title="API Reference" icon="book" href="/index">
+    Full endpoint documentation with parameters and responses
+  </Card>
+  <Card title="Padel Analyst" icon="robot" href="/padel-analyst/index">
+    Explore stats in natural language with AI assistants
+  </Card>
+</CardGroup>
