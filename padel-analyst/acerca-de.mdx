@@ -1,0 +1,239 @@
+---
+title: "Acerca de Padel Analyst"
+description: "Conecta asistentes de IA como Claude, ChatGPT y VS Code a datos profesionales de pádel a través del servidor MCP de Padel API"
+---
+
+## ¿Qué es Padel Analyst?
+
+Padel Analyst es un servidor [MCP (Model Context Protocol)](https://modelcontextprotocol.io/introduction) que conecta asistentes de IA con datos profesionales de pádel. Te permite hacer preguntas en lenguaje natural sobre jugadores, torneos, partidos y estadísticas sin escribir código.
+
+<CardGroup cols={3}>
+  <Card title="Lenguaje Natural" icon="message">
+    Haz preguntas como "¿Quién ganó el último Major?" o "Compara a Lebrón vs Galán"
+  </Card>
+  <Card title="Datos en Tiempo Real" icon="bolt">
+    Accede a resultados en directo, resultados recientes y estadísticas actualizadas
+  </Card>
+  <Card title="Múltiples Asistentes IA" icon="robot">
+    Funciona con Claude, ChatGPT, VS Code y cualquier cliente compatible con MCP
+  </Card>
+</CardGroup>
+
+<iframe
+  width="100%"
+  height="400"
+  src="https://www.youtube.com/embed/oEP4WlOpHwk"
+  title="Presentación de Padel Analyst"
+  frameBorder="0"
+  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+  allowFullScreen
+></iframe>
+
+## Requisitos Previos
+
+<Steps>
+  <Step title="Suscríbete al Plan Analyst">
+    Regístrate en el [Plan Analyst](https://padelapi.org/billing) (19€/mes) que incluye:
+    - Hasta 50K peticiones/mes
+    - Acceso al servidor MCP
+    - Funciona con ChatGPT
+    - Consultas en lenguaje natural
+    - Soporte básico
+  </Step>
+  <Step title="Crea un Token de API">
+    Genera tu token personal de API desde la página de [Tokens de API](https://padelapi.org/user/api-tokens). Lo necesitarás para autenticar las peticiones MCP.
+  </Step>
+</Steps>
+
+## Herramientas Disponibles
+
+El servidor MCP de Padel Analyst proporciona 12 herramientas para consultar datos de pádel:
+
+| Herramienta | Descripción |
+|-------------|-------------|
+| `list-pair-matches` | Obtener todos los partidos de una pareja de jugadores |
+| `list-player-matches` | Obtener todos los partidos de un jugador |
+| `list-tournament-matches` | Obtener todos los partidos de un torneo |
+| `search-headtohead` | Buscar enfrentamientos directos entre jugadores |
+| `search-matches` | Buscar partidos con varios filtros |
+| `search-players` | Buscar jugadores por nombre, nacionalidad, categoría o lado |
+| `search-seasons` | Explorar temporadas y competiciones disponibles |
+| `search-tournaments` | Buscar torneos por nombre, nivel o rango de fechas |
+| `show-match-stats` | Obtener estadísticas detalladas de un partido, incluyendo datos punto a punto |
+| `show-pair-stats` | Mostrar estadísticas de una pareja de jugadores |
+| `show-player-stats` | Mostrar estadísticas detalladas de un jugador |
+| `simulate-match` | Simular el resultado de un partido basándose en estadísticas |
+
+## Prompts Disponibles
+
+Los prompts preconfigurados ayudan a estructurar tareas de análisis comunes:
+
+| Prompt | Descripción |
+|--------|-------------|
+| `head-to-head` | Comparar resultados históricos entre dos jugadores/parejas |
+| `match-preview` | Generar una previa de un próximo partido |
+| `pair-analysis` | Analizar el rendimiento y estilo de juego de una pareja |
+| `player-comparison` | Comparación lado a lado de dos jugadores |
+| `player-profile` | Perfil completo de un jugador |
+| `recent-results` | Resumen de resultados recientes |
+| `season-overview` | Resumen de una temporada completa |
+| `tournament-summary` | Resumen de un torneo con resultados |
+
+## Instalación
+
+### ChatGPT
+
+Sigue nuestra [guía de instalación paso a paso](/padel-analyst/chatgpt) para añadir Padel Analyst a ChatGPT usando el modo Desarrollador.
+
+### Claude.ai
+
+Sigue nuestra [guía de instalación paso a paso](/padel-analyst/claude) para añadir Padel Analyst como conector en Claude.ai. Es la forma más fácil de empezar: no necesitas archivos de configuración.
+
+### Cursor
+
+Haz clic en el botón de abajo para instalar el servidor MCP de Padel API en Cursor:
+
+[![Instalar en Cursor](https://img.shields.io/badge/Cursor-Instalar_Servidor-000000?style=flat-square&logo=cursor&logoColor=white)](cursor://anysphere.cursor-deeplink/mcp/install?name=Padel%20API&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vcGFkZWxhcGkub3JnL21jcCJ9)
+
+O añade manualmente lo siguiente a la configuración MCP de Cursor (`~/.cursor/mcp.json`):
+
+```json
+{
+  "mcpServers": {
+    "padel-api": {
+      "type": "http",
+      "url": "https://padelapi.org/mcp",
+      "headers": {
+        "Authorization": "Bearer TU_TOKEN_DE_API"
+      }
+    }
+  }
+}
+```
+
+### VS Code / GitHub Copilot
+
+Haz clic en el botón de abajo para instalar el servidor MCP de Padel API en VS Code:
+
+[![Instalar en VS Code](https://img.shields.io/badge/VS_Code-Instalar_Servidor-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=padel-api&config=%7B%22type%22%3A%20%22http%22%2C%22url%22%3A%20%22https%3A%2F%2Fpadelapi.org%2Fmcp%22%7D)
+
+O añade manualmente lo siguiente a tu `settings.json` de VS Code:
+
+```json
+{
+  "mcp": {
+    "servers": {
+      "padel-api": {
+        "type": "http",
+        "url": "https://padelapi.org/mcp",
+        "headers": {
+          "Authorization": "Bearer TU_TOKEN_DE_API"
+        }
+      }
+    }
+  }
+}
+```
+
+### Windsurf
+
+Añade lo siguiente a tu archivo de configuración MCP de Windsurf (`~/.codeium/windsurf/mcp_config.json`):
+
+```json
+{
+  "mcpServers": {
+    "padel-api": {
+      "type": "http",
+      "url": "https://padelapi.org/mcp",
+      "headers": {
+        "Authorization": "Bearer TU_TOKEN_DE_API"
+      }
+    }
+  }
+}
+```
+
+También puedes instalarlo desde el MCP Marketplace: abre Windsurf Settings → Cascade → MCP Servers, y busca "Padel API".
+
+### Claude Desktop
+
+Añade lo siguiente a tu archivo de configuración de Claude Desktop:
+
+<Tabs>
+  <Tab title="macOS">
+    Edita `~/Library/Application Support/Claude/claude_desktop_config.json`:
+    ```json
+    {
+      "mcpServers": {
+        "padel-api": {
+          "type": "http",
+          "url": "https://padelapi.org/mcp",
+          "headers": {
+            "Authorization": "Bearer TU_TOKEN_DE_API"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+  <Tab title="Windows">
+    Edita `%APPDATA%\Claude\claude_desktop_config.json`:
+    ```json
+    {
+      "mcpServers": {
+        "padel-api": {
+          "type": "http",
+          "url": "https://padelapi.org/mcp",
+          "headers": {
+            "Authorization": "Bearer TU_TOKEN_DE_API"
+          }
+        }
+      }
+    }
+    ```
+  </Tab>
+</Tabs>
+
+### Otros Clientes MCP
+
+Para cualquier cliente compatible con MCP, usa estos datos de conexión:
+
+| Configuración | Valor |
+|---------------|-------|
+| URL del servidor | `https://padelapi.org/mcp` |
+| Transporte | HTTP (Streamable) |
+| Autenticación | Bearer token en la cabecera `Authorization` |
+
+## Ejemplos de Consultas
+
+Una vez conectado, puedes hacer preguntas a tu asistente de IA como estas:
+
+<AccordionGroup>
+  <Accordion title="Información de jugadores">
+    - "¿Quién es Arturo Coello? Dame su perfil y resultados recientes"
+    - "Lista los 10 mejores jugadores del ranking femenino"
+    - "Encuentra todos los jugadores españoles que juegan en el lado del revés"
+  </Accordion>
+  <Accordion title="Análisis de partidos">
+    - "¿Cuáles fueron los resultados del último Major de Premier Padel?"
+    - "Muéstrame el historial de enfrentamientos entre Lebrón/Galán y Coello/Tapia"
+    - "Dame las estadísticas punto a punto de la final de ayer"
+  </Accordion>
+  <Accordion title="Datos de torneos">
+    - "Lista todos los torneos P1 de esta temporada"
+    - "¿Quién ganó el Qatar Major 2024?"
+    - "Muéstrame el cuadro y resultados del Paris Premier Padel"
+  </Accordion>
+  <Accordion title="Predicciones">
+    - "Simula un partido entre Coello/Tapia vs Lebrón/Galán"
+    - "Basándote en la forma reciente, ¿quién ganaría: Sánchez/Josemaría o Triay/Fernández?"
+  </Accordion>
+</AccordionGroup>
+
+## Más Allá de los Datos de Partidos
+
+Padel Analyst te da acceso a datos de rendimiento: rankings, resultados y estadísticas. Si también necesitas **análisis de engagement de fans**, consulta [Padel Fan Index](/guides/padel-fan-index), que combina estos datos con decisiones reales de fans de Fantasy Padel Tour.
+
+## Soporte
+
+¿Necesitas ayuda? Contáctanos en [ferran@padelapi.org](mailto:ferran@padelapi.org) o consulta la [documentación de la API](/index) para más detalles sobre los datos disponibles.
