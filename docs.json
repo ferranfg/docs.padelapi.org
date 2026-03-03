@@ -108,6 +108,7 @@
      "copy",
      "view",
      "chatgpt",
+      "grok",
      "claude"
    ]
   },
