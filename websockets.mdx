@@ -26,10 +26,12 @@ curl -X GET \
 {
   "id": 7243,
   "self": "/api/matches/7243/live",
+  "status": "live",
   "channel": "matches.7243",
   "sets": [
     {
       "set_number": 1,
+      "set_score": "6-2",
       "games": [
         {
           "game_number": 1,
@@ -42,6 +44,17 @@ curl -X GET \
           "points": ["0:0", "15:0", "30:0", "40:0", "40:15"]
         }
       ]
+    },
+    {
+      "set_number": 2,
+      "set_score": null,
+      "games": [
+        {
+          "game_number": 1,
+          "game_score": "0 - 0",
+          "points": ["0:0", "15:0", "30:0"]
+        }
+      ]
     }
   ],
   "connections": {
@@ -52,9 +65,11 @@ curl -X GET \
 
 | Field | Description |
 |---|---|
+| `status` | Match status: `live`, `finished`, `scheduled`, etc. |
 | `channel` | The Pusher channel name to subscribe for real-time updates |
 | `sets` | Array of sets, each containing an array of games |
 | `sets[].set_number` | Set number (1, 2, or 3) |
+| `sets[].set_score` | Final set score (e.g. `"6-2"`) when the set is complete, `null` while in progress |
 | `sets[].games[].game_number` | Game number within the set |
 | `sets[].games[].game_score` | Cumulative set score **before** this game started (e.g. `"3 - 1"`) |
 | `sets[].games[].points` | Array of point scores during the game (format `"team1:team2"`) |
@@ -137,14 +152,14 @@ channel.bind('App\\PadelApi\\Events\\MatchLiveUpdated', on_event)
 
 ### Event Payload
 
-The WebSocket event payload has the same structure as the `/api/matches/{match}/live` REST response — `id`, `self`, `channel`, `sets`, and `connections`.
+The WebSocket event payload has the same structure as the `/api/matches/{match}/live` REST response — `id`, `self`, `status`, `channel`, `sets`, and `connections`.
 
 ## Recommended Workflow
 
 1. **Find live matches** — `GET /api/live`
 2. **Get initial state** — `GET /api/matches/{id}/live`
 3. **Subscribe to updates** — Connect to Pusher channel `matches.{id}`
-4. **Detect match end** — When the match `status` changes to `finished` on the main match endpoint, unsubscribe from the channel
+4. **Detect match end** — When `status` changes to `finished`, unsubscribe from the channel
 
 <Tip>
   Use the `channel` field from the live endpoint response directly as your Pusher channel name — no need to construct it manually.
