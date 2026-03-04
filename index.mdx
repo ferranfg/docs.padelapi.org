@@ -78,11 +78,13 @@ By default, the **Padel API** only returns the first 15 results for those endpoi
 
 The **Padel API** limits the number of requests you can make to protect the service and ensure fair usage for all users.
 
-| Limit              | Value            |
-|--------------------|------------------|
-| Requests per minute | 60              |
+| Limit               | Free       | Analyst & Pro | Business    |
+|----------------------|------------|---------------|-------------|
+| Requests per minute  | 10         | 60            | 500         |
+| Requests per day     | 3,000      | 3,000         | 100,000     |
+| Requests per month   | 50,000     | 50,000        | 2,000,000   |
 
-When you exceed the rate limit, the API returns a [`429 Too Many Requests`](/error-codes#429-too-many-requests) error. Wait until the next minute before making additional requests.
+When you exceed a rate limit, the API returns a [`429 Too Many Requests`](/error-codes#429-too-many-requests) error. Wait until the limit resets before making additional requests.
 
 The API includes the following headers in responses to help you track your usage:
 
