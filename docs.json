@@ -18,7 +18,8 @@
             "icon": "book-open",
             "pages": [
               "index",
-              "error-codes"
+              "error-codes",
+              "websockets"
             ]
           },
           {

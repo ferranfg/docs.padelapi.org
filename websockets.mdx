@@ -1,0 +1,156 @@
+---
+title: "WebSockets"
+description: "Learn how to track live padel matches in real-time using the Padel API live endpoint and Pusher WebSockets."
+---
+
+## Overview
+
+Padel API provides real-time match tracking through two mechanisms:
+
+1. **REST endpoint** — Poll `/api/matches/{match}/live` for point-by-point data
+2. **WebSockets** — Subscribe to Pusher channels for instant updates
+
+## Live Match Endpoint
+
+The live endpoint returns point-by-point data for an ongoing match:
+
+```bash
+curl -X GET \
+  'https://padelapi.org/api/matches/7243/live' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+### Response Structure
+
+```json
+{
+  "id": 7243,
+  "self": "/api/matches/7243/live",
+  "channel": "matches.7243",
+  "sets": [
+    {
+      "set_number": 1,
+      "games": [
+        {
+          "game_number": 1,
+          "game_score": "0 - 0",
+          "points": ["15:0", "30:0", "40:15"]
+        },
+        {
+          "game_number": 2,
+          "game_score": "1 - 0",
+          "points": ["0:0", "15:0", "30:0", "40:0", "40:15"]
+        }
+      ]
+    }
+  ],
+  "connections": {
+    "match": "/api/matches/7243"
+  }
+}
+```
+
+| Field | Description |
+|---|---|
+| `channel` | The Pusher channel name to subscribe for real-time updates |
+| `sets` | Array of sets, each containing an array of games |
+| `sets[].set_number` | Set number (1, 2, or 3) |
+| `sets[].games[].game_number` | Game number within the set |
+| `sets[].games[].game_score` | Cumulative set score **before** this game started (e.g. `"3 - 1"`) |
+| `sets[].games[].points` | Array of point scores during the game (format `"team1:team2"`) |
+
+### Finding Live Matches
+
+To find matches currently being played, use the live endpoint:
+
+```bash
+curl -X GET \
+  'https://padelapi.org/api/live' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+## WebSockets (Pusher)
+
+For real-time updates without polling, subscribe to Pusher WebSocket channels. Each live match broadcasts updates on a dedicated channel.
+
+### Connection Details
+
+| Parameter | Value |
+|---|---|
+| **Provider** | [Pusher](https://pusher.com) |
+| **App Key** | `0ffbefeb945e4e466065` |
+| **Cluster** | `eu` |
+| **Channel format** | `matches.{matchId}` (public, no auth required) |
+| **Event name** | `App\PadelApi\Events\MatchLiveUpdated` |
+
+<Note>
+  Channels are **public** — no authentication handshake is required to subscribe. You only need the Pusher app key and cluster.
+</Note>
+
+### JavaScript Example
+
+Install the Pusher client library:
+
+```bash
+npm install pusher-js
+```
+
+Subscribe to a live match channel:
+
+```javascript
+import Pusher from 'pusher-js';
+
+const pusher = new Pusher('0ffbefeb945e4e466065', {
+  cluster: 'eu'
+});
+
+// Subscribe using the "channel" field from the live endpoint
+const channel = pusher.subscribe('matches.7243');
+
+channel.bind('App\\PadelApi\\Events\\MatchLiveUpdated', (data) => {
+  console.log('Sets:', data.sets);
+  // data has the same structure as the /live endpoint response
+});
+```
+
+### Python Example
+
+Install the Pusher client library:
+
+```bash
+pip install pysher
+```
+
+```python
+import pysher
+
+def on_event(data):
+    print('Live update:', data)
+
+pusher = pysher.Pusher(key='0ffbefeb945e4e466065', cluster='eu')
+pusher.connection.bind('pusher:connection_established', lambda _: None)
+pusher.connect()
+
+channel = pusher.subscribe('matches.7243')
+channel.bind('App\\PadelApi\\Events\\MatchLiveUpdated', on_event)
+```
+
+### Event Payload
+
+The WebSocket event payload has the same structure as the `/api/matches/{match}/live` REST response — `id`, `self`, `channel`, `sets`, and `connections`.
+
+## Recommended Workflow
+
+1. **Find live matches** — `GET /api/live`
+2. **Get initial state** — `GET /api/matches/{id}/live`
+3. **Subscribe to updates** — Connect to Pusher channel `matches.{id}`
+4. **Detect match end** — When the match `status` changes to `finished` on the main match endpoint, unsubscribe from the channel
+
+<Tip>
+  Use the `channel` field from the live endpoint response directly as your Pusher channel name — no need to construct it manually.
+</Tip>
+
+## Need Help?
+
+- Check the [API Reference](/index) for all match endpoints
+- Contact support at [ferran@padelapi.org](mailto:ferran@padelapi.org)
