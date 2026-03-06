@@ -27,6 +27,7 @@ curl -X GET \
   "id": 7243,
   "self": "/api/matches/7243/live",
   "status": "live",
+  "coverage": "full",
   "channel": "matches.7243",
   "sets": [
     {
@@ -66,6 +67,7 @@ curl -X GET \
 | Field | Description |
 |---|---|
 | `status` | Match status: `live`, `finished`, `scheduled`, etc. |
+| `coverage` | Point-by-point data completeness: `tracking` (match live, collecting data), `full` (all games tracked), `partial` (some games missing due to source feed gaps), or `null` (no data available) |
 | `channel` | The Pusher channel name to subscribe for real-time updates |
 | `sets` | Array of sets, each containing an array of games |
 | `sets[].set_number` | Set number (1, 2, or 3) |
@@ -152,7 +154,7 @@ channel.bind('App\\PadelApi\\Events\\MatchLiveUpdated', on_event)
 
 ### Event Payload
 
-The WebSocket event payload has the same structure as the `/api/matches/{match}/live` REST response — `id`, `self`, `status`, `channel`, `sets`, and `connections`.
+The WebSocket event payload has the same structure as the `/api/matches/{match}/live` REST response — `id`, `self`, `status`, `coverage`, `channel`, `sets`, and `connections`.
 
 ## Recommended Workflow
 
