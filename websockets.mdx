@@ -1,18 +1,70 @@
 ---
 title: "WebSockets"
-description: "Learn how to track live padel matches in real-time using the Padel API live endpoint and Pusher WebSockets."
+description: "Build real-time padel scoreboards and live trackers using the Padel API. Step-by-step guide covering REST polling, WebSocket subscriptions, and full working examples."
 ---
 
-## Overview
+Track professional padel matches point-by-point as they happen. The Padel API provides two ways to get live data: a REST endpoint for polling and WebSocket channels for instant push updates.
 
-Padel API provides real-time match tracking through two mechanisms:
+<CardGroup cols={2}>
+  <Card title="REST Polling" icon="arrows-rotate">
+    Fetch the latest match state on demand. Simple to implement, works everywhere.
+  </Card>
+  <Card title="WebSockets" icon="bolt">
+    Receive updates instantly via Pusher. No polling, no delays.
+  </Card>
+</CardGroup>
 
-1. **REST endpoint** — Poll `/api/matches/{match}/live` for point-by-point data
-2. **WebSockets** — Subscribe to Pusher channels for instant updates
+## Prerequisites
 
-## Live Match Endpoint
+Before you begin, make sure you have:
 
-The live endpoint returns point-by-point data for an ongoing match:
+- A Padel API account ([sign up here](https://padelapi.org/register))
+- An API token from your [API Tokens](https://padelapi.org/user/api-tokens) page
+
+---
+
+## Step 1: Find Live Matches
+
+First, discover which matches are currently being played:
+
+<CodeGroup>
+
+```bash cURL
+curl -X GET \
+  'https://padelapi.org/api/live' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+```javascript JavaScript
+const response = await fetch('https://padelapi.org/api/live', {
+  headers: { 'Authorization': 'Bearer YOUR_API_TOKEN' }
+});
+
+const liveMatches = await response.json();
+console.log(liveMatches.data);
+```
+
+```python Python
+import requests
+
+response = requests.get(
+    'https://padelapi.org/api/live',
+    headers={'Authorization': 'Bearer YOUR_API_TOKEN'}
+)
+
+live_matches = response.json()
+print(live_matches['data'])
+```
+
+</CodeGroup>
+
+This returns a list of all matches with `status: "live"`. Each match includes its `id`, which you'll use in the next steps.
+
+---
+
+## Step 2: Get the Live Match State
+
+Once you have a match ID, fetch its point-by-point data:
 
 ```bash
 curl -X GET \
@@ -20,7 +72,7 @@ curl -X GET \
   -H 'Authorization: Bearer YOUR_API_TOKEN'
 ```
 
-### Response Structure
+### Response structure
 
 ```json
 {
@@ -64,57 +116,62 @@ curl -X GET \
 }
 ```
 
+### Field reference
+
 | Field | Description |
 |---|---|
 | `status` | Match status: `live`, `finished`, `scheduled`, etc. |
-| `coverage` | Point-by-point data completeness: `tracking` (match live, collecting data), `full` (all games tracked), `partial` (some games missing due to source feed gaps), or `null` (no data available) |
-| `channel` | The Pusher channel name to subscribe for real-time updates |
-| `sets` | Array of sets, each containing an array of games |
+| `coverage` | Data completeness: `tracking` (collecting data), `full` (all games tracked), `partial` (some gaps), or `null` (no data) |
+| `channel` | Pusher channel name for real-time updates |
 | `sets[].set_number` | Set number (1, 2, or 3) |
-| `sets[].set_score` | Final set score (e.g. `"6-2"`) when the set is complete, `null` while in progress |
+| `sets[].set_score` | Final set score (e.g. `"6-2"`) when complete, `null` while in progress |
 | `sets[].games[].game_number` | Game number within the set |
 | `sets[].games[].game_score` | Cumulative set score **before** this game started (e.g. `"3 - 1"`) |
 | `sets[].games[].points` | Array of point scores during the game (format `"team1:team2"`) |
 
-### Finding Live Matches
+<Tip>
+  The `channel` field is the exact Pusher channel name you need for Step 3 — use it directly, no need to construct it manually.
+</Tip>
 
-To find matches currently being played, use the live endpoint:
+---
 
-```bash
-curl -X GET \
-  'https://padelapi.org/api/live' \
-  -H 'Authorization: Bearer YOUR_API_TOKEN'
-```
+## Step 3: Subscribe to Real-Time Updates
 
-## WebSockets (Pusher)
+Instead of polling the REST endpoint repeatedly, subscribe to WebSocket updates for instant notifications on every point.
 
-For real-time updates without polling, subscribe to Pusher WebSocket channels. Each live match broadcasts updates on a dedicated channel.
-
-### Connection Details
+### Connection details
 
 | Parameter | Value |
 |---|---|
 | **Provider** | [Pusher](https://pusher.com) |
 | **App Key** | `0ffbefeb945e4e466065` |
 | **Cluster** | `eu` |
-| **Channel format** | `matches.{matchId}` (public, no auth required) |
+| **Channel format** | `matches.{matchId}` |
 | **Event name** | `App\PadelApi\Events\MatchLiveUpdated` |
 
 <Note>
   Channels are **public** — no authentication handshake is required to subscribe. You only need the Pusher app key and cluster.
 </Note>
 
-### JavaScript Example
+### Install a Pusher client
 
-Install the Pusher client library:
+<CodeGroup>
 
-```bash
+```bash npm
 npm install pusher-js
 ```
 
-Subscribe to a live match channel:
+```bash pip
+pip install pysher
+```
 
-```javascript
+</CodeGroup>
+
+### Subscribe to a match channel
+
+<CodeGroup>
+
+```javascript JavaScript
 import Pusher from 'pusher-js';
 
 const pusher = new Pusher('0ffbefeb945e4e466065', {
@@ -125,24 +182,20 @@ const pusher = new Pusher('0ffbefeb945e4e466065', {
 const channel = pusher.subscribe('matches.7243');
 
 channel.bind('App\\PadelApi\\Events\\MatchLiveUpdated', (data) => {
+  console.log('Match update:', data.status);
   console.log('Sets:', data.sets);
-  // data has the same structure as the /live endpoint response
+  // data has the same structure as the /live REST response
 });
 ```
 
-### Python Example
-
-Install the Pusher client library:
-
-```bash
-pip install pysher
-```
-
-```python
+```python Python
 import pysher
+import json
 
 def on_event(data):
-    print('Live update:', data)
+    match = json.loads(data)
+    print(f"Match update: {match['status']}")
+    print(f"Sets: {match['sets']}")
 
 pusher = pysher.Pusher(key='0ffbefeb945e4e466065', cluster='eu')
 pusher.connection.bind('pusher:connection_established', lambda _: None)
@@ -152,9 +205,42 @@ channel = pusher.subscribe('matches.7243')
 channel.bind('App\\PadelApi\\Events\\MatchLiveUpdated', on_event)
 ```
 
-### Event Payload
+</CodeGroup>
 
-The WebSocket event payload has the same structure as the `/api/matches/{match}/live` REST response — `id`, `self`, `status`, `coverage`, `channel`, `sets`, and `connections`.
+The WebSocket event payload has the **same structure** as the REST response — `id`, `self`, `status`, `coverage`, `channel`, `sets`, and `connections`.
+
+---
+
+## Step 4: Handle Match Completion
+
+When a match ends, the `status` field changes to `finished`. Use this to clean up your subscription:
+
+<CodeGroup>
+
+```javascript JavaScript
+channel.bind('App\\PadelApi\\Events\\MatchLiveUpdated', (data) => {
+  updateScoreboard(data);
+
+  if (data.status === 'finished') {
+    pusher.unsubscribe('matches.7243');
+    console.log('Match finished, unsubscribed');
+  }
+});
+```
+
+```python Python
+def on_event(data):
+    match = json.loads(data)
+    update_scoreboard(match)
+
+    if match['status'] == 'finished':
+        pusher.unsubscribe('matches.7243')
+        print('Match finished, unsubscribed')
+```
+
+</CodeGroup>
+
+---
 
 ## Recommended Workflow
 
@@ -163,11 +249,37 @@ The WebSocket event payload has the same structure as the `/api/matches/{match}/
 3. **Subscribe to updates** — Connect to Pusher channel `matches.{id}`
 4. **Detect match end** — When `status` changes to `finished`, unsubscribe from the channel
 
-<Tip>
-  Use the `channel` field from the live endpoint response directly as your Pusher channel name — no need to construct it manually.
-</Tip>
+---
 
-## Need Help?
+## Tips
 
-- Check the [API Reference](/index) for all match endpoints
-- Contact support at [ferran@padelapi.org](mailto:ferran@padelapi.org)
+<AccordionGroup>
+  <Accordion title="REST polling vs WebSockets — when to use which">
+    Use **REST polling** when you need a simple integration, are building server-side batch processes, or your environment doesn't support persistent connections. Use **WebSockets** for user-facing applications where latency matters — live scoreboards, mobile apps, or real-time dashboards.
+  </Accordion>
+  <Accordion title="Not all matches have live data">
+    The `coverage` field indicates whether any points were lost during tracking. `full` means every point was captured, `partial` means some points were missed due to source feed gaps, and `tracking` means the match is live and data is being collected. Check this field before relying on point-level completeness.
+  </Accordion>
+  <Accordion title="Handling reconnections">
+    Pusher clients handle reconnections automatically. If the connection drops, the client will reconnect and resubscribe to channels. However, you may miss events during the disconnection — fetch the latest state from the REST endpoint after reconnecting to fill any gaps.
+  </Accordion>
+  <Accordion title="Rate limits for the REST endpoint">
+    If you choose REST polling over WebSockets, avoid polling more frequently than once every 10 seconds per match. For lower latency, use WebSockets instead.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next steps
+
+<CardGroup cols={3}>
+  <Card title="Your First API Call" icon="rocket" href="/guides/your-first-api-call">
+    Get set up with authentication and basic requests
+  </Card>
+  <Card title="Match Statistics" icon="chart-bar" href="/guides/padel-statistics">
+    Combine live tracking with post-match stats analysis
+  </Card>
+  <Card title="API Reference" icon="book" href="/index">
+    Full endpoint documentation with parameters and responses
+  </Card>
+</CardGroup>
