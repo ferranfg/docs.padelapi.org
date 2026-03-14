@@ -141,7 +141,7 @@
   },
   "integrations": {
     "plausible": {
-      "domain": "docs.padelapi.org",
+      "domain": "padelapi.org",
       "server": "plausible.padelapi.org"
     }
   },
