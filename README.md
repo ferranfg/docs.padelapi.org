@@ -51,11 +51,11 @@ Coverage currently includes 2023 World Padel Tour events. Additional historical 
 
 Tournaments — especially at lower levels like FIP Gold, FIP Silver, or regional events — are subject to changes throughout the season: name updates, date shifts, merges with other events, or even cancellations. New tournaments can also be added to the calendar mid-season.
 
-We recommend implementing a **weekly synchronization process** using the [`/seasons/{id}/tournaments`](/api-reference/seasons/get-season-tournaments) endpoint as your starting point. Your sync logic should account for:
+We recommend implementing a **weekly synchronization process** using the [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments) endpoint as your starting point. Your sync logic should account for:
 
 - **New tournaments**: New events may appear in the calendar throughout the season. Your sync should detect and store any tournaments not previously seen.
-- **Tournament status changes**: Some events may transition to `cancelled` during the season. Always check the tournament `status` field and update your records accordingly.
-- **Redirections (renamed or merged tournaments)**: When a tournament has been renamed or merged into another event, the API will respond with a `301` redirect pointing to the new resource. Your sync process should follow these redirects and update any stored references. See [Redirection Codes](/error-codes#redirection-codes) for details on how to handle these responses.
+- **Tournament status changes**: Some events may transition to `cancelled` during the season. Cancelled tournaments are excluded from list endpoints ([`/tournaments`](/api-reference/tournament/list-tournaments) and [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments)) but remain accessible via the [tournament detail endpoint](/api-reference/tournament/show-tournament) with their `cancelled` status visible. If you have previously stored a tournament, you can check its current status by fetching it directly by ID.
+- **Redirections (merged tournaments)**: When a tournament has been merged into another event, the API will respond with a `302` redirect pointing to the new resource. Your sync process should follow these redirects and update any stored references. See [Redirection Codes](/error-codes#redirection-codes) for details on how to handle these responses. Note that renamed tournaments keep the same ID — redirections only occur when two tournaments are merged.
 
 ## Authentication
 
