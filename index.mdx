@@ -55,7 +55,7 @@ We recommend implementing a **weekly synchronization process** using the [`/seas
 
 - **New tournaments**: New events may appear in the calendar throughout the season. Your sync should detect and store any tournaments not previously seen.
 - **Tournament status changes**: Some events may transition to `cancelled` during the season. Always check the tournament `status` field and update your records accordingly.
-- **Redirections (renamed or merged tournaments)**: When a tournament has been renamed or merged into another event, the API will respond with a `301` redirect pointing to the new resource. Your sync process should follow these redirects and update any stored references. See [Redirection Codes](/error-codes#redirection-codes) for details on how to handle these responses.
+- **Redirections (merged tournaments)**: When a tournament has been merged into another event, the API will respond with a `302` redirect pointing to the new resource. Your sync process should follow these redirects and update any stored references. See [Redirection Codes](/error-codes#redirection-codes) for details on how to handle these responses. Note that renamed tournaments keep the same ID — redirections only occur when two tournaments are merged.
 
 ## Authentication
 
