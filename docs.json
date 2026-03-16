@@ -129,6 +129,10 @@
           {
             "label": "Terms of Service",
             "href": "https://padelapi.org/terms-of-service"
+          },
+          {
+            "label": "Cookies Policy",
+            "href": "https://padelapi.org/cookies-policy"
           }
         ]
       }
