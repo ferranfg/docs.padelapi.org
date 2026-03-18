@@ -3,11 +3,21 @@ title: "Getting Started"
 description: "Discover how to access and use the Padel API for professional padel data. Learn about authentication, coverage, rate limits, and supported tournaments."
 ---
 
-## Roadmap & Issues
+## Authentication
 
-❇️ View the official [Padel API public roadmap](https://github.com/users/ferranfg/projects/2).
+The **Padel API** uses API tokens to authenticate requests. These are provided to you on your [API Tokens](https://padelapi.org/user/api-tokens) management page.
 
-Our product roadmap is where you can learn about what features we're working on, what stage they're in, and when we expect to bring them to you. Have any questions or comments about items on the roadmap? Share your feedback via [Padel API public issues](https://github.com/ferranfg/docs.padelapi.org/issues).
+To authenticate, you need to include an `Authorization` header in all of your requests. In this header, you must state that you're using an API token (similar to [HTTP basic access authentication](https://en.wikipedia.org/wiki/Basic_access_authentication)).
+
+For example:
+
+```curl
+curl -i -X GET \
+  'https://padelapi.org/api/seasons' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN_HERE'
+```
+
+Either if the API key isn't valid, or you don't provide an `Authorization` header at all, you'll receive a `401` status code as response
 
 ## Tournaments Coverage
 
@@ -57,33 +67,6 @@ We recommend implementing a **weekly synchronization process** using the [`/seas
 - **Tournament status changes**: Some events may transition to `cancelled` during the season. Cancelled tournaments are excluded from list endpoints ([`/tournaments`](/api-reference/tournament/list-tournaments) and [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments)) but remain accessible via the [tournament detail endpoint](/api-reference/tournament/show-tournament) with their `cancelled` status visible. If you have previously stored a tournament, you can check its current status by fetching it directly by ID.
 - **Redirections (merged tournaments)**: When a tournament has been merged into another event, the API will respond with a `302` redirect pointing to the new resource. Your sync process should follow these redirects and update any stored references. See [Redirection Codes](/error-codes#redirection-codes) for details on how to handle these responses. Note that renamed tournaments keep the same ID — redirections only occur when two tournaments are merged.
 
-## Authentication
-
-The **Padel API** uses API tokens to authenticate requests. These are provided to you on your [API Tokens](https://padelapi.org/user/api-tokens) management page.
-
-To authenticate, you need to include an `Authorization` header in all of your requests. In this header, you must state that you're using an API token (similar to [HTTP basic access authentication](https://en.wikipedia.org/wiki/Basic_access_authentication)).
-
-For example:
-
-```curl
-curl -i -X GET \
-  'https://padelapi.org/api/seasons' \
-  -H 'Authorization: Bearer YOUR_API_TOKEN_HERE'
-```
-
-Either if the API key isn't valid, or you don't provide an `Authorization` header at all, you'll receive a `401` status code as response
-
-## Pagination
-
-Several endpoints return paginated results.
-
-By default, the **Padel API** only returns the first 15 results for those endpoints. You can use optional query parameters to increase or decrease the number of results.
-
-| Parameter  | Description                                                         |
-|------------|---------------------------------------------------------------------|
-| `per_page` | Number of results to return per page (default: 15, min: 1, max: 50) |
-| `page`     | Page number to retrieve                                             |
-
 ## Rate Limits
 
 The **Padel API** limits the number of requests you can make to protect the service and ensure fair usage for all users.
@@ -107,8 +90,25 @@ The API includes the following headers in responses to help you track your usage
   Use caching strategies and monitor `X-RateLimit-Remaining` to avoid hitting the limit.
 </Tip>
 
+## Pagination
+
+Several endpoints return paginated results.
+
+By default, the **Padel API** only returns the first 15 results for those endpoints. You can use optional query parameters to increase or decrease the number of results.
+
+| Parameter  | Description                                                         |
+|------------|---------------------------------------------------------------------|
+| `per_page` | Number of results to return per page (default: 15, min: 1, max: 50) |
+| `page`     | Page number to retrieve                                             |
+
 ## Status Codes
 
 The **Padel API** uses conventional [HTTP response codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) to indicate whether a request was successful (`2XX` codes) or resulted in an error (`4XX` and `5XX` codes).
 
 See the [Error Codes](/error-codes) page for details on each status code.
+
+## Roadmap & Issues
+
+❇️ View the official [Padel API public roadmap](https://github.com/users/ferranfg/projects/2).
+
+Our product roadmap is where you can learn about what features we're working on, what stage they're in, and when we expect to bring them to you. Have any questions or comments about items on the roadmap? Share your feedback via [Padel API public issues](https://github.com/ferranfg/docs.padelapi.org/issues).
