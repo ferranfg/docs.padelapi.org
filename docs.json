@@ -125,7 +125,7 @@
         "items": [
           {
             "label": "About Us",
-            "href": "/docs/about"
+            "href": "https://padelapi.org/docs/about"
           },
           {
             "label": "Privacy Policy",
