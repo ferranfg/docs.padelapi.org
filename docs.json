@@ -19,8 +19,7 @@
             "pages": [
               "index",
               "error-codes",
-              "websockets",
-              "about"
+              "websockets"
             ]
           },
           {
