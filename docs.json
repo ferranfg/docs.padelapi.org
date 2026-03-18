@@ -123,6 +123,10 @@
         "header": "Legal",
         "items": [
           {
+            "label": "About Us",
+            "href": "/about"
+          },
+          {
             "label": "Privacy Policy",
             "href": "https://padelapi.org/privacy-policy"
           },
@@ -131,8 +135,8 @@
             "href": "https://padelapi.org/terms-of-service"
           },
           {
-            "label": "Cookies Policy",
-            "href": "https://padelapi.org/cookies-policy"
+            "label": "Support",
+            "href": "mailto:ferran@padelapi.org"
           }
         ]
       }

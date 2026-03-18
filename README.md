@@ -1,5 +1,5 @@
 ---
-title: "About the Padel API"
+title: "Getting Started"
 description: "Discover how to access and use the Padel API for professional padel data. Learn about authentication, coverage, rate limits, and supported tournaments."
 ---
 
