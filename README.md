@@ -11,7 +11,7 @@ To authenticate, you need to include an `Authorization` header in all of your re
 
 For example:
 
-```curl
+```bash
 curl -i -X GET \
   'https://padelapi.org/api/seasons' \
   -H 'Authorization: Bearer YOUR_API_TOKEN_HERE'

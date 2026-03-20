@@ -11,7 +11,7 @@ To authenticate, you need to include an `Authorization` header in all of your re
 
 For example:
 
-```curl
+```bash
 curl -i -X GET \
   'https://padelapi.org/api/seasons' \
   -H 'Authorization: Bearer YOUR_API_TOKEN_HERE'
@@ -25,7 +25,7 @@ To guarantee the highest data quality and consistency, Padel API currently focus
 
 This ensures comprehensive and timely coverage of draws, schedules, matches, results, and statistics.
 
-Feature availability varies by tournament level. Refer to the tables below for the current availability of Results, Stats, and Live coverage.
+Feature availability varies by tournament level. Refer to the tables below for the current availability of Results, Stats, and Live coverage. For guidance on keeping your local data up to date, see the [Data Synchronization](/guides/data-synchronization) guide.
 
 ### Padel FIP & Premier Padel
 
@@ -57,15 +57,6 @@ Coverage currently includes 2023 World Padel Tour events. Additional historical 
 | `wpt_500`       |✅     |❌       |❌               |
 | `wpt_final`     |✅     |❌       |❌               |
 
-### Data Synchronization
-
-Tournaments — especially at lower levels like FIP Gold, FIP Silver, or regional events — are subject to changes throughout the season: name updates, date shifts, merges with other events, or even cancellations. New tournaments can also be added to the calendar mid-season.
-
-We recommend implementing a **weekly synchronization process** using the [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments) endpoint as your starting point. Your sync logic should account for:
-
-- **New tournaments**: New events may appear in the calendar throughout the season. Your sync should detect and store any tournaments not previously seen.
-- **Tournament status changes**: Some events may transition to `cancelled` during the season. Cancelled tournaments are excluded from list endpoints ([`/tournaments`](/api-reference/tournament/list-tournaments) and [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments)) but remain accessible via the [tournament detail endpoint](/api-reference/tournament/show-tournament) with their `cancelled` status visible. If you have previously stored a tournament, you can check its current status by fetching it directly by ID.
-- **Redirections (merged tournaments)**: When a tournament has been merged into another event, the API will respond with a `302` redirect pointing to the new resource. Your sync process should follow these redirects and update any stored references. See [Redirection Codes](/error-codes#redirection-codes) for details on how to handle these responses. Note that renamed tournaments keep the same ID — redirections only occur when two tournaments are merged.
 
 ## Rate Limits
 
@@ -88,6 +79,10 @@ The API includes the following headers in responses to help you track your usage
 
 <Tip>
   Use caching strategies and monitor `X-RateLimit-Remaining` to avoid hitting the limit.
+</Tip>
+
+<Tip>
+  Check your requests and daily/monthly quota available in the [Logs & Quota](https://padelapi.org/explore/resources/logs) page.
 </Tip>
 
 ## Pagination
