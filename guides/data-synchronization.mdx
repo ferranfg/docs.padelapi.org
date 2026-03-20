@@ -1,0 +1,69 @@
+---
+title: "Data Synchronization"
+description: "Learn how to keep your local data in sync with the Padel API, handling new tournaments, cancellations, redirects, and player identity changes."
+---
+
+If you are building an application on top of the Padel API, you will likely want to store data locally rather than fetching it on every request. This reduces latency, avoids hitting [rate limits](/index#rate-limits), and gives you more control over your data model.
+
+However, padel data is not static. Tournaments get cancelled or rescheduled, player rankings change after every event, and match results can be corrected after the fact. This guide describes a synchronization strategy to keep your local data consistent with the API.
+
+## Sync frequency
+
+| Data type     | Recommended frequency         | Key endpoints |
+|---------------|-------------------------------|---------------|
+| Tournaments   | Weekly                        | [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments) |
+| Players       | After each tournament week    | [`/players/{player}`](/api-reference/player/show-player) |
+| Matches       | After each tournament         | [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) |
+
+## Tournaments
+
+Tournaments, especially at lower levels like FIP Gold, FIP Silver, or regional events, are subject to changes throughout the season: name updates, date shifts, merges with other events, or even cancellations. New tournaments can also be added to the calendar mid-season.
+
+We recommend implementing a **weekly synchronization process** using the [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments) endpoint as your starting point. Your sync logic should account for:
+
+- **New tournaments**: New events may appear in the calendar throughout the season. Your sync should detect and store any tournaments not previously seen.
+- **Tournament status changes**: Some events may transition to `cancelled` during the season. Cancelled tournaments are excluded from list endpoints ([`/tournaments`](/api-reference/tournament/list-tournaments) and [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments)) but remain accessible via the [tournament detail endpoint](/api-reference/tournament/show-tournament) with their `cancelled` status visible. If you have previously stored a tournament, you can check its current status by fetching it directly by ID.
+- **Redirections (merged tournaments)**: When a tournament has been merged into another event, the API will respond with a `302` redirect pointing to the new resource. Your sync process should follow these redirects and update any stored references.
+
+<Tip>See [Redirection Codes](/error-codes#redirection-codes) for details on how to handle these responses. Note that renamed tournaments keep the same ID. Redirections only occur when two tournaments are merged.</Tip>
+
+## Players
+
+Player data changes regularly throughout the season. Rankings and points are updated after every tournament, so any locally cached player records will become stale quickly.
+
+Beyond rankings, the most common issue is a player appearing under multiple name variations (for example, `"Juan García"` and `"Juan Garcia Lopez"`), which results in separate player entries, each with a subset of that player's matches.
+
+When this happens, one player ID becomes the canonical record and the other is merged into it. The API handles this the same way as merged tournaments: the deprecated player ID will respond with a `302` redirect pointing to the canonical player. Your sync logic should:
+
+- **Re-sync rankings and points regularly**: Use [`/players/{player}`](/api-reference/player/show-player) to refresh stored player data after each tournament week.
+- **Follow player redirects**: When fetching a stored player by ID and receiving a `302`, update your local reference to point to the new ID and re-fetch the canonical record.
+- **Re-sync match history after a merge**: Once a player has been merged, fetch their matches again via [`/players/{player}/matches`](/api-reference/player/list-player-matches) to ensure your local data reflects the complete, consolidated match history.
+- **Use player IDs as your primary key**: Player names are not stable identifiers. Always store and reference players by their numeric ID.
+
+## Matches
+
+Match results are generally stable once a tournament has concluded, but stats and point-by-point data may be added or corrected after the fact. Sync matches tournament by tournament using [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches).
+
+For each match, consider storing:
+
+- The match result and score
+- Player and pair references (by ID)
+- Match stats via [`/matches/{match}/stats`](/api-reference/match/show-match-stats) 🔒, once available
+
+Avoid re-syncing match data for tournaments that concluded several weeks ago unless you have a specific reason to. Results for completed events rarely change.
+
+## Error handling
+
+Your sync process will encounter errors. Handle these cases explicitly:
+
+<Warning>
+  A `404` on a previously stored resource means it has been permanently removed. Remove or flag the record in your local database rather than retrying.
+</Warning>
+
+<Warning>
+  A `302` means the resource has moved or been merged. Follow the redirect, update your stored ID, and re-fetch the canonical record. Do not continue using the old ID.
+</Warning>
+
+<Tip>
+  A `429` means you have hit a rate limit. Back off and retry after the limit resets. Do not retry immediately in a loop. Monitor the `X-RateLimit-Remaining` header to pace your requests during large sync jobs.
+</Tip>
