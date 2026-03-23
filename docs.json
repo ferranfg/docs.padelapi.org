@@ -18,15 +18,21 @@
             "icon": "book-open",
             "pages": [
               "index",
-              "error-codes",
-              "statuses",
-              "websockets"
+              "error-codes"
             ]
           },
           {
             "group": "Endpoints",
             "icon": "file-code",
             "openapi": "https://padelapi.org/docs/api.json"
+          },
+          {
+            "group": "Reference",
+            "icon": "list",
+            "pages": [
+              "statuses",
+              "websockets"
+            ]
           }
         ]
       },
