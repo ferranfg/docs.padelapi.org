@@ -19,6 +19,7 @@
             "pages": [
               "index",
               "error-codes",
+              "statuses",
               "websockets"
             ]
           },
