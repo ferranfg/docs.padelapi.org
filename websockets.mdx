@@ -213,7 +213,7 @@ The WebSocket event payload has the **same structure** as the REST response — 
 
 ## Step 4: Handle Match Completion
 
-When a match ends, the `status` field changes to `finished`. Use this to clean up your subscription:
+When a match ends, the `status` field changes to `ended`. See [Match Statuses](/statuses#match-statuses) for details. Use this to clean up your subscription:
 
 <CodeGroup>
 
@@ -221,9 +221,9 @@ When a match ends, the `status` field changes to `finished`. Use this to clean u
 channel.bind('App\\PadelApi\\Events\\MatchLiveUpdated', (data) => {
   updateScoreboard(data);
 
-  if (data.status === 'finished') {
+  if (data.status === 'ended') {
     pusher.unsubscribe('matches.7243');
-    console.log('Match finished, unsubscribed');
+    console.log('Match ended, unsubscribed');
   }
 });
 ```
@@ -233,9 +233,9 @@ def on_event(data):
     match = json.loads(data)
     update_scoreboard(match)
 
-    if match['status'] == 'finished':
+    if match['status'] == 'ended':
         pusher.unsubscribe('matches.7243')
-        print('Match finished, unsubscribed')
+        print('Match ended, unsubscribed')
 ```
 
 </CodeGroup>
@@ -247,7 +247,7 @@ def on_event(data):
 1. **Find live matches** — `GET /api/live`
 2. **Get initial state** — `GET /api/matches/{id}/live`
 3. **Subscribe to updates** — Connect to Pusher channel `matches.{id}`
-4. **Detect match end** — When `status` changes to `finished`, unsubscribe from the channel
+4. **Detect match end** — When `status` changes to `ended`, unsubscribe from the channel
 
 ---
 
