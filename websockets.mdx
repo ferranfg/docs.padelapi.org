@@ -120,7 +120,7 @@ curl -X GET \
 
 | Field | Description |
 |---|---|
-| `status` | Match status: `live`, `finished`, `scheduled`, etc. |
+| `status` | Match status in a live context: `live`, `ended`, or `finished`. See [Match Statuses](/statuses#match-statuses) for all possible values. |
 | `coverage` | Data completeness: `tracking` (collecting data), `full` (all games tracked), `partial` (some gaps), or `null` (no data) |
 | `channel` | Pusher channel name for real-time updates |
 | `sets[].set_number` | Set number (1, 2, or 3) |
@@ -213,7 +213,12 @@ The WebSocket event payload has the **same structure** as the REST response — 
 
 ## Step 4: Handle Match Completion
 
-When a match ends, the `status` field changes to `ended`. See [Match Statuses](/statuses#match-statuses) for details. Use this to clean up your subscription:
+When a match ends, you will receive two final events in sequence:
+
+1. **`ended`** — the match is over, but results are still being confirmed
+2. **`finished`** — the match is fully closed and results are final
+
+See [Match Statuses](/statuses#match-statuses) for details. You can react to either status depending on your use case — unsubscribe from the channel once you receive `finished`:
 
 <CodeGroup>
 
@@ -222,8 +227,12 @@ channel.bind('App\\PadelApi\\Events\\MatchLiveUpdated', (data) => {
   updateScoreboard(data);
 
   if (data.status === 'ended') {
+    console.log('Match ended, waiting for final confirmation...');
+  }
+
+  if (data.status === 'finished') {
     pusher.unsubscribe('matches.7243');
-    console.log('Match ended, unsubscribed');
+    console.log('Match finished, unsubscribed');
   }
 });
 ```
@@ -234,8 +243,11 @@ def on_event(data):
     update_scoreboard(match)
 
     if match['status'] == 'ended':
+        print('Match ended, waiting for final confirmation...')
+
+    if match['status'] == 'finished':
         pusher.unsubscribe('matches.7243')
-        print('Match ended, unsubscribed')
+        print('Match finished, unsubscribed')
 ```
 
 </CodeGroup>
@@ -247,7 +259,7 @@ def on_event(data):
 1. **Find live matches** — `GET /api/live`
 2. **Get initial state** — `GET /api/matches/{id}/live`
 3. **Subscribe to updates** — Connect to Pusher channel `matches.{id}`
-4. **Detect match end** — When `status` changes to `ended`, unsubscribe from the channel
+4. **Detect match end** — When `status` changes to `ended` (match over) and then `finished` (results confirmed), unsubscribe from the channel
 
 ---
 
