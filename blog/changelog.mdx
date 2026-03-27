@@ -4,6 +4,18 @@ description: "Stay up-to-date with Padel API releases, new features, bug fixes, 
 rss: true
 ---
 
+<Update label="March 2026" description="Match Statuses, Live Fixes & WebSockets">
+  - **New:** Match status `ended` for matches pending official score
+  - **New:** `short_name` property in Player resource
+  - Added `ended` and `finished` events to WebSocket `MatchLiveUpdated`
+  - Cancelled tournaments hidden from list endpoints
+  - Fixed duplicate and flickering points in live point-by-point
+  - Updated rate limits: Free 2,000 req/day, Pro 4,000 req/day
+  - **Docs:** Added [Statuses reference](/reference/statuses) page
+  - **Docs:** Added [WebSockets](/reference/websockets) guide
+  - **Docs:** Added [Data Synchronization](/guides/data-synchronization) guide
+</Update>
+
 <Update label="February 2026" description="LLMs, OAuth & Match Simulator">
   - **New:** `llms.txt` endpoint for AI and LLM agent discovery
   - **New:** MCP tool `show-match-live` for point-by-point live scores
