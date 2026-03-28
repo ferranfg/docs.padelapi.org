@@ -1,0 +1,85 @@
+---
+title: "Padel Intelligence Alternative"
+seo:
+  title: "Padel Intelligence Alternative - Padel API"
+  description: "Looking for a Padel Intelligence alternative? Padel API offers cumulative stats, tournament history, and live scores via REST API for developers and fans — no visual app required."
+description: "How Padel API compares to Padel Intelligence: cumulative stats and full tournament history via API vs. manual shot-level analysis with limited coverage."
+---
+
+There are two products in the padel data space that share a similar name but serve completely different purposes: **Padel Intelligence** and **Padel API**. If you found this page while researching padel data tools, here is an honest breakdown of what each one does.
+
+---
+
+## What is Padel Intelligence?
+
+[Padel Intelligence](https://padelintelligence.live/) is a performance analysis platform focused on **collecting shot-level data** from professional matches. Their data is gathered by a team of human analysts using their proprietary PICA technology, and the output is a **visual interface** to review match performance.
+
+- Shot tracking per match
+- Visual match reports
+- Player and tournament rankings
+- Betting on padel doubles matches
+
+Because data is collected manually by analysts on a per-match basis, coverage depends entirely on which matches their team covers.
+
+<Note>
+  Padel Intelligence does not offer programmatic access to data, historical season coverage, or integrations for developers.
+</Note>
+
+---
+
+## What is Padel API?
+
+[Padel API](https://padelapi.org) is a **REST API for professional padel data** — tournaments, matches, player statistics, rankings, and live scores. The data is **cumulative and historical**: win rates, titles, head-to-head records, match scores, and serve metrics across entire seasons or careers.
+
+There is no visual interface by default. The API returns structured JSON that developers consume to build their own applications, dashboards, or analysis tools.
+
+<CardGroup cols={2}>
+  <Card title="For Developers" icon="code">
+    Query tournaments, matches, players, and stats programmatically. Build rankings models, prediction tools, or data pipelines.
+  </Card>
+  <Card title="For Fans" icon="magnifying-glass">
+    Use [Padel Analyst](/padel-analyst/index) — an AI assistant pre-loaded with Padel API data — to ask questions in natural language without writing any code.
+  </Card>
+</CardGroup>
+
+---
+
+## Side-by-side comparison
+
+| | Padel Intelligence | Padel API |
+|---|---|---|
+| **Target audience** | Analysts reviewing specific matches | Developers & padel enthusiasts |
+| **Data type** | Shot-level, per-match | Cumulative stats, results, rankings |
+| **Format** | Visual dashboards | REST API (JSON) |
+| **Coverage** | Individual match analysis | Full tournament history across seasons |
+| **Access** | App / visual interface | HTTP requests with Bearer token |
+| **AI integration** | No | Yes — via [Padel Analyst](/padel-analyst/index) |
+
+---
+
+## Which one do you need?
+
+**Use Padel Intelligence if** you want a visual breakdown of a specific professional match and don't need programmatic access or historical data.
+
+**Use Padel API if** you want to:
+
+- Build a padel statistics app, ranking tool, or prediction model
+- Embed live scores or tournament draws into your site
+- Analyze player career trajectories or head-to-head records
+- Ask questions like *"Who has the best win rate in finals?"* using [Padel Analyst](/padel-analyst/index)
+
+---
+
+## Get started with Padel API
+
+<CardGroup cols={3}>
+  <Card title="Your First API Call" icon="rocket" href="/guides/your-first-api-call">
+    Authenticate and make your first request in minutes
+  </Card>
+  <Card title="Padel Statistics" icon="chart-bar" href="/guides/padel-statistics">
+    Match stats, player career data, and pair performance
+  </Card>
+  <Card title="Padel Analyst" icon="robot" href="/padel-analyst/index">
+    Explore padel data in natural language — no code required
+  </Card>
+</CardGroup>
