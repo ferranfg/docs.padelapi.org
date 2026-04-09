@@ -41,7 +41,7 @@ Lower-tier events (such as FIP Rise, FIP Promises, national or exhibition events
 | `finals`        |✅     |✅       |✅               |
 | `fip_platinum`  |✅     |✅       |✅               |
 | `fip_gold`      |✅     |❌       |❌               |
-| `fip_silver`    |🔜     |❌       |❌               |
+| `fip_silver`    |✅     |❌       |❌               |
 | `fip_other`*    |✅     |❓       |❓               |
 
 *Other tournaments may include manually curated individual FIP events of particular relevance, such as the FIP World Cup Pairs.
