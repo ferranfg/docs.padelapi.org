@@ -145,7 +145,7 @@
       }
     ]
   },
-  "description": "First-ever API for professional padel data. Get access to the latest padel player stats, rankings, and more.",
+  "description": "First-ever API for professional padel data. Access the latest padel player stats, rankings, and more.",
   "appearance": {
     "strict": true,
     "default": "dark"
