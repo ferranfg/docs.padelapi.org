@@ -5,24 +5,7 @@ description: "Discover how developers and businesses use Padel API to build fant
 
 Padel API powers a variety of applications across the padel ecosystem. Here are some popular ways developers use our data.
 
-<CardGroup cols={2}>
-  <Card title="Fantasy Sports" icon="trophy" color="#eab308">
-    Build fantasy games with real player stats
-  </Card>
-  <Card title="Analytics" icon="chart-line" color="#22c55e">
-    Analyze performance trends and insights
-  </Card>
-  <Card title="Media" icon="newspaper" color="#3b82f6">
-    Power sports journalism with real-time data
-  </Card>
-  <Card title="Brand Sponsorships" icon="bullseye-arrow" color="#ec4899">
-    Track sponsored players' performance
-  </Card>
-</CardGroup>
-
----
-
-## <Icon icon="trophy" /> Fantasy Sports Applications
+## <Icon icon="trophy" color="#eab308" /> Fantasy Sports Applications
 
 Build fantasy padel games using real player statistics, match results, and rankings. Track player performance across tournaments to calculate fantasy points and leaderboards.
 
@@ -30,29 +13,30 @@ Build fantasy padel games using real player statistics, match results, and ranki
   Fantasy games typically use the **Players**, **Matches**, **Rankings**, and **Statistics** endpoints to calculate points based on real match performance.
 </Tip>
 
-**Example:**
+| Fantasy Padel Tour |
+|---|
+| The first online padel manager. Build your squad and earn points based on real Premier Padel match performance. |
+| [fantasypadeltour.com <Icon icon="arrow-up-right-from-square" size={12} />](https://fantasypadeltour.com) |
 
-<Frame>
-  <img src="/images/use-cases/fantasy-padel-tour.webp" alt="Fantasy Padel Tour" />
-</Frame>
+| Out of the Court |
+|---|
+| Fantasy padel app for iOS and Android. Compete in global leagues based on real match performance. |
+| [outofthecourt.com <Icon icon="arrow-up-right-from-square" size={12} />](https://outofthecourt.com) |
 
-<Card title="Fantasy Padel Tour" icon="trophy" href="https://fantasypadeltour.com">
-  The first online padel manager. Build your squad, manage your lineup, and earn points based on real Premier Padel match performance.
-</Card>
+## <Icon icon="table-list" color="#f97316" /> Live Scores & Results
 
-<br />
+Display real-time match scores, tournament draws, and results pages. Build your own padel scoreboard or results tracker similar to SofaScore or FlashScore.
 
-<Frame>
-  <img src="/images/use-cases/out-of-the-court.webp" alt="Out of the Court" />
-</Frame>
+<Tip>
+  Use **Matches** and **WebSockets** to display live scores in real time, and **Tournaments** to show draws and brackets.
+</Tip>
 
-<Card title="Out of the Court" icon="mobile" href="https://outofthecourt.com">
-  A fantasy padel app for iOS and Android where you build teams of Premier Padel players and compete in global leagues based on real match performance.
-</Card>
+| Padel Nachos |
+|---|
+| Follow every point live. Real-time scores, player rankings, tournament draws, highlights, and breaking news from Premier Padel and FIP — all in one app. |
+| [padelnachos.com <Icon icon="arrow-up-right-from-square" size={12} />](https://padelnachos.com) |
 
----
-
-## <Icon icon="chart-line" /> Sports Analytics & Research
+## <Icon icon="chart-line" color="#22c55e" /> Sports Analytics & Research
 
 Analyze player performance trends, head-to-head records, and ranking progressions. Generate insights for coaches, players, or sports researchers.
 
@@ -60,11 +44,7 @@ Analyze player performance trends, head-to-head records, and ranking progression
   Combine **Statistics** with **Matches** data to build comprehensive performance reports and predictive models.
 </Note>
 
-**Relevant endpoints:** Players, Statistics, Rankings, Matches
-
----
-
-## <Icon icon="newspaper" /> Sports Media & Journalism
+## <Icon icon="newspaper" color="#3b82f6" /> Sports Media & Journalism
 
 Pull statistics for articles, generate match previews, and create data-driven recaps. Access historical data to provide context for your coverage.
 
@@ -72,11 +52,7 @@ Pull statistics for articles, generate match previews, and create data-driven re
   Use tournament and match data to automatically generate pre-match previews and post-match summaries for your publication.
 </Info>
 
-**Relevant endpoints:** Players, Matches, Tournaments, Statistics
-
----
-
-## <Icon icon="bullseye-arrow" /> Brand Sponsorships
+## <Icon icon="bullseye-arrow" color="#ec4899" /> Brand Sponsorships
 
 Help brands and sponsors track the performance of their sponsored players. Monitor rankings, tournament results, and visibility metrics to measure sponsorship ROI.
 
@@ -84,9 +60,10 @@ Help brands and sponsors track the performance of their sponsored players. Monit
   Use **Rankings** and **Matches** data to generate performance reports for sponsors, showing their players' progression and tournament achievements.
 </Tip>
 
-**Relevant endpoints:** Players, Matches, Rankings, Tournaments
-
----
+| Padel Fan Index |
+|---|
+| Sponsor-grade analytics that measure real fan engagement with professional padel players. Powered by Fantasy Padel Tour and Padel API. |
+| [Padel Fan Index <Icon icon="arrow-up-right-from-square" size={12} />](/guides/padel-fan-index) |
 
 <CardGroup cols={2}>
   <Card title="Need help building?" icon="handshake" href="/guides/consulting">
