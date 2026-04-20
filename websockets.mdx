@@ -89,11 +89,13 @@ curl -X GET \
         {
           "game_number": 1,
           "game_score": "0 - 0",
+          "serving": "team_1",
           "points": ["15:0", "30:0", "40:15"]
         },
         {
           "game_number": 2,
           "game_score": "1 - 0",
+          "serving": "team_2",
           "points": ["0:0", "15:0", "30:0", "40:0", "40:15"]
         }
       ]
@@ -105,6 +107,7 @@ curl -X GET \
         {
           "game_number": 1,
           "game_score": "0 - 0",
+          "serving": "team_1",
           "points": ["0:0", "15:0", "30:0"]
         }
       ]
@@ -127,6 +130,7 @@ curl -X GET \
 | `sets[].set_score` | Final set score (e.g. `"6-2"`) when complete, `null` while in progress |
 | `sets[].games[].game_number` | Game number within the set |
 | `sets[].games[].game_score` | Cumulative set score **before** this game started (e.g. `"3 - 1"`) |
+| `sets[].games[].serving` | Serving team: `"team_1"`, `"team_2"`, or `null` if unknown |
 | `sets[].games[].points` | Array of point scores during the game (format `"team1:team2"`) |
 
 <Tip>
