@@ -17,16 +17,22 @@
             "group": "Overview",
             "icon": "book-open",
             "pages": [
-              "index",
+              "index"
+            ]
+          },
+          {
+            "group": "API Endpoints",
+            "icon": "code",
+            "openapi": "https://padelapi.org/docs/api.json"
+          },
+          {
+            "group": "Reference",
+            "icon": "bookmark",
+            "pages": [
               "error-codes",
               "statuses",
               "websockets"
             ]
-          },
-          {
-            "group": "Endpoints",
-            "icon": "file-code",
-            "openapi": "https://padelapi.org/docs/api.json"
           }
         ]
       },
