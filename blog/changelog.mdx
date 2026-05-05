@@ -4,6 +4,22 @@ description: "Stay up-to-date with Padel API releases, new features, bug fixes, 
 rss: true
 ---
 
+<Update label="April 2026" description="Player Pairs, FIP Silver & updated_at Filter">
+  - **New:** Player pairs endpoint (`/players/{id}/pairs`)
+  - **New:** `updated_at` parameter for incremental syncs on list endpoints
+  - **New:** FIP Silver added to tournament level coverage
+  - **New:** `serving` field in live match response
+  - **New:** `redirect_to` for merged players (resolves to canonical player)
+  - Show cancelled tournaments and all statuses in Season relations
+  - Applied Business plan rate limits as documented
+  - Improved match-info update cadence and tournament filtering
+  - Fixed duplicate players (Daniel Aguero, Letizia Dellagnese)
+  - **Docs:** Added [Padel API vs Scraping](/guides/vs-scraping) guide
+  - **Docs:** Updated [WebSockets](/reference/websockets) reference
+  - **Docs:** Redesigned showcase page with Live Scores category
+  - **Docs:** Separated endpoints and reference groups in navigation
+</Update>
+
 <Update label="March 2026" description="Match Statuses, Live Fixes & WebSockets">
   - **New:** Match status `ended` for matches pending official score
   - **New:** `short_name` property in Player resource
