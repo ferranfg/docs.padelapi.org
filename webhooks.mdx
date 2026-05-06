@@ -303,8 +303,8 @@ The `data` field of each event contains the **same shape** as the corresponding 
   <Accordion title="What about backfills?">
     Webhooks only fire for changes that happen **after** the subscription is created. To bootstrap your local copy, do an initial fetch with the REST endpoints (e.g. `GET /api/tournaments?per_page=100`) and then let webhooks keep you in sync. See the [Data Synchronization](/guides/data-synchronization) guide for the full pattern.
   </Accordion>
-  <Accordion title="Handling burst traffic during live tournaments">
-    During a busy tournament day you can receive hundreds of `match.updated` events per minute. Always queue work in a background job and return `200` immediately — synchronous processing inside the webhook handler will hit the 3-second timeout and trigger needless retries.
+  <Accordion title="Live match updates">
+    Webhooks for `match.updated` only fire at significant transitions — typically when a match starts and when it ends. Point-by-point and score updates while the match is in progress are not delivered as webhooks; subscribe to the [WebSocket channel](/websockets) for real-time live data instead.
   </Accordion>
   <Accordion title="Lost or compromised secret">
     Secrets are non-recoverable. If yours leaks or you forget it, delete the webhook and create a new one — your URL stays the same, just rotate the `PADEL_WEBHOOK_SECRET` env var on your server.
