@@ -1,0 +1,328 @@
+---
+title: "Webhooks"
+description: "Receive instant push notifications from the Padel API when tournaments, matches, or players are created, updated, or deleted — with HMAC-signed payloads and automatic retries."
+---
+
+Webhooks let your server react to changes in the Padel API the moment they happen — no polling required. Register a public HTTPS endpoint, pick the events you care about, and we'll POST a signed JSON payload to your URL each time one of them fires.
+
+<CardGroup cols={2}>
+  <Card title="Push, not poll" icon="bolt">
+    Get notified within seconds of a tournament, match, or player change.
+  </Card>
+  <Card title="Signed & retried" icon="shield-check">
+    Every payload is HMAC-SHA256 signed and retried up to 3 times on failure.
+  </Card>
+</CardGroup>
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+- A Padel API account ([sign up here](https://padelapi.org/register))
+- An API token from your [API Tokens](https://padelapi.org/user/api-tokens) page
+- A **Business** subscription ([upgrade here](https://padelapi.org/billing)) — required to register new webhooks
+- A public HTTPS endpoint that accepts `POST` requests with a JSON body
+
+---
+
+## Step 1: Register a Webhook
+
+Create a webhook subscription by sending the URL you control and the list of events you want to receive:
+
+<CodeGroup>
+
+```bash cURL
+curl -X POST \
+  'https://padelapi.org/api/webhooks' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "url": "https://your-server.com/padel-webhook",
+    "events": ["match.updated", "match.created"]
+  }'
+```
+
+```javascript JavaScript
+const response = await fetch('https://padelapi.org/api/webhooks', {
+  method: 'POST',
+  headers: {
+    'Authorization': 'Bearer YOUR_API_TOKEN',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({
+    url: 'https://your-server.com/padel-webhook',
+    events: ['match.updated', 'match.created']
+  })
+});
+
+const webhook = await response.json();
+console.log('Store this secret securely:', webhook.secret);
+```
+
+```python Python
+import requests
+
+response = requests.post(
+    'https://padelapi.org/api/webhooks',
+    headers={'Authorization': 'Bearer YOUR_API_TOKEN'},
+    json={
+        'url': 'https://your-server.com/padel-webhook',
+        'events': ['match.updated', 'match.created']
+    }
+)
+
+webhook = response.json()
+print('Store this secret securely:', webhook['secret'])
+```
+
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "id": 42,
+  "self": "/api/webhooks/42",
+  "url": "https://your-server.com/padel-webhook",
+  "events": ["match.updated", "match.created"],
+  "secret": "Xp7aS2nQ4kF8vL1dT9bH3jE6mY0wR5cZuI...",
+  "created_at": "2026-05-05T10:23:11+00:00",
+  "updated_at": "2026-05-05T10:23:11+00:00"
+}
+```
+
+<Warning>
+  The full `secret` is returned **only once**, on creation. Store it somewhere safe — subsequent reads return a masked value (`********...XXXX`) and there is no way to recover the original. If lost, delete the webhook and create a new one.
+</Warning>
+
+---
+
+## Step 2: Receive Events
+
+Each time a subscribed event fires, we send a `POST` request to your URL with this body:
+
+```json
+{
+  "event": "match.updated",
+  "occurred_at": "2026-05-05T18:42:07+00:00",
+  "data": {
+    "id": 7243,
+    "self": "/api/matches/7243",
+    "status": "live",
+    "...": "the same fields you would get from GET /api/matches/{id}"
+  }
+}
+```
+
+### Payload reference
+
+| Field | Description |
+|---|---|
+| `event` | The event name that triggered the call (e.g. `match.updated`). See [Available events](#available-events). |
+| `occurred_at` | ISO 8601 UTC timestamp of when the change was detected. |
+| `data` | The full resource representation — identical to the response of the corresponding `GET /api/{resource}/{id}` endpoint. |
+
+### Request headers
+
+| Header | Description |
+|---|---|
+| `Content-Type` | Always `application/json`. |
+| `Signature` | HMAC-SHA256 hex digest of the raw request body, signed with your webhook `secret`. See [Step 3](#step-3-verify-the-signature). |
+
+<Tip>
+  Respond with any `2xx` status code as fast as possible (within **3 seconds**). Heavy processing should happen in a background job — if your endpoint times out, the delivery is retried.
+</Tip>
+
+---
+
+## Step 3: Verify the Signature
+
+Always verify the `Signature` header before trusting a payload — it confirms the request came from the Padel API and was not tampered with in transit.
+
+The signature is calculated as:
+
+```
+HMAC_SHA256(raw_request_body, webhook_secret)
+```
+
+<CodeGroup>
+
+```javascript Node.js (Express)
+import express from 'express';
+import crypto from 'crypto';
+
+const app = express();
+const SECRET = process.env.PADEL_WEBHOOK_SECRET;
+
+// IMPORTANT: use the raw body, not the parsed JSON object
+app.post('/padel-webhook', express.raw({ type: 'application/json' }), (req, res) => {
+  const expected = crypto
+    .createHmac('sha256', SECRET)
+    .update(req.body)
+    .digest('hex');
+
+  const received = req.header('Signature');
+
+  if (!received || !crypto.timingSafeEqual(Buffer.from(expected), Buffer.from(received))) {
+    return res.status(401).send('Invalid signature');
+  }
+
+  const payload = JSON.parse(req.body);
+  console.log('Verified event:', payload.event);
+
+  res.sendStatus(200);
+});
+```
+
+```python Python (Flask)
+import hmac, hashlib, os
+from flask import Flask, request, abort
+
+app = Flask(__name__)
+SECRET = os.environ['PADEL_WEBHOOK_SECRET']
+
+@app.post('/padel-webhook')
+def receive():
+    raw = request.get_data()
+    expected = hmac.new(SECRET.encode(), raw, hashlib.sha256).hexdigest()
+    received = request.headers.get('Signature', '')
+
+    if not hmac.compare_digest(expected, received):
+        abort(401)
+
+    payload = request.get_json()
+    print('Verified event:', payload['event'])
+    return '', 200
+```
+
+```php PHP (Laravel)
+Route::post('/padel-webhook', function (Request $request) {
+    $expected = hash_hmac('sha256', $request->getContent(), config('services.padel.webhook_secret'));
+
+    if (! hash_equals($expected, $request->header('Signature', ''))) {
+        abort(401);
+    }
+
+    $payload = $request->json()->all();
+    Log::info('Verified event', ['event' => $payload['event']]);
+
+    return response()->noContent();
+});
+```
+
+</CodeGroup>
+
+<Warning>
+  Use a constant-time comparison (`crypto.timingSafeEqual`, `hmac.compare_digest`, `hash_equals`) to avoid timing attacks. A plain `===` comparison leaks information about the secret.
+</Warning>
+
+---
+
+## Step 4: Manage Retries and Failures
+
+If your endpoint returns a non-`2xx` response or doesn't reply within **3 seconds**, we retry the delivery automatically.
+
+| Behavior | Value |
+|---|---|
+| Maximum attempts | **3** |
+| Backoff | Exponential — increasing delay between retries |
+| Timeout per attempt | 3 seconds |
+| TLS verification | Enforced — the destination must serve a valid certificate |
+
+After 3 failed attempts, the event is dropped and logged on our side. The webhook itself is **not** automatically disabled.
+
+<Tip>
+  Webhooks deliver events **at-least-once**. Network retries or transient errors may produce duplicates — make your handler idempotent by deduplicating on `data.id` + `event` + `occurred_at`.
+</Tip>
+
+---
+
+## Step 5: Update or Pause a Webhook
+
+Change the URL or the list of subscribed events without recreating the webhook (and without losing the secret):
+
+```bash
+curl -X PATCH \
+  'https://padelapi.org/api/webhooks/42' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "events": ["match.updated", "tournament.updated", "player.updated"]
+  }'
+```
+
+Send an empty `events` array to **pause** delivery without deleting the webhook:
+
+```bash
+curl -X PATCH \
+  'https://padelapi.org/api/webhooks/42' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{ "events": [] }'
+```
+
+To stop a webhook permanently, delete it:
+
+```bash
+curl -X DELETE \
+  'https://padelapi.org/api/webhooks/42' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+You can list every webhook you own with `GET /api/webhooks`, or fetch one by id with `GET /api/webhooks/{id}`.
+
+---
+
+## Available Events
+
+| Event | Fires when |
+|---|---|
+| `tournament.created` | A new tournament is added to the calendar. |
+| `tournament.updated` | Any field of a tournament changes (dates, venue, status, name…). |
+| `tournament.deleted` | A tournament is removed from the calendar. |
+| `match.created` | A new match is scheduled (typically when a draw is published). |
+| `match.updated` | A match changes — score, status, court, schedule, players, or any other field. |
+| `match.deleted` | A match is removed (cancellations, walkovers, draw corrections). |
+| `player.created` | A new player profile is added. |
+| `player.updated` | A player's profile changes — ranking, country, image, name, etc. |
+| `player.deleted` | A player profile is removed (typically merge of duplicates). |
+
+The `data` field of each event contains the **same shape** as the corresponding REST resource — see the [API Reference](/index) for the exact schema of each one.
+
+---
+
+## Tips
+
+<AccordionGroup>
+  <Accordion title="Webhooks vs WebSockets — when to use which">
+    Use **WebSockets** for point-by-point live scoreboards where every second matters and your client is a browser or mobile app. Use **Webhooks** for backend integrations: syncing your own database, triggering notifications, updating CRMs — anything where a server-to-server push is more natural than a persistent connection. See [WebSockets](/websockets) for the live alternative.
+  </Accordion>
+  <Accordion title="Use ngrok or similar to test locally">
+    Webhooks require a public HTTPS endpoint, but you don't need to deploy. Tools like [ngrok](https://ngrok.com), [Cloudflare Tunnel](https://developers.cloudflare.com/cloudflare-one/connections/connect-networks/) or [Tailscale Funnel](https://tailscale.com/kb/1223/funnel) expose your local server with a temporary HTTPS URL — register that URL as your webhook target during development, then update it to your real endpoint when you go live.
+  </Accordion>
+  <Accordion title="What about backfills?">
+    Webhooks only fire for changes that happen **after** the subscription is created. To bootstrap your local copy, do an initial fetch with the REST endpoints (e.g. `GET /api/tournaments?per_page=100`) and then let webhooks keep you in sync. See the [Data Synchronization](/guides/data-synchronization) guide for the full pattern.
+  </Accordion>
+  <Accordion title="Handling burst traffic during live tournaments">
+    During a busy tournament day you can receive hundreds of `match.updated` events per minute. Always queue work in a background job and return `200` immediately — synchronous processing inside the webhook handler will hit the 3-second timeout and trigger needless retries.
+  </Accordion>
+  <Accordion title="Lost or compromised secret">
+    Secrets are non-recoverable. If yours leaks or you forget it, delete the webhook and create a new one — your URL stays the same, just rotate the `PADEL_WEBHOOK_SECRET` env var on your server.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next steps
+
+<CardGroup cols={3}>
+  <Card title="WebSockets" icon="bolt" href="/websockets">
+    Real-time point-by-point updates for live matches
+  </Card>
+  <Card title="Data Synchronization" icon="arrows-rotate" href="/guides/data-synchronization">
+    Bootstrap and keep your local data in sync
+  </Card>
+  <Card title="API Reference" icon="book" href="/index">
+    Full endpoint documentation with parameters and responses
+  </Card>
+</CardGroup>

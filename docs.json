@@ -31,7 +31,8 @@
             "pages": [
               "error-codes",
               "statuses",
-              "websockets"
+              "websockets",
+              "webhooks"
             ]
           }
         ]
