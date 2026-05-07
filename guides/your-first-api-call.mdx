@@ -23,7 +23,7 @@ Before you begin, make sure you have:
 
 ## Step 2: Make Your First Request
 
-Let's fetch the list of available seasons. This is a simple endpoint that returns all padel seasons available in the API.
+Let's fetch the list of available seasons with [`GET /api/seasons`](/api-reference/season/list-seasons). This is a simple endpoint that returns all padel seasons available in the API.
 
 <CodeGroup>
 
@@ -124,7 +124,7 @@ A successful response returns a JSON array with season data:
 
 ## Step 4: Fetch Player Rankings
 
-Now let's try something more interesting. Fetching the current player rankings:
+Now let's try something more interesting. Fetching the current player rankings via [`GET /api/players`](/api-reference/player/list-players):
 
 ```bash
 curl -X GET \

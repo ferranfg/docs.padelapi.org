@@ -27,7 +27,7 @@ Before you begin, make sure you have:
 
 ## Step 1: Register a Webhook
 
-Create a webhook subscription by sending the URL you control and the list of events you want to receive:
+Create a webhook subscription with [`POST /api/webhooks`](/api-reference/webhook/create-webhook), sending the URL you control and the list of events you want to receive:
 
 <CodeGroup>
 
@@ -239,7 +239,7 @@ After 3 failed attempts, the event is dropped and logged on our side. The webhoo
 
 ## Step 5: Update or Pause a Webhook
 
-Change the URL or the list of subscribed events without recreating the webhook (and without losing the secret):
+Change the URL or the list of subscribed events without recreating the webhook (and without losing the secret) using [`PATCH /api/webhooks/{id}`](/api-reference/webhook/update-webhook):
 
 ```bash
 curl -X PATCH \
@@ -261,7 +261,7 @@ curl -X PATCH \
   -d '{ "events": [] }'
 ```
 
-To stop a webhook permanently, delete it:
+To stop a webhook permanently, delete it with [`DELETE /api/webhooks/{id}`](/api-reference/webhook/delete-webhook):
 
 ```bash
 curl -X DELETE \
@@ -269,7 +269,7 @@ curl -X DELETE \
   -H 'Authorization: Bearer YOUR_API_TOKEN'
 ```
 
-You can list every webhook you own with `GET /api/webhooks`, or fetch one by id with `GET /api/webhooks/{id}`.
+You can list every webhook you own with [`GET /api/webhooks`](/api-reference/webhook/list-webhooks), or fetch one by id with [`GET /api/webhooks/{id}`](/api-reference/webhook/show-webhook).
 
 ---
 

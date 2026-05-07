@@ -14,6 +14,10 @@ Track professional padel matches point-by-point as they happen. The Padel API pr
   </Card>
 </CardGroup>
 
+<Note>
+  Looking for *resource changes* rather than point-by-point data? Use [Webhooks](/webhooks) instead — they push notifications when a tournament, match, or player is created, updated, or deleted, without keeping a connection open.
+</Note>
+
 ## Prerequisites
 
 Before you begin, make sure you have:
@@ -25,7 +29,7 @@ Before you begin, make sure you have:
 
 ## Step 1: Find Live Matches
 
-First, discover which matches are currently being played:
+First, discover which matches are currently being played using [`GET /api/live`](/api-reference/live/list-live-matches):
 
 <CodeGroup>
 
@@ -64,7 +68,7 @@ This returns a list of all matches with `status: "live"`. Each match includes it
 
 ## Step 2: Get the Live Match State
 
-Once you have a match ID, fetch its point-by-point data:
+Once you have a match ID, fetch its point-by-point data with [`GET /api/matches/{id}/live`](/api-reference/match/show-match-point-by-point):
 
 ```bash
 curl -X GET \
@@ -260,8 +264,8 @@ def on_event(data):
 
 ## Recommended Workflow
 
-1. **Find live matches** — `GET /api/live`
-2. **Get initial state** — `GET /api/matches/{id}/live`
+1. **Find live matches** — [`GET /api/live`](/api-reference/live/list-live-matches)
+2. **Get initial state** — [`GET /api/matches/{id}/live`](/api-reference/match/show-match-point-by-point)
 3. **Subscribe to updates** — Connect to Pusher channel `matches.{id}`
 4. **Detect match end** — When `status` changes to `ended` (match over) and then `finished` (results confirmed), unsubscribe from the channel
 
@@ -270,8 +274,8 @@ def on_event(data):
 ## Tips
 
 <AccordionGroup>
-  <Accordion title="REST polling vs WebSockets — when to use which">
-    Use **REST polling** when you need a simple integration, are building server-side batch processes, or your environment doesn't support persistent connections. Use **WebSockets** for user-facing applications where latency matters — live scoreboards, mobile apps, or real-time dashboards.
+  <Accordion title="REST polling vs WebSockets vs Webhooks — when to use which">
+    Use **REST polling** when you need a simple integration, are building server-side batch processes, or your environment doesn't support persistent connections. Use **WebSockets** for user-facing applications where latency matters — live scoreboards, mobile apps, or real-time dashboards. Use [**Webhooks**](/webhooks) for backend integrations that react to *resource changes* (match created, score finalised, player merged) — server-to-server, no persistent connection, signed payloads. WebSockets and Webhooks solve different problems: point-by-point during play vs. notifications when something changes.
   </Accordion>
   <Accordion title="Not all matches have live data">
     The `coverage` field indicates whether any points were lost during tracking. `full` means every point was captured, `partial` means some points were missed due to source feed gaps, and `tracking` means the match is live and data is being collected. Check this field before relying on point-level completeness.
@@ -289,8 +293,8 @@ def on_event(data):
 ## Next steps
 
 <CardGroup cols={3}>
-  <Card title="Your First API Call" icon="rocket" href="/guides/your-first-api-call">
-    Get set up with authentication and basic requests
+  <Card title="Webhooks" icon="webhook" href="/webhooks">
+    Server-to-server push for tournament, match, and player changes
   </Card>
   <Card title="Match Statistics" icon="chart-bar" href="/guides/padel-statistics">
     Combine live tracking with post-match stats analysis

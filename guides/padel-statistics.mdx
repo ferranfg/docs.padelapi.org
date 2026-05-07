@@ -21,7 +21,7 @@ Professional padel generates detailed statistics for every match. The Padel API 
 
 ## Match statistics
 
-The most granular level. Every match with available data includes stats for both teams, broken down by set.
+The most granular level. Every match with available data includes stats for both teams, broken down by set. Endpoint: [`GET /api/matches/{match_id}/stats`](/api-reference/match/show-match-stats).
 
 ```bash
 curl -X GET \
@@ -77,7 +77,7 @@ A match stats response includes overall totals plus per-set breakdowns:
 
 ## Player statistics
 
-Career-level aggregates for any player. Useful for comparing trajectories, building rankings models, or analyzing form over specific periods.
+Career-level aggregates for any player. Useful for comparing trajectories, building rankings models, or analyzing form over specific periods. Endpoint: [`GET /api/players/{player_id}/stats`](/api-reference/player/show-player-stats).
 
 ```bash
 curl -X GET \
@@ -143,7 +143,7 @@ curl -X GET \
 
 ## Pair statistics
 
-Padel is a doubles sport, and individual numbers only tell part of the story. Pair stats measure how two specific players perform **together**.
+Padel is a doubles sport, and individual numbers only tell part of the story. Pair stats measure how two specific players perform **together**. Endpoint: [`GET /api/pairs/{player_1_id}-{player_2_id}/stats`](/api-reference/pair/show-pair-stats).
 
 ```bash
 curl -X GET \

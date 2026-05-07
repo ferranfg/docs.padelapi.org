@@ -7,13 +7,17 @@ If you are building an application on top of the Padel API, you will likely want
 
 However, padel data is not static. Tournaments get cancelled or rescheduled, player rankings change after every event, and match results can be corrected after the fact. This guide describes a synchronization strategy to keep your local data consistent with the API.
 
+<Tip>
+  Want near-real-time sync without polling? Do an initial REST fetch to bootstrap your local copy, then subscribe to [Webhooks](/webhooks) and let the API push changes to you as they happen. The polling cadence below is the fallback when webhooks aren't an option (Free / Analyst / Pro plans, or environments without a public HTTPS endpoint).
+</Tip>
+
 ## Sync frequency
 
-| Data type     | Recommended frequency         | Key endpoints |
-|---------------|-------------------------------|---------------|
-| Tournaments   | Weekly                        | [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments) |
-| Players       | After each tournament week    | [`/players/{player}`](/api-reference/player/show-player) |
-| Matches       | After each tournament         | [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) |
+| Data type     | Recommended frequency         | Key endpoints | Webhook events |
+|---------------|-------------------------------|---------------|----------------|
+| Tournaments   | Weekly                        | [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments) | `tournament.created`, `tournament.updated`, `tournament.deleted` |
+| Players       | After each tournament week    | [`/players/{player}`](/api-reference/player/show-player) | `player.created`, `player.updated`, `player.deleted` |
+| Matches       | After each tournament         | [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) | `match.created`, `match.updated`, `match.deleted` |
 
 ## Tournaments
 
@@ -26,6 +30,8 @@ We recommend implementing a **weekly synchronization process** using the [`/seas
 - **Redirections (merged tournaments)**: When a tournament has been merged into another event, the API will respond with a `302` redirect pointing to the new resource. Your sync process should follow these redirects and update any stored references.
 
 <Tip>See [Redirection Codes](/error-codes#redirection-codes) for details on how to handle these responses. Note that renamed tournaments keep the same ID. Redirections only occur when two tournaments are merged.</Tip>
+
+If you have webhooks enabled, subscribe to `tournament.created`, `tournament.updated`, and `tournament.deleted` ([see all events](/webhooks#available-events)) to react to these changes immediately instead of waiting for the next weekly sync.
 
 ## Players
 
@@ -40,6 +46,8 @@ When this happens, one player ID becomes the canonical record and the other is m
 - **Re-sync match history after a merge**: Once a player has been merged, fetch their matches again via [`/players/{player}/matches`](/api-reference/player/list-player-matches) to ensure your local data reflects the complete, consolidated match history.
 - **Use player IDs as your primary key**: Player names are not stable identifiers. Always store and reference players by their numeric ID.
 
+With [webhooks](/webhooks), `player.updated` fires on every ranking, points, or profile change, and `player.deleted` lets you detect merges the moment they happen — without waiting to receive a `302` on a stale ID.
+
 ## Matches
 
 Match results are generally stable once a tournament has concluded, but stats and point-by-point data may be added or corrected after the fact. Sync matches tournament by tournament using [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches).
@@ -51,6 +59,8 @@ For each match, consider storing:
 - Match stats via [`/matches/{match}/stats`](/api-reference/match/show-match-stats) 🔒, once available
 
 Avoid re-syncing match data for tournaments that concluded several weeks ago unless you have a specific reason to. Results for completed events rarely change.
+
+If you want results delivered as they're confirmed instead of polling, subscribe to `match.updated` via [webhooks](/webhooks) — the event fires on score, status, and schedule changes. For point-by-point updates *during* a live match, use [WebSockets](/websockets) instead; webhooks only fire at significant transitions (start, end).
 
 ## Error handling
 
