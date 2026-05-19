@@ -3,6 +3,8 @@ title: "Getting Started"
 description: "Discover how to access and use the Padel API for professional padel data. Learn about authentication, coverage, rate limits, and supported tournaments."
 ---
 
+> <Icon icon="sparkles" /> Prefer an AI assistant? Connect Claude or ChatGPT via [Padel Analyst](/padel-analyst).
+
 ## Authentication
 
 The **Padel API** uses API tokens to authenticate requests. These are provided to you on your [API Tokens](https://padelapi.org/user/api-tokens) management page.
