@@ -4,6 +4,21 @@ description: "Stay up-to-date with Padel API releases, new features, bug fixes, 
 rss: true
 ---
 
+<Update label="May 2026" description="Webhooks, Rankings & Career Stats">
+  - **New:** Webhooks for tournament, match and player events (Business plan)
+  - **New:** Bulk rankings endpoint with official and RACE types
+  - **New:** Ranking history endpoint for player rankings over time
+  - **New:** MCP tool for player rankings
+  - **New:** `timezone` field on tournaments, resolved via GeoNames
+  - Filter player and pair stats by tournament level
+  - Include `retired` matches in player/pair stats to match FIP
+  - Accelerated `ended` → `finished` transition
+  - Fixed ELO calculation: real winner, individual diff, idempotency and margin modulation
+  - Fixed `sort_by`/`order_by` on player and pair matches endpoints
+  - **Docs:** Added [Webhooks](/webhooks) reference page
+  - **Docs:** Interlinking between guides, reference and API endpoints
+</Update>
+
 <Update label="April 2026" description="Player Pairs, FIP Silver & updated_at Filter">
   - **New:** Player pairs endpoint (`/players/{id}/pairs`)
   - **New:** `updated_at` parameter for incremental syncs on list endpoints
