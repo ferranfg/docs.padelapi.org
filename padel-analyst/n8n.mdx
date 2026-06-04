@@ -1,0 +1,88 @@
+---
+title: "Install in n8n"
+description: "Connect Padel Analyst to n8n workflows using the MCP Client Tool node. Give your AI Agent automations access to professional padel data."
+icon: "/images/integrations/n8n.svg"
+---
+
+This guide shows you how to connect Padel Analyst to [n8n](https://n8n.io) using the **MCP Client Tool** node, so your AI Agent workflows can query professional padel data.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+<CardGroup cols={2}>
+  <Card title="n8n Instance" icon="diagram-project">
+    A self-hosted or cloud n8n instance with AI features enabled
+  </Card>
+  <Card title="Padel API Token" icon="key">
+    Get your token from the [API Tokens](https://padelapi.org/user/api-tokens) page
+  </Card>
+</CardGroup>
+
+## Installation Steps
+
+<Steps>
+  <Step title="Add an MCP Client Tool node">
+    In your workflow, add an **AI Agent** node, then connect an **MCP Client Tool** node to its **Tool** input.
+  </Step>
+
+  <Step title="Configure the connection">
+    In the MCP Client Tool node, set:
+
+    | Field | Value |
+    |-------|-------|
+    | **Endpoint** | `https://padelapi.org/mcp` |
+    | **Server Transport** | `HTTP Streamable` |
+    | **Authentication** | `Header Auth` |
+  </Step>
+
+  <Step title="Create the Header Auth credential">
+    Create a new **Header Auth** credential with the following values, replacing `YOUR_API_TOKEN` with your token from the [API Tokens page](https://padelapi.org/user/api-tokens):
+
+    | Field | Value |
+    |-------|-------|
+    | **Name** | `Authorization` |
+    | **Value** | `Bearer YOUR_API_TOKEN` |
+  </Step>
+
+  <Step title="Select the tools to expose">
+    Set **Tools to Include** to `All`, or pick specific tools (e.g. `search-players`, `show-player-stats`) to limit what the agent can call. Execute the node once to confirm the tool list loads from the server.
+  </Step>
+</Steps>
+
+## Example Usage
+
+With the MCP Client Tool connected, your AI Agent can answer prompts such as:
+
+- "Who won the last Premier Padel Major?"
+- "Show me the head-to-head between Lebron/Galan and Coello/Tapia"
+- "What are Arturo Coello's statistics this season?"
+- "List all P1 tournaments in 2025"
+- "Simulate a match between the top two ranked pairs"
+
+Combine it with other n8n nodes to automate reports, post results to Slack, or trigger workflows on new match data.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="No tools loaded">
+    Verify the endpoint is `https://padelapi.org/mcp` and the transport is set to HTTP Streamable. Check that your API token is valid and that you have an active Analyst plan subscription.
+  </Accordion>
+  <Accordion title="Authentication errors">
+    Make sure the Header Auth credential uses the exact name `Authorization` and value `Bearer YOUR_API_TOKEN`, with a space after `Bearer`.
+  </Accordion>
+  <Accordion title="MCP Client Tool node not available">
+    The node requires a recent version of n8n. Update your instance to the latest version to access the AI agent and MCP nodes.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Available Tools" icon="wrench" href="/padel-analyst/index#available-tools">
+    See all 12 tools available for querying padel data
+  </Card>
+  <Card title="Example Queries" icon="magnifying-glass" href="/padel-analyst/index#example-queries">
+    Explore more example questions to ask
+  </Card>
+</CardGroup>

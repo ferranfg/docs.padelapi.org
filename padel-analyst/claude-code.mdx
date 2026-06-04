@@ -1,0 +1,102 @@
+---
+title: "Install in Claude Code"
+description: "Install Padel Analyst in Claude Code to query professional padel data from your terminal. One-command setup using the MCP HTTP transport."
+icon: "/images/integrations/anthropic.svg"
+---
+
+This guide shows you how to add Padel Analyst to [Claude Code](https://claude.com/claude-code), Anthropic's CLI, so you can query professional padel data directly from your terminal or IDE.
+
+## Prerequisites
+
+Before you begin, make sure you have:
+
+<CardGroup cols={2}>
+  <Card title="Claude Code Installed" icon="terminal">
+    Install with `npm install -g @anthropic-ai/claude-code`
+  </Card>
+  <Card title="Padel API Token" icon="key">
+    Get your token from the [API Tokens](https://padelapi.org/user/api-tokens) page
+  </Card>
+</CardGroup>
+
+## Installation Steps
+
+<Steps>
+  <Step title="Add the MCP server">
+    Run the following command, replacing `YOUR_API_TOKEN` with your token from the [API Tokens page](https://padelapi.org/user/api-tokens):
+
+    ```bash
+    claude mcp add --transport http padel-api https://padelapi.org/mcp \
+      --header "Authorization: Bearer YOUR_API_TOKEN"
+    ```
+
+    By default the server is added at the `local` scope (available only to you in the current project). Use `--scope user` to make it available across all your projects, or `--scope project` to share it with your team via a checked-in `.mcp.json`.
+  </Step>
+
+  <Step title="Verify the connection">
+    List your configured MCP servers to confirm it was added and is reachable:
+
+    ```bash
+    claude mcp list
+    ```
+
+    You can also run `/mcp` inside a Claude Code session to see the server status and its available tools.
+  </Step>
+
+  <Step title="Start querying">
+    Open a Claude Code session and ask a question about professional padel. Claude Code will call the Padel Analyst tools automatically when it needs data.
+  </Step>
+</Steps>
+
+## Configuration File
+
+If you prefer to edit configuration directly, add Padel Analyst to your `.mcp.json` (project scope) or `~/.claude.json` (user scope):
+
+```json
+{
+  "mcpServers": {
+    "padel-api": {
+      "type": "http",
+      "url": "https://padelapi.org/mcp",
+      "headers": {
+        "Authorization": "Bearer YOUR_API_TOKEN"
+      }
+    }
+  }
+}
+```
+
+## Example Questions
+
+Try asking Claude Code questions like:
+
+- "Who won the last Premier Padel Major?"
+- "Show me the head-to-head between Lebron/Galan and Coello/Tapia"
+- "What are Arturo Coello's statistics this season?"
+- "List all P1 tournaments in 2025"
+- "Simulate a match between the top two ranked pairs"
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="Server shows as failed in /mcp">
+    Verify your API token is correct and that you have an active Analyst plan subscription. Re-run the `claude mcp add` command with the corrected header.
+  </Accordion>
+  <Accordion title="Server not found in a different project">
+    Local-scope servers are project-specific. Re-add with `--scope user` to make Padel Analyst available everywhere.
+  </Accordion>
+  <Accordion title="Authentication errors">
+    Make sure the header is passed exactly as `Authorization: Bearer YOUR_API_TOKEN` and that your token hasn't expired.
+  </Accordion>
+</AccordionGroup>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Available Tools" icon="wrench" href="/padel-analyst/index#available-tools">
+    See all 12 tools available for querying padel data
+  </Card>
+  <Card title="Example Queries" icon="magnifying-glass" href="/padel-analyst/index#example-queries">
+    Explore more example questions to ask
+  </Card>
+</CardGroup>

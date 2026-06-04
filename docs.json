@@ -53,7 +53,9 @@
             "icon": "download",
             "pages": [
               "padel-analyst/chatgpt",
-              "padel-analyst/claude"
+              "padel-analyst/claude",
+              "padel-analyst/claude-code",
+              "padel-analyst/n8n"
             ]
           }
         ]
