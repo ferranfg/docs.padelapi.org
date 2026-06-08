@@ -5,21 +5,9 @@ description: "Connect AI assistants like Claude, ChatGPT, and VS Code to profess
 
 > <Icon icon="language" /> ¿Prefieres leerlo en español? Esta página también está disponible en [español](/padel-analyst/acerca-de).
 
-## What is Padel Analyst?
+## Your AI doesn't know padel yet
 
-Padel Analyst is an [MCP (Model Context Protocol)](https://modelcontextprotocol.io/introduction) server that connects AI assistants to professional padel data. It allows you to ask natural language questions about players, tournaments, matches, and statistics without writing any code.
-
-<CardGroup cols={3}>
-  <Card title="Natural Language" icon="message">
-    Ask questions like "Who won the last Major?" or "Compare Lebron vs Galan"
-  </Card>
-  <Card title="Real-time Data" icon="bolt">
-    Access live scores, recent results, and up-to-date statistics
-  </Card>
-  <Card title="Multiple AI Hosts" icon="robot">
-    Works with Claude, ChatGPT, VS Code, and any MCP-compatible client
-  </Card>
-</CardGroup>
+Ask ChatGPT for a result or a head-to-head and it often improvises: it confuses players, mixes up tournaments, or makes up scores. **Padel Analyst fixes that:** it connects your AI assistant to the database behind [Padel API](https://padelapi.org), so its answers come from a reliable, up-to-date source instead of the model's memory.
 
 <iframe
   width="100%"
@@ -31,11 +19,56 @@ Padel Analyst is an [MCP (Model Context Protocol)](https://modelcontextprotocol.
   allowFullScreen
 ></iframe>
 
-## Prerequisites
+Here's what you'll be able to ask your AI assistant once you connect it:
+
+<AccordionGroup>
+  <Accordion title="Player information">
+    - "Who is Arturo Coello? Give me his profile and recent results"
+    - "List the top 10 ranked women players"
+    - "Find all Spanish players who play on the backhand side"
+  </Accordion>
+  <Accordion title="Match analysis">
+    - "What were the results of the last Premier Padel Major?"
+    - "Show me the head-to-head record between Lebron/Galan and Coello/Tapia"
+    - "Get the point-by-point statistics from yesterday's final"
+  </Accordion>
+  <Accordion title="Tournament data">
+    - "List all P1 tournaments this season"
+    - "Who won the Qatar Major 2024?"
+    - "Show me the draw and results from the Paris Premier Padel"
+  </Accordion>
+  <Accordion title="Predictions">
+    - "Simulate a match between Coello/Tapia vs Lebron/Galan"
+    - "Based on recent form, who would win: Sanchez/Josemaria or Triay/Fernandez?"
+  </Accordion>
+</AccordionGroup>
+
+## Who it's for
+
+Padel Analyst turns your AI assistant into a padel analyst for anyone who lives the sport but doesn't want to dig through spreadsheets:
+
+<CardGroup cols={2}>
+  <Card title="Fans" icon="users">
+    Settle debates and get the head-to-head for any matchup instantly.
+  </Card>
+  <Card title="Creators" icon="video">
+    Prep previews, threads, and videos with solid data in minutes.
+  </Card>
+  <Card title="Journalists & media" icon="newspaper">
+    Pull accurate stats and context in seconds, straight from your chat.
+  </Card>
+  <Card title="Sponsors" icon="handshake">
+    Evaluate players and pairs with real data before investing in a sponsorship.
+  </Card>
+</CardGroup>
+
+## Get started in 3 steps
+
+Padel Analyst is an [MCP (Model Context Protocol)](https://modelcontextprotocol.io/introduction) server that connects your AI assistant to professional padel data, so you can ask in natural language without writing any code. Connect it in three steps:
 
 <Steps>
-  <Step title="Subscribe to the Analyst Plan">
-    Sign up for the [Analyst Plan](https://padelapi.org/billing) (19€/month) which includes:
+  <Step title="Subscribe to the Plus Plan">
+    Sign up for the [Plus Plan](https://padelapi.org/billing) (19€/month) which includes:
     - Up to 50K requests/month
     - MCP Server Access
     - Works with ChatGPT
@@ -45,7 +78,133 @@ Padel Analyst is an [MCP (Model Context Protocol)](https://modelcontextprotocol.
   <Step title="Create an API Token">
     Generate your personal API token from the [API Tokens](https://padelapi.org/user/api-tokens) page. You'll need this to authenticate MCP requests.
   </Step>
+  <Step title="Connect your AI assistant">
+    Choose your assistant and follow the installation guide to start asking:
+    <CardGroup cols={2}>
+      <Card title="Connect to ChatGPT" icon="comments" href="/padel-analyst/chatgpt">
+        Add Padel Analyst in ChatGPT's Developer mode.
+      </Card>
+      <Card title="Connect to Claude" icon="robot" href="/padel-analyst/claude">
+        The easiest way — add it as a connector, no config files.
+      </Card>
+    </CardGroup>
+  </Step>
 </Steps>
+
+### Connect other clients
+
+<AccordionGroup>
+  <Accordion title="Cursor">
+    Click the button below to install the Padel API MCP server in Cursor:
+
+    [![Install in Cursor](https://img.shields.io/badge/Cursor-Install_Server-000000?style=flat-square&logo=cursor&logoColor=white)](cursor://anysphere.cursor-deeplink/mcp/install?name=Padel%20API&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vcGFkZWxhcGkub3JnL21jcCJ9)
+
+    Or manually add the following to your Cursor MCP settings (`~/.cursor/mcp.json`):
+
+    ```json
+    {
+      "mcpServers": {
+        "padel-api": {
+          "type": "http",
+          "url": "https://padelapi.org/mcp",
+          "headers": {
+            "Authorization": "Bearer YOUR_API_TOKEN"
+          }
+        }
+      }
+    }
+    ```
+  </Accordion>
+  <Accordion title="VS Code / GitHub Copilot">
+    Click the button below to install the Padel API MCP server in VS Code:
+
+    [![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_Server-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=padel-api&config=%7B%22type%22%3A%20%22http%22%2C%22url%22%3A%20%22https%3A%2F%2Fpadelapi.org%2Fmcp%22%7D)
+
+    Or manually add the following to your VS Code `settings.json`:
+
+    ```json
+    {
+      "mcp": {
+        "servers": {
+          "padel-api": {
+            "type": "http",
+            "url": "https://padelapi.org/mcp",
+            "headers": {
+              "Authorization": "Bearer YOUR_API_TOKEN"
+            }
+          }
+        }
+      }
+    }
+    ```
+  </Accordion>
+  <Accordion title="Windsurf">
+    Add the following to your Windsurf MCP configuration file (`~/.codeium/windsurf/mcp_config.json`):
+
+    ```json
+    {
+      "mcpServers": {
+        "padel-api": {
+          "type": "http",
+          "url": "https://padelapi.org/mcp",
+          "headers": {
+            "Authorization": "Bearer YOUR_API_TOKEN"
+          }
+        }
+      }
+    }
+    ```
+
+    You can also install via the MCP Marketplace: open Windsurf Settings → Cascade → MCP Servers, and search for "Padel API".
+  </Accordion>
+  <Accordion title="Claude Desktop">
+    Add the following to your Claude Desktop configuration file:
+
+    <Tabs>
+      <Tab title="macOS">
+        Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
+        ```json
+        {
+          "mcpServers": {
+            "padel-api": {
+              "type": "http",
+              "url": "https://padelapi.org/mcp",
+              "headers": {
+                "Authorization": "Bearer YOUR_API_TOKEN"
+              }
+            }
+          }
+        }
+        ```
+      </Tab>
+      <Tab title="Windows">
+        Edit `%APPDATA%\Claude\claude_desktop_config.json`:
+        ```json
+        {
+          "mcpServers": {
+            "padel-api": {
+              "type": "http",
+              "url": "https://padelapi.org/mcp",
+              "headers": {
+                "Authorization": "Bearer YOUR_API_TOKEN"
+              }
+            }
+          }
+        }
+        ```
+      </Tab>
+    </Tabs>
+  </Accordion>
+  <Accordion title="Other MCP clients">
+    For any MCP-compatible client, use these connection details:
+
+    | Setting | Value |
+    |---------|-------|
+    | Server URL | `https://padelapi.org/mcp` |
+    | Transport | HTTP (Streamable) |
+    | Authentication | Bearer token in `Authorization` header |
+  </Accordion>
+</AccordionGroup>
 
 ## Available Tools
 
@@ -80,157 +239,6 @@ Pre-configured prompts help structure common analysis tasks:
 | `recent-results` | Summary of recent match results |
 | `season-overview` | Overview of a complete season |
 | `tournament-summary` | Summary of a tournament with results |
-
-## Installation
-
-### ChatGPT
-
-Follow our [step-by-step installation guide](/padel-analyst/chatgpt) to add Padel Analyst to ChatGPT using Developer mode.
-
-### Claude.ai
-
-Follow our [step-by-step installation guide](/padel-analyst/claude) to add Padel Analyst as a connector in Claude.ai. This is the easiest way to get started - no configuration files needed.
-
-### Cursor
-
-Click the button below to install the Padel API MCP server in Cursor:
-
-[![Install in Cursor](https://img.shields.io/badge/Cursor-Install_Server-000000?style=flat-square&logo=cursor&logoColor=white)](cursor://anysphere.cursor-deeplink/mcp/install?name=Padel%20API&config=eyJ0eXBlIjoiaHR0cCIsInVybCI6Imh0dHBzOi8vcGFkZWxhcGkub3JnL21jcCJ9)
-
-Or manually add the following to your Cursor MCP settings (`~/.cursor/mcp.json`):
-
-```json
-{
-  "mcpServers": {
-    "padel-api": {
-      "type": "http",
-      "url": "https://padelapi.org/mcp",
-      "headers": {
-        "Authorization": "Bearer YOUR_API_TOKEN"
-      }
-    }
-  }
-}
-```
-
-### VS Code / GitHub Copilot
-
-Click the button below to install the Padel API MCP server in VS Code:
-
-[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_Server-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](https://insiders.vscode.dev/redirect/mcp/install?name=padel-api&config=%7B%22type%22%3A%20%22http%22%2C%22url%22%3A%20%22https%3A%2F%2Fpadelapi.org%2Fmcp%22%7D)
-
-Or manually add the following to your VS Code `settings.json`:
-
-```json
-{
-  "mcp": {
-    "servers": {
-      "padel-api": {
-        "type": "http",
-        "url": "https://padelapi.org/mcp",
-        "headers": {
-          "Authorization": "Bearer YOUR_API_TOKEN"
-        }
-      }
-    }
-  }
-}
-```
-
-### Windsurf
-
-Add the following to your Windsurf MCP configuration file (`~/.codeium/windsurf/mcp_config.json`):
-
-```json
-{
-  "mcpServers": {
-    "padel-api": {
-      "type": "http",
-      "url": "https://padelapi.org/mcp",
-      "headers": {
-        "Authorization": "Bearer YOUR_API_TOKEN"
-      }
-    }
-  }
-}
-```
-
-You can also install via the MCP Marketplace: open Windsurf Settings → Cascade → MCP Servers, and search for "Padel API".
-
-### Claude Desktop
-
-Add the following to your Claude Desktop configuration file:
-
-<Tabs>
-  <Tab title="macOS">
-    Edit `~/Library/Application Support/Claude/claude_desktop_config.json`:
-    ```json
-    {
-      "mcpServers": {
-        "padel-api": {
-          "type": "http",
-          "url": "https://padelapi.org/mcp",
-          "headers": {
-            "Authorization": "Bearer YOUR_API_TOKEN"
-          }
-        }
-      }
-    }
-    ```
-  </Tab>
-  <Tab title="Windows">
-    Edit `%APPDATA%\Claude\claude_desktop_config.json`:
-    ```json
-    {
-      "mcpServers": {
-        "padel-api": {
-          "type": "http",
-          "url": "https://padelapi.org/mcp",
-          "headers": {
-            "Authorization": "Bearer YOUR_API_TOKEN"
-          }
-        }
-      }
-    }
-    ```
-  </Tab>
-</Tabs>
-
-### Other MCP Clients
-
-For any MCP-compatible client, use these connection details:
-
-| Setting | Value |
-|---------|-------|
-| Server URL | `https://padelapi.org/mcp` |
-| Transport | HTTP (Streamable) |
-| Authentication | Bearer token in `Authorization` header |
-
-## Example Queries
-
-Once connected, you can ask your AI assistant questions like:
-
-<AccordionGroup>
-  <Accordion title="Player information">
-    - "Who is Arturo Coello? Give me his profile and recent results"
-    - "List the top 10 ranked women players"
-    - "Find all Spanish players who play on the backhand side"
-  </Accordion>
-  <Accordion title="Match analysis">
-    - "What were the results of the last Premier Padel Major?"
-    - "Show me the head-to-head record between Lebron/Galan and Coello/Tapia"
-    - "Get the point-by-point statistics from yesterday's final"
-  </Accordion>
-  <Accordion title="Tournament data">
-    - "List all P1 tournaments this season"
-    - "Who won the Qatar Major 2024?"
-    - "Show me the draw and results from the Paris Premier Padel"
-  </Accordion>
-  <Accordion title="Predictions">
-    - "Simulate a match between Coello/Tapia vs Lebron/Galan"
-    - "Based on recent form, who would win: Sanchez/Josemaria or Triay/Fernandez?"
-  </Accordion>
-</AccordionGroup>
 
 ## Beyond Match Data
 
