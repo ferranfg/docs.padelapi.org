@@ -64,7 +64,7 @@ Coverage currently includes 2023 World Padel Tour events. Additional historical 
 
 The **Padel API** limits the number of requests you can make to protect the service and ensure fair usage for all users.
 
-| Limit               | Free       | Analyst & Pro | Business    |
+| Limit               | Free       | Plus & Pro    | Business    |
 |----------------------|------------|---------------|-------------|
 | Requests per minute  | 10         | 60            | 500         |
 | Requests per day     | 2,000      | 4,000         | 100,000     |

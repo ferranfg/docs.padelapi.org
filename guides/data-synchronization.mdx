@@ -8,7 +8,7 @@ If you are building an application on top of the Padel API, you will likely want
 However, padel data is not static. Tournaments get cancelled or rescheduled, player rankings change after every event, and match results can be corrected after the fact. This guide describes a synchronization strategy to keep your local data consistent with the API.
 
 <Tip>
-  Want near-real-time sync without polling? Do an initial REST fetch to bootstrap your local copy, then subscribe to [Webhooks](/webhooks) and let the API push changes to you as they happen. The polling cadence below is the fallback when webhooks aren't an option (Free / Analyst / Pro plans, or environments without a public HTTPS endpoint).
+  Want near-real-time sync without polling? Do an initial REST fetch to bootstrap your local copy, then subscribe to [Webhooks](/webhooks) and let the API push changes to you as they happen. The polling cadence below is the fallback when webhooks aren't an option (Free / Plus / Pro plans, or environments without a public HTTPS endpoint).
 </Tip>
 
 ## Sync frequency
