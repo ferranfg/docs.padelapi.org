@@ -156,24 +156,6 @@
       }
     ]
   },
-  "redirects": [
-    {
-      "source": "/api-reference/player/show-player-stats-🔒",
-      "destination": "/api-reference/player/show-player-stats"
-    },
-    {
-      "source": "/api-reference/match/show-match-point-by-point-🔒",
-      "destination": "/api-reference/match/show-match-point-by-point"
-    },
-    {
-      "source": "/api-reference/live/list-live-matches-🔒",
-      "destination": "/api-reference/live/list-live-matches"
-    },
-    {
-      "source": "/api-reference/pair/show-pair-stats-🔒",
-      "destination": "/api-reference/pair/show-pair-stats"
-    }
-  ],
   "description": "First-ever API for professional padel data. Access the latest padel player stats, rankings, and more.",
   "appearance": {
     "strict": true,
