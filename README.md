@@ -50,7 +50,7 @@ Lower-tier events (such as FIP Rise, FIP Promises, national or exhibition events
 
 ### World Padel Tour
 
-Coverage currently includes 2023 World Padel Tour events. Additional historical data is being collected and will be added as it meets quality standards.
+The World Padel Tour (WPT) was the leading professional circuit until 2023. We provide scores for its main event categories. Stats and point-by-point data are not available at this level.
 
 | Level           | Score | Stats   | Point by point |
 |-----------------|-------|---------|----------------|
@@ -58,6 +58,28 @@ Coverage currently includes 2023 World Padel Tour events. Additional historical 
 | `wpt_1000`      |✅     |❌       |❌               |
 | `wpt_500`       |✅     |❌       |❌               |
 | `wpt_final`     |✅     |❌       |❌               |
+
+### Padel Pro Tour
+
+The Padel Pro Tour (PPT) was the main professional circuit in Spain and the predecessor of the World Padel Tour. We provide scores for its full range of event categories. Stats and point-by-point data are not available at this level.
+
+| Level               | Score | Stats   | Point by point |
+|---------------------|-------|---------|----------------|
+| `ppt_master`        |✅     |❌       |❌               |
+| `ppt_international`  |✅     |❌       |❌               |
+| `ppt_final`         |✅     |❌       |❌               |
+| `ppt_promotional`   |✅     |❌       |❌               |
+| `ppt_other`         |✅     |❌       |❌               |
+
+### Historical Coverage
+
+Our historical depth varies by season, and we are continuously expanding it as more data meets our quality standards.
+
+<Note>
+  **From 2023 onwards**, we provide **complete draws** for the covered tournament levels — every round, from qualifiers and early rounds through to the final.
+
+  **From 2006 to 2023**, we currently provide **finals only**. We are actively reconstructing the earlier rounds of these events and will add them as they become available.
+</Note>
 
 
 ## Rate Limits
@@ -83,9 +105,7 @@ The API includes the following headers in responses to help you track your usage
   Use caching strategies and monitor `X-RateLimit-Remaining` to avoid hitting the limit.
 </Tip>
 
-<Tip>
-  Check your requests and daily/monthly quota available in the [Logs & Quota](https://padelapi.org/explore/resources/logs) page.
-</Tip>
+You can track your API usage at any time from the [Logs & Quota](https://padelapi.org/explore/resources/logs) page. It shows a detailed breakdown of your recent requests, along with your daily and monthly quota consumption, so you always know how much of your plan you've used and how much remains.
 
 ## Pagination
 
