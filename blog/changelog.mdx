@@ -4,6 +4,25 @@ description: "Stay up-to-date with Padel API releases, new features, bug fixes, 
 rss: true
 ---
 
+<Update label="June 2026" description="Venue & Prize Data, Seeds and Plus Plan">
+  - **New:** `venue`, `court_type` and `prize` fields on tournaments
+  - **New:** Team seeds exposed on matches (seed number or entry code)
+  - **New:** `started_time_local` and `scheduled_at` fields on matches
+  - **New:** `status` (`current`/`former`) on pairs listing, plus MCP tool for searching pairs
+  - **New:** Filters and sorting on rankings and tournament matches endpoints
+  - **New:** Historical Padel Pro Tour coverage, extending historical depth
+  - **New:** OAuth loopback redirect URIs with arbitrary ports for local integrations
+  - Analyst plan renamed to **Plus**
+  - Rankings on Free plan: only the current snapshot is visible, flagged via `hidden_free_plan`
+  - News engine migrated to Google News for fresher, more complete coverage
+  - Fixed webhook delivery failures on tournament status transitions
+  - Fixed phantom point in the last game of live point-by-point
+  - **Docs:** Added [Claude Code](/padel-analyst/claude-code) and [n8n](/padel-analyst/n8n) integration guides
+  - **Docs:** Rewrote [Padel Analyst](/padel-analyst) landing and updated MCP tools list (16 tools)
+  - **Docs:** Added [Padel Advertising](/guides/padel-advertising) guide
+  - **Docs:** Added DeuceLab and Padel Earnings to the [use cases showcase](/guides/use-cases-showcase)
+</Update>
+
 <Update label="May 2026" description="Webhooks, Rankings & Career Stats">
   - **New:** Webhooks for tournament, match and player events (Business plan)
   - **New:** [Bulk rankings endpoint](/api-reference/ranking/list-rankings) with official and RACE types
