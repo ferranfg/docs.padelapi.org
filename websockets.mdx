@@ -278,7 +278,7 @@ def on_event(data):
     Use **REST polling** when you need a simple integration, are building server-side batch processes, or your environment doesn't support persistent connections. Use **WebSockets** for user-facing applications where latency matters — live scoreboards, mobile apps, or real-time dashboards. Use [**Webhooks**](/webhooks) for backend integrations that react to *resource changes* (match created, score finalised, player merged) — server-to-server, no persistent connection, signed payloads. WebSockets and Webhooks solve different problems: point-by-point during play vs. notifications when something changes.
   </Accordion>
   <Accordion title="Not all matches have live data">
-    The `coverage` field indicates whether any points were lost during tracking. `full` means every point was captured, `partial` means some points were missed due to source feed gaps, and `tracking` means the match is live and data is being collected. Check this field before relying on point-level completeness.
+    The `coverage` field indicates whether any points were lost during tracking. `full` means every game was captured and matches the confirmed score, `partial` means some games were missed due to source feed gaps, and `tracking` means the match is live and data is being collected. Coverage refers to game-level completeness — individual points within a game may occasionally be missing.
   </Accordion>
   <Accordion title="Handling reconnections">
     Pusher clients handle reconnections automatically. If the connection drops, the client will reconnect and resubscribe to channels. However, you may miss events during the disconnection — fetch the latest state from the REST endpoint after reconnecting to fill any gaps.
