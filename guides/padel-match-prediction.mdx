@@ -72,7 +72,7 @@ The pairs do not need to have ever played together. Any combination of players i
 
 ### 1. Every player has a rating
 
-Each player carries a single number, their Elo rating. Beating a stronger opponent moves it up more than beating a weaker one, and every result is **weighted by the margin of victory**: a 6-0 6-1 win says more about the gap between two pairs than a 7-6 in the third.
+Each player carries a single number, their [Elo rating](/guides/padel-elo-rating). Beating a stronger opponent moves it up more than beating a weaker one, and every result is **weighted by the margin of victory**: a 6-0 6-1 win says more about the gap between two pairs than a 7-6 in the third.
 
 Ratings are updated after every completed match, in chronological order, and each change is stored in the player's history. That detail matters for the validation below: the rating used to predict a match was built **only from matches played before it**.
 
@@ -212,7 +212,7 @@ You can also reach the model in plain English through **[Padel Analyst](/padel-a
     Individual matches, no. Distributions of matches, yes. That is what a calibrated model gives you: over thousands of matches the stated percentages match observed frequencies, which is enough to price a bracket or benchmark a strategy, and never enough to be sure about one match.
   </Accordion>
   <Accordion title="What is an Elo rating in padel?">
-    A single number per player that moves up or down after every completed match, based on the opponent's rating and the margin of victory. Unlike the official ranking, which is a rolling sum of tournament points, Elo measures strength relative to the field and updates immediately after each result. Both are available in the API: `ranking`, `points` and `elo`.
+    A single number per player that moves up or down after every completed match, based on the opponent's rating and the margin of victory. Unlike the official ranking, which is a rolling sum of tournament points, Elo measures strength relative to the field and updates immediately after each result. Both are available in the API: `ranking`, `points` and `elo`. The [Padel Elo Rating guide](/guides/padel-elo-rating) covers how to read the scale and how it compares to the ranking.
   </Accordion>
   <Accordion title="Does it work for women's padel?">
     Yes. Ratings are computed the same way for both categories, and the endpoint accepts any player IDs. The calibration above was fitted across the full match history.
@@ -236,10 +236,10 @@ You can also reach the model in plain English through **[Padel Analyst](/padel-a
   <Card title="Your first API call" icon="rocket" href="/guides/your-first-api-call">
     Get a token and make your first request in a couple of minutes.
   </Card>
+  <Card title="Padel Elo rating" icon="hashtag" href="/guides/padel-elo-rating">
+    The rating system the model is built on: how to read it and where to get it.
+  </Card>
   <Card title="Padel statistics" icon="chart-bar" href="/guides/padel-statistics">
     Match, player and pair statistics to build on top of the model.
-  </Card>
-  <Card title="Padel Analyst" icon="robot" href="/padel-analyst/index">
-    The same data and model inside your AI assistant.
   </Card>
 </CardGroup>

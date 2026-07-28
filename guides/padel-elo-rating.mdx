@@ -1,0 +1,197 @@
+---
+title: "Padel Elo Rating"
+description: "What an Elo rating is in padel, how the Padel API rates every professional player, how to read the numbers and how to get them from the player profile."
+---
+
+The official ranking answers one question: **who has collected the most points this season**. It is a great answer, but it is not the only one. It says nothing about who is playing best right now, it ignores who you beat to get there, and it resets with the calendar.
+
+The Elo rating answers a different question: **how strong is this player compared to the rest of the field**. One number per player, updated after every completed match, and available on the player profile in the API.
+
+<CardGroup cols={3}>
+  <Card title="One number" icon="hashtag">
+    A single rating per player that summarises their level relative to everyone else.
+  </Card>
+  <Card title="Always current" icon="rotate">
+    It moves after every completed match, not once a week when the ranking is published.
+  </Card>
+  <Card title="Comparable" icon="scale-balanced">
+    Two ratings can be compared directly, even between players who have never met.
+  </Card>
+</CardGroup>
+
+---
+
+## Where to find it
+
+Every player carries an `elo` field on their profile.
+
+```bash
+curl 'https://padelapi.org/api/players/65' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+```json
+{
+  "data": {
+    "id": 65,
+    "name": "Arturo Coello",
+    "category": "men",
+    "nationality": "ES",
+    "ranking": 1,
+    "points": "...",
+    "elo": 2136,
+    "...": "..."
+  }
+}
+```
+
+The same field is included everywhere a player appears: [the player list](/api-reference/player/list-players), [match line-ups](/api-reference/tournament/list-tournament-matches) and the [simulate endpoint](/api-reference/match/simulate-match).
+
+To pull the rating table itself, sort the player list by `elo`:
+
+```bash
+curl 'https://padelapi.org/api/players?sort_by=elo&order_by=desc&category=men' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+<Tip>
+  You can also ask for it in plain English through **[Padel Analyst](/padel-analyst/index)**: *"who are the top 10 men's players by Elo?"* or *"is Tapia's Elo higher than Galán's?"*.
+</Tip>
+
+---
+
+## How to read the number
+
+Every player enters the system at **1000** and moves from there. The rating goes up when they win and down when they lose, by an amount that depends on two things: **how strong the opponents were** and **how comfortable the win was**. Beating the world number one is worth far more than beating a qualifier, and a 6-0 6-1 says more about the gap between two pairs than a 7-6 in the third.
+
+That gives you a scale that is easy to read once you know where the landmarks are:
+
+| Rating | What it means |
+|---|---|
+| Around 1000 | A player who has just entered the professional circuit, or who has played very few matches |
+| 1300 to 1700 | The body of the tour: qualifiers, main draw regulars, players who win some and lose some |
+| 1800 to 2000 | Consistently deep runs. Seeded players, semi-finalists, occasional title contenders |
+| Above 2000 | The very top of the game. A handful of players at any given moment |
+
+**What matters is the gap, not the absolute number.** A 100 point gap means roughly the same thing at 1400 as at 2100: the higher rated side is a clear but beatable favourite. That gap is exactly what the [prediction model](/guides/padel-match-prediction) turns into a win probability, and the conversion is calibrated against thousands of real results.
+
+<Info>
+  Padel is a doubles sport, so ratings are individual and a pair is read as the average of its two players. That is why any two players can be compared against any other two, even a pair that has never played together.
+</Info>
+
+---
+
+## Elo vs the official ranking
+
+Both numbers are in the API, and they are useful for different things.
+
+| | Official ranking | Elo rating |
+|---|---|---|
+| **What it measures** | Points accumulated in tournaments | Strength relative to the rest of the field |
+| **Who you beat** | Irrelevant, the round reached is what pays | Central, the opponent's rating sets the reward |
+| **How you won** | Irrelevant | The margin of victory is part of the update |
+| **Updates** | When the official ranking is published | After every completed match |
+| **Not playing** | Points drop off as the period rolls | The rating stays where it was |
+| **Across seasons** | Resets with the calendar | Continuous, it carries over |
+| **API field** | `ranking`, `points` | `elo` |
+
+A practical way to use them together: **the ranking tells you the seeding, the rating tells you the danger.** An unseeded pair with two 1900 rated players is the draw's problem, and only one of the two numbers says so.
+
+<Note>
+  Ratings are only comparable inside a category. Men and women never play each other, so the two pools are rated independently and a men's 1900 is not "the same level" as a women's 1900.
+</Note>
+
+---
+
+## What moves a rating, and what does not
+
+Ratings react to results, and only to results:
+
+- **Completed matches with a scoreline.** Every settled match on the tour, main draw and qualifying, in chronological order.
+- **Walkovers do not count.** No match was played, so nothing moves.
+- **Retirements count for what was played.** A match abandoned early carries little information, and the rating reflects that.
+- **Not playing changes nothing.** There is no decay for inactivity: a player returning after six months out comes back with the number they left.
+
+That last one is deliberate, and it is also a limitation. A rating is a record of what has happened, not a forecast of physical condition.
+
+---
+
+## What it does not capture
+
+<AccordionGroup>
+  <Accordion title="Pair chemistry" icon="people-group">
+    Ratings are individual. A pair playing its first tournament together reads the same as one with two seasons of joint titles. If chemistry matters for your use case, layer [pair stats](/api-reference/pair/show-pair-stats) on top.
+  </Accordion>
+  <Accordion title="Newcomers" icon="user-plus">
+    A player with a handful of matches sits near the entry level rating, whatever their real level. Their number is the least informative in the database and needs a season to settle.
+  </Accordion>
+  <Accordion title="Conditions and context" icon="cloud-sun">
+    Altitude, indoor or outdoor, heat, night sessions, a marathon quarter-final the day before. None of it reaches the rating.
+  </Accordion>
+  <Accordion title="Injuries and form" icon="notes-medical">
+    A player who retired mid-match last week carries the same rating into tomorrow. Combine it with [recent results](/api-reference/player/list-player-matches) if you need current form.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## What people build with it
+
+<CardGroup cols={2}>
+  <Card title="Power rankings" icon="ranking-star">
+    A merit table that does not wait for the official publication, and that rewards beating the best.
+  </Card>
+  <Card title="Draw analysis" icon="sitemap">
+    Spot the quarter of the bracket where the seeding and the actual level disagree.
+  </Card>
+  <Card title="Match previews" icon="newspaper">
+    A rating gap is a headline: two numbers explain a fixture in one line.
+  </Card>
+  <Card title="Predictions" icon="percent">
+    The rating gap is the input to the [prediction model](/guides/padel-match-prediction), available as a single endpoint.
+  </Card>
+</CardGroup>
+
+---
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="What is an Elo rating in padel?">
+    A single number per player that measures strength relative to the rest of the tour. It moves after every completed match, up or down depending on the opponent's rating and the margin of victory. It is the padel equivalent of the system chess has used for decades, adapted to a doubles sport played to sets and games.
+  </Accordion>
+  <Accordion title="Is Elo better than the official ranking?">
+    Neither is better, they answer different questions. The ranking decides seedings and prize money, and it is the official truth of the circuit. The rating is the better estimate of who would win a match tomorrow, which is why the prediction model is built on it and not on ranking points.
+  </Accordion>
+  <Accordion title="Can I compare two players who have never faced each other?">
+    Yes, and that is the point of a rating system. Both players are connected to the same pool of opponents, so their numbers are comparable even without a direct head to head.
+  </Accordion>
+  <Accordion title="Is it available for women's padel?">
+    Yes. Ratings are computed the same way for both categories. Just remember they are only comparable within a category.
+  </Accordion>
+  <Accordion title="How often does the rating change?">
+    After every completed match, as results are ingested. A player can leave a tournament day with a different number than they started it with.
+  </Accordion>
+  <Accordion title="How far back does it go?">
+    The rating is built from the professional match history covered by the API. A player's number starts at their first covered match, so careers that began before our coverage are rated from that point onwards, not from their debut. The [coverage tables](/index) show what is included by circuit and level.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Match prediction model" icon="chart-line" href="/guides/padel-match-prediction">
+    How the rating gap becomes a calibrated win probability, and how well it holds up.
+  </Card>
+  <Card title="Player endpoint" icon="user" href="/api-reference/player/show-player">
+    Full reference for the player profile, including the `elo` field.
+  </Card>
+  <Card title="Padel statistics" icon="chart-bar" href="/guides/padel-statistics">
+    Match, player and pair statistics to put next to the rating.
+  </Card>
+  <Card title="Best padel player" icon="trophy" href="/guides/best-padel-player">
+    The other criteria in the debate: titles, win rate, head to head, partners.
+  </Card>
+</CardGroup>
