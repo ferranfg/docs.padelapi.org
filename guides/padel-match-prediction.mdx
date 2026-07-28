@@ -1,0 +1,245 @@
+---
+title: "Padel Match Prediction Model"
+description: "How the Padel API predicts padel matches: Elo ratings, calibrated win probabilities and the simulate endpoint, validated against more than 7,500 professional matches."
+---
+
+Most padel predictions you find online are opinions. This one is a number you can audit: a **win probability produced by an Elo rating model**, calibrated so that when it says 78%, the favourite really wins about 78% of the time.
+
+This guide explains how the model works, how it was validated, and how to call it.
+
+<CardGroup cols={3}>
+  <Card title="Ratings" icon="chart-line">
+    Every professional player carries an Elo rating, updated after each completed match.
+  </Card>
+  <Card title="Probabilities" icon="percent">
+    The rating gap becomes a win probability through a logistic curve fitted on real results.
+  </Card>
+  <Card title="One endpoint" icon="code">
+    Any two players against any other two, live in a single request.
+  </Card>
+</CardGroup>
+
+---
+
+## Try it
+
+The model is exposed through [`POST /api/matches/simulate`](/api-reference/match/simulate-match). You send four player IDs (or two, for a 1v1) and you get the matchup back with its probabilities.
+
+```bash
+curl -X POST \
+  'https://padelapi.org/api/matches/simulate' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "team_1": [65, 66],
+    "team_2": [115, 114]
+  }'
+```
+
+```json
+{
+  "data": {
+    "name": "Coello/Tapia - Chingotto/Galan",
+    "probability": {
+      "team_1": 73.48,
+      "team_2": 26.52
+    },
+    "favorite": "team_1",
+    "elo_diff": 89,
+    "players": {
+      "team_1": [
+        { "id": 65, "name": "Arturo Coello", "elo": 2136, "ranking": 1, "...": "..." },
+        { "id": 66, "name": "Agustin Tapia", "elo": 2136, "ranking": 1, "...": "..." }
+      ],
+      "team_2": [
+        { "id": 114, "name": "Federico Chingotto", "elo": 2038, "ranking": 3, "...": "..." },
+        { "id": 115, "name": "Alejandro Galan", "elo": 2057, "ranking": 3, "...": "..." }
+      ]
+    }
+  }
+}
+```
+
+The pairs do not need to have ever played together. Any combination of players is a valid matchup, which is what makes the endpoint useful for draws, hypotheticals and fantasy line-ups.
+
+<Tip>
+  Player IDs come from [`GET /api/players`](/api-reference/player/list-players). That endpoint also returns the `elo` field and accepts `sort_by=elo`, so you can pull the rating table directly.
+</Tip>
+
+---
+
+## How the model works
+
+### 1. Every player has a rating
+
+Each player carries a single number, their Elo rating. Beating a stronger opponent moves it up more than beating a weaker one, and every result is **weighted by the margin of victory**: a 6-0 6-1 win says more about the gap between two pairs than a 7-6 in the third.
+
+Ratings are updated after every completed match, in chronological order, and each change is stored in the player's history. That detail matters for the validation below: the rating used to predict a match was built **only from matches played before it**.
+
+### 2. A pair is the average of its two players
+
+Padel is a doubles sport, so the model rates players and averages the two ratings of each side. A pair that has never played a single match together still has a rating from day one, which is exactly the case the endpoint is built for.
+
+This is a deliberate simplification. It captures individual level, not chemistry (see [what the model does not know](#what-the-model-does-not-know)).
+
+### 3. The rating gap becomes a probability
+
+The gap between the two averages goes through a logistic curve:
+
+```
+P(team_1 wins) = 1 / (1 + 10 ^ (-elo_diff / 200))
+```
+
+In the example above, Coello/Tapia average 2136 and Chingotto/Galán average 2047.5. An 89 point gap becomes 73.5%.
+
+The only free parameter is that divisor, and it is the difference between a useful number and a decorative one.
+
+---
+
+## Why the divisor is 200 and not 400
+
+Chess Elo uses 400. Padel does not behave like chess: averaging two players compresses the differences between sides, so the same 400 that works for individuals is far too flat here. And the original implementation was flatter still, splitting the ratings linearly (`a / (a + b)`), which mathematically could never move far from 50%.
+
+We fitted the divisor by maximum likelihood over **more than 7,500 completed professional matches** using each player's pre-match rating. The optimum came out at 198, rounded to 200 in production. Here is what each option predicts against what actually happened:
+
+| Elo gap | Matches | Favourite won | Linear ratio | Logistic ÷400 | **Logistic ÷200** |
+|---|---|---|---|---|---|
+| 0–50 | 2,330 | 51.5% | 50.3% | 52.2% | **54.4%** |
+| 50–100 | 1,811 | 66.0% | 51.3% | 58.7% | **67.0%** |
+| 100–150 | 1,220 | 78.9% | 52.3% | 65.5% | **78.4%** |
+| 150–200 | 813 | 88.7% | 53.4% | 71.6% | **86.6%** |
+| 200–250 | 568 | 92.8% | 54.4% | 77.1% | **92.1%** |
+| 250–300 | 382 | 94.8% | 55.4% | 81.8% | **95.4%** |
+| 300–350 | 231 | 97.4% | 56.5% | 85.7% | **97.4%** |
+| 400+ | 186 | 98.9% | 59.3% | 92.9% | **99.4%** |
+
+Read the third column against the last one. Where reality says the favourite wins 88.7% of the time, the linear method answered 53% and the chess divisor answered 72%. The calibrated curve answers 86.6%.
+
+<Info>
+  This is what "calibrated" means, and it is a stronger claim than "accurate". A model can pick winners well and still be useless as a probability: saying 55% for every match it gets right tells you nothing about which matches are close.
+</Info>
+
+---
+
+## How good is it
+
+Over that same set of matches, with pre-match ratings only:
+
+| Metric | Value |
+|---|---|
+| Matches evaluated | 7,500+ |
+| Pick accuracy | 71.8% |
+| Brier score | 0.175 |
+| Log loss | 0.517 (0.549 with the previous linear method) |
+
+Two notes on how to read this.
+
+**Accuracy is the least interesting number.** It only measures who ended up above 50%, and a padel favourite is a favourite under any monotonic transformation. Brier score and log loss are the ones that punish saying 60% when the true answer was 85%, and they are the ones the calibration work improved.
+
+**Elite matches are more predictable than the average.** The 71.8% covers everything in the database, including qualifying rounds and first rounds where two unrated newcomers meet. Restricted to matches between top ranked players, the same model reaches **87.9% accuracy and a Brier score of 0.097**. Upsets are rarer at the top than the overall figure suggests.
+
+---
+
+## The band we could not fix
+
+Every calibration curve has a weak point. Ours sits in the 55–60% band: across roughly 1,400 matches the model predicts 57.4% and observes 53.9%, a gap of about 3.5 points, while the neighbouring bands (50–55, 60–65) and the confident zone above 65% all sit within a point of the diagonal.
+
+The obvious move is to bend the curve there. We tried, three different ways, each validated with a 70/30 temporal split (fit on the older matches, evaluate on the newer ones):
+
+<AccordionGroup>
+  <Accordion title="Refit the divisor" icon="slider">
+    Maximum likelihood returns 197.5, essentially the 200 already in production. There is no slack in the parameter to spend on that band.
+  </Accordion>
+  <Accordion title="Use a more flexible curve" icon="chart-line">
+    We fitted a family with an extra shape parameter, `P = 1 / (1 + 10^-(|d|/A)^γ)`. It converges to γ = 1.04 and A = 194, which is the current model again. The dip barely moves.
+  </Accordion>
+  <Accordion title="Isotonic recalibration" icon="wrench">
+    The canonical tool for exactly this problem. Trained on the first 70% of the history, it makes the band **worse** on the final 30%, flipping it from −3.4 to +5.1. The correction does not transfer between periods, which is the classic signature of fitting noise.
+  </Accordion>
+</AccordionGroup>
+
+The statistics agree with the experiments. A 3.5 point gap on that sample is a z score of −2.27 in one of nine bands; the chance of seeing a deviation like that somewhere by pure chance is around 20%. The 85–90% band deviates by +2.13 in the opposite direction and nobody would call that a defect either.
+
+We also replayed the entire rating history with a more aggressive update rate, the deeper kind of fix. Temporal holdout accuracy improves by about one point, but the 55–60% band stays exactly where it was. Not even changing the rating engine touches it.
+
+**So we left it alone.** Publishing a model with a documented soft spot is more honest than shipping a correction that only looks good on the data it was fitted on.
+
+<Note>
+  **Methodology.** Ratings are strictly pre-match: each prediction uses only matches played before it. The divisor is a single global parameter fitted over the full history, so the headline calibration is an in-sample backtest of one degree of freedom. The band analysis above is the out-of-sample part, run on a temporal split.
+</Note>
+
+---
+
+## What the model does not know
+
+A rating gap is a strong prior, not a forecast of the specific evening. The model has no visibility into:
+
+- **Injuries and physical condition.** A player who retired mid-match last week carries the same rating into tomorrow.
+- **Pair chemistry.** Ratings are individual and averaged. A pair playing its first tournament together gets the same treatment as one with two seasons of joint titles.
+- **Conditions.** Altitude, indoor or outdoor, heat, ball speed, night sessions. All invisible to the model.
+- **Form and context.** Motivation, schedule, a marathon quarter-final the night before, a home crowd.
+- **Newcomers.** Players with few completed matches sit near the base rating, so their probabilities are the least informative in the database.
+
+If you need those factors, the API gives you the raw material to layer them on top: [head to head records](/api-reference/match/search-head-to-head-matches), [pair stats](/api-reference/pair/show-pair-stats), [match statistics](/api-reference/match/show-match-stats) and [recent results per player](/api-reference/player/list-player-matches).
+
+---
+
+## What people build with it
+
+<CardGroup cols={2}>
+  <Card title="Draw projections" icon="sitemap">
+    Simulate a bracket round by round to get each pair's odds of reaching the final.
+  </Card>
+  <Card title="Match previews" icon="newspaper">
+    A probability and a rating gap turn a fixture list into publishable content, automatically.
+  </Card>
+  <Card title="Fantasy and games" icon="gamepad">
+    Price players, set line-up expectations, or score picks against a calibrated baseline.
+  </Card>
+  <Card title="Model benchmarking" icon="flask">
+    Use it as the reference line your own model has to beat.
+  </Card>
+</CardGroup>
+
+You can also reach the model in plain English through **[Padel Analyst](/padel-analyst/index)**, which exposes the same endpoint as a tool for ChatGPT, Claude and any MCP client. Ask *"who would win between Coello/Tapia and Chingotto/Galán?"* and you get the calibrated number, not a guess.
+
+---
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Can padel matches actually be predicted?">
+    Individual matches, no. Distributions of matches, yes. That is what a calibrated model gives you: over thousands of matches the stated percentages match observed frequencies, which is enough to price a bracket or benchmark a strategy, and never enough to be sure about one match.
+  </Accordion>
+  <Accordion title="What is an Elo rating in padel?">
+    A single number per player that moves up or down after every completed match, based on the opponent's rating and the margin of victory. Unlike the official ranking, which is a rolling sum of tournament points, Elo measures strength relative to the field and updates immediately after each result. Both are available in the API: `ranking`, `points` and `elo`.
+  </Accordion>
+  <Accordion title="Does it work for women's padel?">
+    Yes. Ratings are computed the same way for both categories, and the endpoint accepts any player IDs. The calibration above was fitted across the full match history.
+  </Accordion>
+  <Accordion title="Can I predict a match between players who never faced each other?">
+    Yes, and that is the point. The model only needs both sides to have ratings, so any of the possible pair combinations is a valid simulation.
+  </Accordion>
+  <Accordion title="How often do the ratings change?">
+    After every completed match, as results are ingested. A simulation run before and after a tournament day will return different numbers.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Simulate endpoint" icon="code" href="/api-reference/match/simulate-match">
+    Full reference: parameters, response schema and errors.
+  </Card>
+  <Card title="Your first API call" icon="rocket" href="/guides/your-first-api-call">
+    Get a token and make your first request in a couple of minutes.
+  </Card>
+  <Card title="Padel statistics" icon="chart-bar" href="/guides/padel-statistics">
+    Match, player and pair statistics to build on top of the model.
+  </Card>
+  <Card title="Padel Analyst" icon="robot" href="/padel-analyst/index">
+    The same data and model inside your AI assistant.
+  </Card>
+</CardGroup>
