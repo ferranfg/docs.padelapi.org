@@ -1,0 +1,76 @@
+---
+title: "Building a Padel Prediction Model"
+description: "Two models built independently on the Padel API, compared reliability curves, and the same soft band in both. A joint note by Padel API and DeuceLab."
+---
+![Padel API Prediction Model](https://ik.imagekit.io/ferranfigueredo/tr:w-1920,h-1080/padelapi/milad-fakurian-UYgrVfIhBec-unsplash_gi5ChMDgz.jpg)
+
+*A joint note by Ferran Figueredo ([Padel API](https://padelapi.org)) and Paul ([DeuceLab](https://deucelab.io/padel)).*
+
+A model that says "78%" should be right 78% of the time. That's **calibration**, a different, and often more useful, property than raw accuracy.
+
+We each built a padel match prediction model independently on the same data source, compared notes, and both went back to our own models with the same question. This is what that looked like.
+
+---
+
+## The setup
+
+Padel API's [simulate endpoint](/guides/padel-match-prediction) runs a rating based match simulation. [DeuceLab](https://deucelab.io/padel)'s model is an Elo variant with margin of victory weighted updates, followed by temperature scaling. Both were evaluated over several thousand settled matches; the populations aren't identical, so treat the head to head as indicative.
+
+---
+
+## Both well calibrated, and agreeing
+
+At the sharp end both models are essentially perfect: where each predicts 65% or more, favourites win within a point of expectation (Padel API 84.2 → 84.6, DeuceLab 81.7 → 82.7). Two independently built models landing on top of each other, and on the diagonal, is the kind of mutual validation neither of us could get alone.
+
+---
+
+## The mirror band
+
+The one soft spot was the same range for both, 55–60%, but with opposite signs. Padel API was slightly overconfident there (predicts 57, observes 53); DeuceLab was underconfident (predicts 57, observes 63). Slight favourites resisted both models, in opposite directions.
+
+That asymmetry looked like the useful part. It pointed straight at a mid range discrimination gap, so we both went after it.
+
+---
+
+## The band that wasn't
+
+Neither of us could close it, and the reason turned out to be the same on both sides.
+
+Padel API tried three routes, each validated on a 70/30 temporal split: refitting the single curve parameter (it is already at its maximum likelihood optimum, see below), adding a shape parameter (it converges back to the original model), and isotonic recalibration, the canonical tool for exactly this. The isotonic fix is the decisive one: trained on the first 70% of the history, it makes the band *worse* on the final 30%, flipping it from −3.4 to +5.1. The deviation itself is a z score of −2.27 in one of nine bands, which happens somewhere by chance about one time in five.
+
+DeuceLab ran the strict version of the same question: train on the earlier 70%, choose both the learning rate and the temperature there, report only on the untouched later 30%. The mid band defect doesn't survive either. On the honest split the worst bin isn't even the same one, it moves to 60–65%, and pushing the model hard enough to flatten it just trades underconfidence for overconfidence across the board.
+
+Binning noise, not a fixable defect. Two models, two methods, same verdict.
+
+---
+
+## What held up out of sample
+
+Same exercise, two different outcomes, and both are results.
+
+**DeuceLab found a knob that was set too low.** Its model already weighted margin of victory, but on a proper time split holdout the weight turned out to be far too conservative: ratings crawled through the middle of the field. Raising it moved the Brier score from **0.202 to 0.188** on the held out window, a paired z of about **3.3**. A neat side effect: temperature scaling, which had been doing most of the calibration work, went nearly idle. The sharper ratings now carry it themselves.
+
+**Padel API found its equivalent knob already at the optimum.** The probability layer has a single fitted parameter, the divisor on the rating gap. Maximum likelihood over the full history returns 197.5 against the 200 running in production, so there was no calibration work left for a knob to do, which is also why every attempt to bend the curve made it worse out of sample.
+
+Nothing about the sharp end changed on either side. Both models still agree there.
+
+---
+
+## A short playbook
+
+For anyone building on the API:
+
+1. **Calibrate explicitly.** Fitting a single constant, whether a divisor on the rating gap or a temperature on the log odds, is cheap and effective. It won't fix a weak model, but it makes a decent one honest.
+2. **Always validate on a time split holdout.** Both of us found in sample "optima" that didn't survive out of sample. The weight fix above was only trustworthy because it held on unseen future matches, and the band fix was only rejected because it didn't.
+3. **Margin of victory is a discrimination knob.** How much the scoreline feeds into the rating update trades stability for sharpness. There's a real optimum, and it's worth searching for.
+4. **Read reliability diagrams, but check the bins.** Accuracy hides where a model is over or under confident, and a per band plot shows it in one glance. Just remember you are looking at nine bins at once, each with its own sampling error: before bending a curve to meet a band, prove the band is signal.
+
+---
+
+## The most useful review is a peer's
+
+Neither of us would have run this alone. It took two models flagging the same region from opposite sides to make the question look worth answering, and both of us answering it separately to trust the result.
+
+**Reproducing this.** Both models are built on data from the Padel API. Our side is documented end to end, with the full calibration table and the metrics, in [Padel Match Prediction Model](/guides/padel-match-prediction). DeuceLab's [live track record](https://deucelab.io/padel) is public, and its before and after reliability curves are [here](https://claude.ai/code/artifact/4fc3dc1e-55f7-44d2-92cb-c3acf9c214b7).
+
+*Ferran & Paul*
