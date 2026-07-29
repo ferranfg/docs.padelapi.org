@@ -60,6 +60,8 @@ For each match, consider storing:
 
 Avoid re-syncing match data for tournaments that concluded several weeks ago unless you have a specific reason to. Results for completed events rarely change.
 
+Tournaments in progress are the exception: start times move during the day, and matches without an announced time carry an [estimated start](/guides/match-schedule-estimates) that is recalculated every hour. Poll those with `updated_after` while the event is running.
+
 If you want results delivered as they're confirmed instead of polling, subscribe to `match.updated` via [webhooks](/webhooks) — the event fires on score, status, and schedule changes. For point-by-point updates *during* a live match, use [WebSockets](/websockets) instead; webhooks only fire at significant transitions (start, end).
 
 ## Error handling

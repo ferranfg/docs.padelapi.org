@@ -1,0 +1,202 @@
+---
+title: "Match Schedule Estimates"
+description: "How the Padel API turns an order of play into estimated start times for padel matches: how they are calculated, and how accurate they are."
+---
+
+Padel tournaments publish an order of play, not a timetable. The first match on each court gets a clock time, and the rest simply follow: each one starts when the previous match ends, whenever that is.
+
+That is fine for someone standing at the venue and useless for anything you build. So the API fills the gap: every match without an announced time carries an **estimated start time**, recalculated every hour from what is actually happening on that court.
+
+<CardGroup cols={3}>
+  <Card title="Every court" icon="table-columns">
+    Each court is a chain: a known start, then one match after another until the session ends.
+  </Card>
+  <Card title="Every hour" icon="rotate">
+    Estimates are rebuilt hourly against real start times, so they track delays as the day drifts.
+  </Card>
+  <Card title="Deliberately early" icon="hourglass-start">
+    When in doubt the estimate lands early. Missing the start of a match is worse than waiting for it.
+  </Card>
+</CardGroup>
+
+<Info>
+  In the 2026 season, roughly **six out of ten** matches on an order of play went out without a clock time. Those are the matches this feature is about.
+</Info>
+
+---
+
+## Where to find it
+
+Estimates live in the same fields as announced times, on every match resource:
+
+```bash
+curl 'https://padelapi.org/api/tournaments/739/matches?court=Centre%20Court' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+```json
+{
+  "id": 11293,
+  "round_name": "Round of 32",
+  "category": "men",
+  "played_at": "2026-07-29",
+  "schedule_label": "Estimated around 12:30 PM",
+  "scheduled_at": "2026-07-29T12:30:00+02:00",
+  "scheduled_at_local": "2026-07-29T12:30:00+02:00",
+  "court": "Centre Court",
+  "court_order": 3,
+  "status": "scheduled",
+  "...": "..."
+}
+```
+
+| Field | What it holds |
+|---|---|
+| `scheduled_at` | When the match is expected to start, as an instant in server timezone (`Europe/Madrid`) |
+| `scheduled_at_local` | The same instant in the tournament's timezone |
+| `schedule_label` | The human-readable form of `scheduled_at`, including how firm it is: `"Starting at 9:00 AM"`, `"Not before 6:00 PM"` or `"Estimated around 12:30 PM"` |
+| `court`, `court_order` | The court and the position of the match in that court's order of play |
+| `started_time` | The real start, once the match is on court. This is the first tracked point, after warm-up |
+
+**`scheduled_at` is the value to sort and compare on;** it holds the same instant whether the time was announced by the tournament or estimated by us, so a court sorted by it is the running order of the day. `schedule_label` is what you show to a user, and it is also where the distinction lives: labels reading `Estimated around` are ours, and a client that only wants official times can skip them.
+
+---
+
+## How the estimate is built
+
+Every court on every day is a chain, and the estimate walks it from top to bottom.
+
+<Steps>
+  <Step title="Anchor the court">
+    The chain starts at the last time we actually know: the **real start** of the match currently on court, or the **announced time** of the last match that had one. A court with no known time yet gets no estimates at all.
+  </Step>
+  <Step title="Add the expected duration">
+    Each match in between adds its expected duration: the **historical median for that category and round**. A match already on court adds *at least* the time it has been playing, so a marathon pushes the rest of the day back instead of freezing the estimate in the past.
+  </Step>
+  <Step title="Add the turnaround">
+    Plus a fixed allowance per match for players leaving the court, the next pair warming up and the umpire settling in.
+  </Step>
+  <Step title="Re-anchor on every announced time">
+    A `"Not before 6:00 PM"` in the middle of the session resets the chain: everything below it is estimated from that time, not from the accumulated drift above it.
+  </Step>
+</Steps>
+
+The result is rounded **down** to the half hour and published as `Estimated around X`.
+
+### A real example
+
+Centre Court at Pretoria P1 2026, as the API had it at midday. Only the first match had an announced time, the sixth carried a `Not before`, and the second one was on court:
+
+| # | Label | Where it comes from |
+|---|---|---|
+| 1 | `Starting at 9:00 AM` | Announced by the tournament. It started at 9:09 |
+| 2 | *(none)* | Already on court, so it has a real `started_time` instead |
+| 3 | `Estimated around 12:30 PM` | Match 2's real start + one expected duration + turnaround |
+| 4 | `Estimated around 2:30 PM` | Same chain, two matches down |
+| 5 | `Estimated around 4:00 PM` | Same chain, three matches down |
+| 6 | `Not before 6:00 PM` | Announced by the tournament. **Re-anchors the chain** |
+| 7 | `Estimated around 7:30 PM` | Estimated from 6:00 PM, not from match 5's estimate |
+
+Note what happens at match 6: the accumulated estimate would have run past 5:30 PM, but the tournament said 6:00 PM, so the chain restarts there. Announced times always win.
+
+---
+
+## Why medians, and why early
+
+Two calibration decisions do most of the work, and both are deliberate.
+
+**Durations are medians, not averages.** Across 2,132 professional matches with a recorded duration, the median is **83 minutes** and the average is **92**. The distribution has a long right tail: about **26%** of matches go to a third set, and those run well past two hours (the 90th percentile is 138 minutes, the 10th is 55). Chaining averages down a court pushes every estimate progressively later than reality; chaining medians keeps the middle of the day honest.
+
+**The turnaround allowance is shorter than the real one.** The measured median gap between one match finishing and the next starting on the same court is **20 minutes**. We use less than that on purpose, and we round the final estimate down to the half hour. Both choices bias the number early.
+
+<Note>
+  The cost of an error is not symmetric. An estimate that is 20 minutes early means someone opens a stream and waits. An estimate that is 20 minutes late means they missed the first game. We optimise for the first kind of mistake.
+</Note>
+
+### How accurate it is
+
+The estimator was validated by replaying it hour by hour against **89 tournament days** of 2026 with live coverage, comparing every estimate to the real start time that followed:
+
+| Metric | Result |
+|---|---|
+| Mean absolute error | **≈20 minutes** |
+| Estimates more than 30 minutes ahead of reality | **5.9%** |
+| Matches whose estimate jumped backwards by an hour or more | **1.9%** |
+
+For context on the ceiling: even matches *with* an announced time do not start on the dot. The median match begins about **9 minutes** after its published time, once warm-up is done.
+
+---
+
+## What it does not do
+
+<AccordionGroup>
+  <Accordion title="It never overrides an announced time" icon="lock">
+    If the tournament published a time, that is what you get, including `Not before` labels. Estimates only fill the silence.
+  </Accordion>
+  <Accordion title="It stops once the match is on court" icon="play">
+    A match that has started has a real `started_time`, and a finished match has a score. Neither carries an estimate: the label is dropped rather than left to go stale.
+  </Accordion>
+  <Accordion title="It does not cross local midnight" icon="moon">
+    Night sessions that would push a match past midnight in the tournament's timezone get no estimate for that pass. A match belongs to the calendar day it was drawn into, so a start time landing at 1:00 AM would be reported on the wrong day.
+  </Accordion>
+  <Accordion title="It does not know about weather or walkovers on the fly" icon="cloud-rain">
+    Rain delays, medical timeouts and long-running previous sessions reach the estimate only through the next hourly pass, once the delay is visible in the real start times. Byes and walkovers never occupy a court and are excluded from the chain entirely.
+  </Accordion>
+  <Accordion title="It is not a promise" icon="triangle-exclamation">
+    It is a projection from median durations, and a third set is unpredictable by definition. Present it to your users as approximate, the same way the label reads.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Using it in your app
+
+- **Refresh hourly.** Estimates are recomputed once an hour, so caching one for longer than that means showing a time the API has already corrected.
+- **Poll what changed.** Both [`GET /api/matches`](/api-reference/match/list-matches) and [`GET /api/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) accept `updated_after`, and a re-estimated label bumps `updated_at`. See [Data Synchronization](/guides/data-synchronization) for the full polling strategy.
+- **Sort by `scheduled_at`,** or by `court` plus `court_order`, to render a court's running order.
+- **Show the label, not just the time.** `"Estimated around 12:30 PM"` sets the right expectation on its own. If you render your own copy, keep the word *estimated* in it.
+- **Switch to live data when it starts.** Once a match is on court, `started_time` is a fact and the [WebSocket channel](/websockets) carries the score point by point.
+
+---
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Why do most padel matches have no scheduled start time?">
+    Because they start when the previous match on their court finishes, and match length is unpredictable. Only the first match of each session, and the occasional marquee slot, get a clock time. That is exactly the gap these estimates fill.
+  </Accordion>
+  <Accordion title="How long does a professional padel match last?">
+    The median is 83 minutes, with the middle of the distribution between roughly 55 and 138 minutes. Straight-sets matches are quick, and the 26% that reach a third set are what stretch the day. Finals and women's early rounds sit at opposite ends of the range, which is why the expected duration is computed per category and round.
+  </Accordion>
+  <Accordion title="What is the difference between scheduled_at and started_time?">
+    `scheduled_at` is when the match is expected to start, whether that time was announced or estimated. `started_time` is when play actually began, tracked from the first point after warm-up. Only matches with live coverage have the second one.
+  </Accordion>
+  <Accordion title="Can I tell whether a time was announced or estimated?">
+    Yes. Estimated labels always begin with `Estimated around`. Announced ones read `Starting at` or `Not before`.
+  </Accordion>
+  <Accordion title="Why did the estimate move backwards?">
+    Because the court caught up. If a match ends faster than its median, everything below it shifts earlier on the next pass. It happens, and it is rare: fewer than 2% of estimated matches ever jump back by an hour or more.
+  </Accordion>
+  <Accordion title="Which matches get an estimate?">
+    Any match whose court has a known reference time above it and that has not started yet. A match with an announced time keeps it, a match already on court reports its real `started_time`, and a court with nothing known yet stays without a label until its first time is confirmed.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Tournament matches endpoint" icon="table-list" href="/api-reference/tournament/list-tournament-matches">
+    The order of play of a tournament, with filters by court, date and last update.
+  </Card>
+  <Card title="Match statuses" icon="circle-info" href="/statuses">
+    What `scheduled`, `live`, `finished`, `walkover` and `bye` mean for a match.
+  </Card>
+  <Card title="Live scores over WebSockets" icon="bolt" href="/websockets">
+    Point by point data from the moment a match actually starts.
+  </Card>
+  <Card title="Data synchronization" icon="rotate" href="/guides/data-synchronization">
+    How to keep a local copy in sync, including schedules that move during the day.
+  </Card>
+</CardGroup>
