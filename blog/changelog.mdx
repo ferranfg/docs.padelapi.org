@@ -4,6 +4,24 @@ description: "Stay up-to-date with Padel API releases, new features, bug fixes, 
 rss: true
 ---
 
+<Update label="July 2026" description="Elo Ratings, Match Predictions & Schedule Estimates">
+  - **New:** [Tournament editions endpoint](/api-reference/tournament/list-tournament-editions) linking editions of the same event across seasons
+  - **New:** `elo` field on players — Elo ratings are now public, with `elo` sorting on the players endpoint and MCP tool
+  - **New:** `favorite` and `elo_diff` fields on [Simulate Match](/api-reference/match/simulate-match) responses
+  - **New:** Estimated `schedule_label` on matches without an announced start time
+  - Simulate probabilities are now calibrated, validated against 7,500+ professional matches
+  - Head-to-head endpoint now only includes played matches
+  - Improved live point-by-point: reconstruction of unambiguous missing points and normalized deuce sequences
+  - Improved draw updates: withdrawals, byes and re-published draws are now reflected on re-import
+  - Fixed duplicate court order values in the order of play
+  - **MCP:** Pagination via `per_page` on listing tools, richer tool and parameter descriptions, and validation errors returned as tool results
+  - Padel Analyst chat embedded on Fantasy Padel Tour player, tournament and match pages
+  - **Docs:** Added [Padel Elo Rating](/guides/padel-elo-rating), [Padel Match Prediction Model](/guides/padel-match-prediction) and [Match Schedule Estimates](/guides/match-schedule-estimates) guides
+  - **Docs:** Published [Building a Padel Prediction Model](/blog/20260728-building-a-padel-prediction-model), a joint note with DeuceLab
+  - **Docs:** Clarified that `full` coverage means game-level completeness
+  - **Docs:** Redocumented all API resource properties
+</Update>
+
 <Update label="June 2026" description="Venue & Prize Data, Seeds and Plus Plan">
   - **New:** `venue`, `court_type` and `prize` fields on tournaments
   - **New:** Team seeds exposed on matches (seed number or entry code)
