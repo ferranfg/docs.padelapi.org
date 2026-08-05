@@ -212,7 +212,7 @@ You can also reach the model in plain English through **[Padel Analyst](/padel-a
     Individual matches, no. Distributions of matches, yes. That is what a calibrated model gives you: over thousands of matches the stated percentages match observed frequencies, which is enough to price a bracket or benchmark a strategy, and never enough to be sure about one match.
   </Accordion>
   <Accordion title="What is an Elo rating in padel?">
-    A single number per player that moves up or down after every completed match, based on the opponent's rating and the margin of victory. Unlike the official ranking, which is a rolling sum of tournament points, Elo measures strength relative to the field and updates immediately after each result. Both are available in the API: `ranking`, `points` and `elo`. The [Padel Elo Rating guide](/guides/padel-elo-rating) covers how to read the scale and how it compares to the ranking.
+    A single number per player that moves up or down after every completed match, based on the opponent's rating and the margin of victory. Unlike the official ranking, which is a rolling sum of tournament points, Elo measures strength relative to the field and updates with each result. Both are available in the API: `ranking`, `points` and `elo`. The [Padel Elo Rating guide](/guides/padel-elo-rating) covers how to read the scale and how it compares to the ranking.
   </Accordion>
   <Accordion title="Does it work for women's padel?">
     Yes. Ratings are computed the same way for both categories, and the endpoint accepts any player IDs. The calibration above was fitted across the full match history.
@@ -221,7 +221,7 @@ You can also reach the model in plain English through **[Padel Analyst](/padel-a
     Yes, and that is the point. The model only needs both sides to have ratings, so any of the possible pair combinations is a valid simulation.
   </Accordion>
   <Accordion title="How often do the ratings change?">
-    After every completed match, as results are ingested. A simulation run before and after a tournament day will return different numbers.
+    Every completed match moves the ratings, and new results are applied daily. A simulation run the day after a match already includes its result.
   </Accordion>
 </AccordionGroup>
 
