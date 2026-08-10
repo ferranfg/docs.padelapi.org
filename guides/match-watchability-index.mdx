@@ -1,0 +1,223 @@
+---
+title: "Match Watchability Index"
+description: "How the Padel API rates every match from 0 to 100 before it is played, combining player level, expected closeness and the round at stake, so you can find the padel match worth watching on any given day."
+---
+
+A tournament day on the professional tour is **forty or more matches across five or six courts**, most of them starting whenever the previous one ends. Somewhere in there is the one you should be watching. The order of play will not tell you which, and the round names barely help: a round of 32 between two seeded pairs is often a better watch than a semi-final that ends 6-2 6-1.
+
+So every match in the API carries a **watchability index**: an integer from `0` to `100` that answers one question, *how much is this match worth watching*, before a single point is played.
+
+<CardGroup cols={3}>
+  <Card title="One number per match" icon="star">
+    Sort a day, a court or a whole tournament by it and the best matches come out on top.
+  </Card>
+  <Card title="Known before it starts" icon="clock">
+    It is set as soon as both pairs are known, so it works for previews, alerts and programming.
+  </Card>
+  <Card title="Never rewritten" icon="lock">
+    Once the match is played the number stays as it was. What you promised is what you can audit.
+  </Card>
+</CardGroup>
+
+---
+
+## Where to find it
+
+Every match resource carries a `watchability` field, and the [match list endpoint](/api-reference/match/list-matches) accepts it as a sort key.
+
+```bash
+curl 'https://padelapi.org/api/matches?after_date=2026-08-10&before_date=2026-08-10&sort_by=watchability&order_by=desc' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+```json
+{
+  "data": [
+    {
+      "id": 11293,
+      "name": "Coello/Tapia - Chingotto/Galan",
+      "round_name": "Finals",
+      "category": "men",
+      "played_at": "2026-08-10",
+      "watchability": 84,
+      "schedule_label": "Starting at 6:00 PM",
+      "court": "Centre Court",
+      "status": "scheduled",
+      "...": "..."
+    }
+  ]
+}
+```
+
+That single request is the whole feature: **the first item is the best match of the day**. Narrow it with the filters the endpoint already accepts, all of which combine with `sort_by=watchability`:
+
+| What you want | Add this |
+|---|---|
+| The best match of today | `after_date` and `before_date` set to the same day |
+| The best women's match | `category=women` |
+| The best match on a given court | `court=Centre Court` |
+| The best match of the weekend | a two or three day date range |
+| The best match of a round | `round=4` for quarter-finals |
+
+<Tip>
+  You can ask the same question in plain English through **[Padel Analyst](/padel-analyst/index)**: *"which is the best padel match today?"* or *"what is the most interesting women's match this weekend?"*. The MCP match search tool takes `sort_by=watchability` too.
+</Tip>
+
+---
+
+## How to read the number
+
+The index is **ordinal**: it exists so you can rank matches against each other. It is not proportional, so an 80 is not "twice as good" as a 40, in the same way a 200 point Elo gap is not "twice" a 100 point one.
+
+| Value | What it usually looks like |
+|---|---|
+| **80 to 100** | A late round between two of the best pairs on tour with no clear favourite. A handful per season, sometimes none in a given tournament |
+| **60 to 79** | A strong match: elite pairs in a final or semi-final with one side favoured, or a very even quarter-final just below the top |
+| **40 to 59** | The solid middle of the draw. Even matches between main draw regulars, or good pairs meeting early |
+| **20 to 39** | Predictable, or early, or both. A seeded pair against a qualifier, a lopsided round of 32 |
+| **0 to 19** | An opening round mismatch. The result is close to settled before the warm-up |
+
+For a concrete anchor: the men's number one pair against the pair ranked just behind them, **in a final**, scores **84**. The same two pairs meeting in a round of 16 score lower, and an opening round where one side wins 96 times out of 100 lands in the teens.
+
+<Info>
+  Values are comparable across categories, tournaments and seasons, because the ingredients are. What they are not is a measure of quality of play: they rate the fixture, not the ninety minutes that follow.
+</Info>
+
+---
+
+## What goes into it
+
+Three things, and nothing else. Each is a number the API already publishes, so the index is auditable rather than editorial.
+
+<Steps>
+  <Step title="How good the players are" icon="chart-line">
+    The average [Elo rating](/guides/padel-elo-rating) of the four players on court, read against the range the professional tour actually occupies. This is the heaviest ingredient: a final between two mid-table pairs is not the same event as a final between the top two.
+  </Step>
+  <Step title="How close it should be" icon="scale-balanced">
+    The [calibrated win probability](/guides/padel-match-prediction) for the matchup. A 50/50 contributes everything it can, a 95/5 contributes almost nothing. This is what stops a superstar-against-a-qualifier fixture from ranking above a real contest.
+  </Step>
+  <Step title="What is at stake" icon="trophy">
+    The round. A final counts for more than a semi-final, which counts for more than a quarter-final, down to the opening rounds. Enough to break ties between comparable matches, not enough to push a dull final above a great quarter-final.
+  </Step>
+</Steps>
+
+Notice what the three do together. **Level alone would just rank the seeds**, closeness alone would put two even qualifiers above every final, and the round alone is the draw sheet you already have. A match has to score on more than one of them to reach the top of a day.
+
+<Note>
+  This is a **pre-match** index, which is what makes it useful for programming. It is not the same family as the excitement indexes published in other sports, which are computed after the fact from how the win probability swung during play. Those tell you what a match turned out to be. This one tells you what to watch tonight.
+</Note>
+
+---
+
+## When it is set, and when it stops moving
+
+<AccordionGroup>
+  <Accordion title="It appears when the line-up is complete" icon="user-check">
+    A match needs four known players to be rated. Bracket slots waiting on a previous result carry `null`, and they pick up a value as soon as both pairs are decided.
+  </Accordion>
+  <Accordion title="It follows changes to the draw" icon="rotate">
+    If a pair changes before the match is played, through a withdrawal, a replacement or a re-published draw, the index is recalculated for the new matchup.
+  </Accordion>
+  <Accordion title="It freezes when the match is played" icon="lock">
+    Once there is a result, the value stops moving, permanently. The ratings behind it keep evolving, but the match keeps the number it had going in. That is deliberate: a number you published on Friday still means the same thing on Monday, so archives and back-tests stay honest.
+  </Accordion>
+  <Accordion title="Unrated matches sort last" icon="arrow-down-wide-short">
+    Matches without a value never crowd the head of a list. `sort_by=watchability&order_by=desc` gives you the best matches first and the undecided slots at the end.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## What it does not know
+
+The index is built from level, closeness and round, so anything outside those three is invisible to it:
+
+- **Rivalry and narrative.** A grudge match, a former partnership meeting for the first time, a player's last tournament. None of it reaches the number. If your audience cares, layer [head to head records](/api-reference/match/search-head-to-head-matches) and [pair stats](/api-reference/pair/show-pair-stats) on top.
+- **Home players.** A local wildcard in an opening round can be the match of the day for that crowd and rate in the twenties.
+- **Form and fitness.** Elo does not decay with inactivity and does not know who retired mid-match last week. See [what the prediction model does not know](/guides/padel-match-prediction#what-the-model-does-not-know).
+- **New pairs.** Ratings are individual and averaged, so a pair playing together for the first time reads the same as one with two seasons of joint titles.
+- **What actually happened.** A 90 can end 6-1 6-2 and a 30 can go to a third set tie-break. Padel still gets to decide.
+
+Treat it as a shortlist, not a verdict. Its job is to cut forty matches down to three worth a human look, and it is very good at that.
+
+---
+
+## Availability
+
+<Info>
+  The `watchability` field is available on **paid plans**. On the Free plan it is returned as the string `hidden_free_plan` on every match, so parse it expecting an integer, `null` or that marker.
+</Info>
+
+---
+
+## What people build with it
+
+<CardGroup cols={2}>
+  <Card title="Match of the day widgets" icon="star">
+    One request, one match, rendered on a homepage or a newsletter without an editor picking it.
+  </Card>
+  <Card title="Push alerts" icon="bell">
+    Notify users only when a match above a threshold is about to start, instead of on every fixture.
+  </Card>
+  <Card title="Stream and watch guides" icon="tv">
+    Rank the day's order of play so a viewer with two hours knows where to spend them.
+  </Card>
+  <Card title="Automated previews" icon="newspaper">
+    Index plus probability plus head to head is enough for a publishable preview of the right match.
+  </Card>
+</CardGroup>
+
+A practical pattern for a live product: sort the day by `watchability`, take the top few, then use the [estimated start times](/guides/match-schedule-estimates) to know when each one goes on court and the [WebSocket channel](/websockets) to follow it point by point.
+
+---
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="How do I find the best padel match of the day?">
+    Request the day's matches sorted by `watchability` in descending order and take the first result: `GET /api/matches?after_date=2026-08-10&before_date=2026-08-10&sort_by=watchability&order_by=desc`. The index combines how good the four players are, how even the matchup is expected to be and which round it is, so the top of that list is the day's most attractive fixture.
+  </Accordion>
+  <Accordion title="Which padel match should I watch today?">
+    The highest rated one that fits your schedule. Anything above 80 is a rare fixture worth rearranging your evening for, the 60s and 70s are reliably good matches, and below 40 you are usually watching a formality. Cross the list with the estimated start times to pick what is actually playable in your day.
+  </Accordion>
+  <Accordion title="What is a watchability index?">
+    A single number that rates how much a fixture is worth watching before it is played, built from the strength of the players involved and how competitive the match is expected to be. Other sports publish similar indexes for weekly schedules. This one runs on Elo ratings and calibrated win probabilities, on a 0 to 100 scale, on every professional padel match in the database.
+  </Accordion>
+  <Accordion title="Is it available before the match starts?">
+    Yes, that is the point. It is set as soon as both pairs are known, which for most matches is a day or more before they go on court, and it is fixed by the time play begins. It is never computed after the fact from the result.
+  </Accordion>
+  <Accordion title="Does a high value guarantee a good match?">
+    No. It rates the setup: two strong pairs, evenly matched, late in a draw. A great fixture can still end in straight sets. Over many matches the high values are clearly better watches than the low ones, which is all an ordinal index claims.
+  </Accordion>
+  <Accordion title="Why is the value of a played match different from what I would compute today?">
+    Because it was frozen when the match was played, using the ratings as they stood then. Recomputing it now with today's ratings would give a different number and would quietly rewrite history, so we do not. Historical matches keep the value they carried into the court.
+  </Accordion>
+  <Accordion title="Does it work for women's padel?">
+    Yes, and values are directly comparable between categories. The ratings behind it are computed the same way for both, and the round and closeness components do not depend on the category at all.
+  </Accordion>
+  <Accordion title="Why does a match have no value?">
+    Because its line-up is not complete. Bracket slots still waiting on an earlier result have no four players to rate, so they return `null` until both pairs are decided, and they sort to the end of a watchability-ordered list.
+  </Accordion>
+  <Accordion title="Can I filter by value instead of sorting?">
+    Not directly, but sorting plus pagination covers it: request the range you care about ordered by `watchability` descending and stop reading when the values drop below your threshold.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="List matches endpoint" icon="table-list" href="/api-reference/match/list-matches">
+    Full reference: date, round, category and court filters, plus `sort_by=watchability`.
+  </Card>
+  <Card title="Padel Elo rating" icon="hashtag" href="/guides/padel-elo-rating">
+    The player level that feeds the index, and how to read its scale.
+  </Card>
+  <Card title="Match prediction model" icon="percent" href="/guides/padel-match-prediction">
+    The calibrated win probability behind the closeness component.
+  </Card>
+  <Card title="Match schedule estimates" icon="clock" href="/guides/match-schedule-estimates">
+    When the match you picked actually goes on court.
+  </Card>
+</CardGroup>
