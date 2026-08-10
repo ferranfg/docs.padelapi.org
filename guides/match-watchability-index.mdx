@@ -39,7 +39,7 @@ curl 'https://padelapi.org/api/matches?after_date=2026-08-10&before_date=2026-08
       "round_name": "Finals",
       "category": "men",
       "played_at": "2026-08-10",
-      "watchability": 84,
+      "watchability": 93,
       "schedule_label": "Starting at 6:00 PM",
       "court": "Centre Court",
       "status": "scheduled",
@@ -71,13 +71,15 @@ The index is **ordinal**: it exists so you can rank matches against each other. 
 
 | Value | What it usually looks like |
 |---|---|
-| **80 to 100** | A late round between two of the best pairs on tour with no clear favourite. A handful per season, sometimes none in a given tournament |
+| **90 to 100** | Exceptional. Two of the best pairs on tour, evenly matched, in a final or a semi-final |
+| **80 to 89** | Rare. Two strong pairs late in a draw: the fixture you would pick if you could only watch one |
 | **60 to 79** | A strong match: elite pairs in a final or semi-final with one side favoured, or a very even quarter-final just below the top |
 | **40 to 59** | The solid middle of the draw. Even matches between main draw regulars, or good pairs meeting early |
-| **20 to 39** | Predictable, or early, or both. A seeded pair against a qualifier, a lopsided round of 32 |
-| **0 to 19** | An opening round mismatch. The result is close to settled before the warm-up |
+| **Below 40** | Predictable, or early, or both. A seeded pair against a qualifier, a lopsided round of 32 |
 
-For a concrete anchor: the men's number one pair against the pair ranked just behind them, **in a final**, scores **84**. The same two pairs meeting in a round of 16 score lower, and an opening round where one side wins 96 times out of 100 lands in the teens.
+Most matches land in the middle two rows, which is the point: the top of the scale is meant to be scarce. Most tournaments produce nothing above 80 at all, so treat the top band as an exception rather than a target to filter on.
+
+For a concrete anchor, take the 2026 London P1 as the API recorded it. The men's final scored **93** and the women's final **91**. The winning pair's own quarter-final, two rounds earlier against a much weaker side, scored **50** — the same players, forty-three points lower, because the opponent and the round both changed.
 
 <Info>
   Values are comparable across categories, tournaments and seasons, because the ingredients are. What they are not is a measure of quality of play: they rate the fixture, not the ninety minutes that follow.
@@ -178,7 +180,7 @@ A practical pattern for a live product: sort the day by `watchability`, take the
     Request the day's matches sorted by `watchability` in descending order and take the first result: `GET /api/matches?after_date=2026-08-10&before_date=2026-08-10&sort_by=watchability&order_by=desc`. The index combines how good the four players are, how even the matchup is expected to be and which round it is, so the top of that list is the day's most attractive fixture.
   </Accordion>
   <Accordion title="Which padel match should I watch today?">
-    The highest rated one that fits your schedule. Anything above 80 is a rare fixture worth rearranging your evening for, the 60s and 70s are reliably good matches, and below 40 you are usually watching a formality. Cross the list with the estimated start times to pick what is actually playable in your day.
+    The highest rated one that fits your schedule. Anything above 80 is a rare fixture worth rearranging your evening for, the 60s and 70s are the strong end of an ordinary day, and below 40 you are usually watching a formality. Cross the list with the estimated start times to pick what is actually playable in your day.
   </Accordion>
   <Accordion title="What is a watchability index?">
     A single number that rates how much a fixture is worth watching before it is played, built from the strength of the players involved and how competitive the match is expected to be. Other sports publish similar indexes for weekly schedules. This one runs on Elo ratings and calibrated win probabilities, on a 0 to 100 scale, on every professional padel match in the database.
