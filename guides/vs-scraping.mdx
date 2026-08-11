@@ -1,31 +1,28 @@
 ---
 title: "Padel API vs Scraping"
-description: "Padel API vs building your own scraper: normalization, WebSockets, canonical IDs, and unified coverage across FIP, Premier Padel, and WPT."
+description: "Padel API vs building your own scraper: one normalized, enriched dataset across FIP, Premier Padel and WPT, so you can spend your time building the product."
 ---
 
 If you are building anything with professional padel data, you have two real options: stand up your own scraper across the official sources, or consume a single normalized API.
 
-Both can produce a working prototype. The difference shows up in **week 4**, when source HTML changes, a player's name suddenly has a new spelling across two tournaments, and a fixture you were polling silently disappears from the calendar.
+Both can produce a working prototype. The difference shows up in **month two**, when the data has to be right every morning, a player has quietly become two records, and you also have a product to ship.
 
-This guide is a technical comparison of the two paths.
+This guide is a technical comparison of the two paths. It is also a proposal about how to split the work: we keep the data correct and add what it does not come with, and you spend your time on the product your users actually see.
 
 ---
 
 ## The hidden cost of "I'll just scrape it"
 
-A first scraper for a single source is a weekend project. The hard part is not writing it — it is keeping it useful for a year.
+A first scraper for a single source is a weekend project. The hard part is not writing it. It is keeping it useful for a year.
 
-Anyone who has run a scraper in production has paid some version of this tax:
+Keeping one alive tends to look like this:
 
-- **Source HTML changes** with no notice. Selectors break, fields move, layouts get re-rendered. Every change is an outage.
-- **Failures are silent.** A broken selector returns an empty list, which looks identical to "nothing happened today". You find out from a user.
-- **Player names are not stable.** The same player appears as `"Juan Lebrón"`, `"Juan Lebron"`, and `"J. Lebrón Chincoa"` across tournaments — and sometimes across rounds of the same tournament. Without entity resolution, you are silently splitting one player across multiple records.
-- **Tournaments rename, merge, get cancelled, or shift dates.** If you keyed your data by name or by URL slug, every change is a manual reconciliation.
-- **Live data is hostile to polling.** Fast polling gets your IP blocked; slow polling shows a stale scoreboard.
-- **Three sources, three integrations.** FIP, Premier Padel, and the World Padel Tour archive each have their own structure, IDs, and quirks. You write — and maintain — three scrapers, three parsers, three deduplication layers.
-- **Historical data is gone the moment it leaves the homepage.** A season-long backfill means hoping the data still exists somewhere you can reach.
+- **Sources change with no notice, and failures are silent.** An empty list looks exactly like "nothing happened today". You find out from a user.
+- **Identity is not stable.** `"Juan Lebrón"`, `"Juan Lebron"` and `"J. Lebrón Chincoa"` are one player, and three without entity resolution. Tournaments rename, merge and get cancelled, so keying by name or slug means permanent reconciliation.
+- **Live data is hostile to polling.** Poll fast and you get blocked, poll slowly and the scoreboard is stale.
+- **None of it is your product.** Every hour spent keeping the data alive is an hour not spent on the app your users came for, and it does not stop needing attention when your sprint ends.
 
-None of this is fundamentally hard. It is just a long list of small things that need to keep working forever.
+None of this is fundamentally hard. It is just a list of small things that need to keep working forever. Behind the API, none of them reach you: the dataset arrives already reconciled, and what you do with it is the only part left.
 
 ---
 
@@ -41,14 +38,15 @@ None of this is fundamentally hard. It is just a long list of small things that 
 | **Live scores** | Polling with the risk of IP blocks | Pusher WebSocket channels, push on every point |
 | **Historical depth** | Whatever the source still exposes today | Multi-season archive available on day one |
 | **Aggregated stats** | You compute them yourself | Career, pair, head-to-head, and per-round endpoints out of the box |
+| **Enriched data** | Every model is yours to build, calibrate and keep current | Ships alongside the public facts, on the same resources |
 | **Failure mode** | HTML 200 with broken markup | Conventional HTTP status codes, rate-limit and redirect headers |
-| **Operational cost** | Yours, forever | None — covered by the API |
+| **Operational cost** | Yours, forever | None, covered by the API |
 
 ---
 
 ## Why normalization is the moat
 
-The biggest gap between a scraper and this API is **normalization** — the work of turning three different sources into a single coherent dataset.
+The biggest gap between a scraper and this API is **normalization**: the work of turning three different sources into a single coherent dataset.
 
 **Cross-source unified schema.** A tournament from Premier Padel and a tournament from the legacy WPT archive come back with the same field names, the same enum values for level and status, and the same structure for matches, players, and pairs. One schema covers a 2023 WPT 1000 and a current P1.
 
@@ -61,11 +59,38 @@ The biggest gap between a scraper and this API is **normalization** — the work
 
 Your sync job follows redirects and updates a foreign key. Compare to maintaining a fuzzy-matching layer over a stream of name strings. See [Data Synchronization](/guides/data-synchronization) for the recommended sync strategy.
 
-**Computed endpoints.** Some of the most interesting questions in padel — head-to-head records, pair chemistry, win rate in finals, season-on-season form — are aggregations over the entire match history, not facts you can scrape. The API ships them as endpoints:
+**Computed endpoints.** Some of the most interesting questions in padel (head-to-head records, pair chemistry, win rate in finals, season-on-season form) are aggregations over the entire match history, not facts you can scrape. The API ships them as endpoints:
 
-- [`/players/{id}/stats`](/api-reference/player/show-player-stats) — career win rate, titles, finals, best round, with `after_date` / `before_date` / `round` filters.
-- [`/pairs/{p1}-{p2}/stats`](/api-reference/pair/show-pair-stats) — how a specific duo performs together.
-- [`/matches/{id}/stats`](/api-reference/match/show-match-stats) — set-by-set serve, return, break point, and streak metrics.
+- [`/players/{id}/stats`](/api-reference/player/show-player-stats): career win rate, titles, finals, best round, with `after_date` / `before_date` / `round` filters.
+- [`/pairs/{p1}-{p2}/stats`](/api-reference/pair/show-pair-stats): how a specific duo performs together.
+- [`/matches/{id}/stats`](/api-reference/match/show-match-stats): set-by-set serve, return, break point, and streak metrics.
+
+---
+
+## Enriched data: the part we compute
+
+Results, draws and calendars are public information. A determined pipeline eventually assembles a version of them, and if that is all your product needs, you do not need us.
+
+The **enriched data** is the part that is not public: values computed by our own models over the full match history, on every player and every match we cover. It arrives inline, in the same objects as everything else:
+
+```json
+{
+  "id": 11293,
+  "name": "Coello/Tapia - Chingotto/Galan",
+  "round_name": "Finals",
+  "played_at": "2026-08-10",
+  "court": "Centre Court",
+  "status": "scheduled",
+  "schedule_label": "Estimated around 6:20 PM",
+  "scheduled_at": "2026-08-10T18:20:00+02:00",
+  "watchability": 93,
+  "...": "..."
+}
+```
+
+Part of that response was announced by a tournament and part of it was computed here. Same object, same request, same token: no enrichment endpoint to call separately and no second plan to buy.
+
+This is the other half of the split. Keeping a dataset correct is a full time job, and the upside of somebody doing it full time is that models can be built on top of it: that is where [strength ratings](/guides/padel-elo-rating), [win probabilities](/guides/padel-match-prediction), [watchability](/guides/match-watchability-index) and [schedule estimates](/guides/match-schedule-estimates) come from, each documented with its method and its measured accuracy.
 
 ---
 
@@ -73,7 +98,7 @@ Your sync job follows redirects and updates a foreign key. Compare to maintainin
 
 If your product shows live scores, scraping is where the gap widens fastest. Aggressive polling gets you blocked; gentle polling makes the scoreboard look broken.
 
-The API exposes a Pusher WebSocket channel per match, pushed on every point, with the same JSON shape as the REST `live` endpoint. No polling loop, no IP rotation, no captcha handling. See the [WebSockets guide](/websockets) for the full client setup.
+The API exposes a Pusher WebSocket channel per match, pushed on every point, with the same JSON shape as the REST `live` endpoint. Nothing to poll and no backoff to tune. See the [WebSockets guide](/websockets) for the full client setup.
 
 ---
 
@@ -81,7 +106,7 @@ The API exposes a Pusher WebSocket channel per match, pushed on every point, wit
 
 To be fair: rolling your own pipeline is rational when you need a **specific data point that is not exposed by any API**, and you are willing to own the pipeline forever for the sake of that one field.
 
-If what you need is tournaments, draws, matches, results, players, pairs, point-by-point live data, and aggregated stats across FIP, Premier Padel, and WPT, the API already covers it.
+If what you need is tournaments, draws, matches, results, players, pairs, point-by-point live data, and aggregated stats across FIP, Premier Padel, and WPT, the API already covers it, with the enriched layer on top. What is left is your part.
 
 ---
 
@@ -92,7 +117,7 @@ If what you need is tournaments, draws, matches, results, players, pairs, point-
     Authenticate and run your first request in under a minute.
   </Card>
   <Card title="Data Synchronization" icon="arrows-rotate" href="/guides/data-synchronization">
-    Keep a local copy in sync — including redirects and merges.
+    Keep a local copy in sync, including redirects and merges.
   </Card>
   <Card title="WebSockets" icon="bolt" href="/websockets">
     Push live point-by-point updates without polling.
