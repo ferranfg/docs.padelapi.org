@@ -52,8 +52,9 @@
             "group": "Installation",
             "icon": "download",
             "pages": [
-              "padel-analyst/chatgpt",
+              "padel-analyst/chatgpt-plugin",
               "padel-analyst/claude",
+              "padel-analyst/chatgpt",
               "padel-analyst/claude-code",
               "padel-analyst/n8n"
             ]

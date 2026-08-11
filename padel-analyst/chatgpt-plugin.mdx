@@ -1,0 +1,135 @@
+---
+title: "Install in ChatGPT"
+description: "Install the Padel Analyst app in ChatGPT in three steps and ask about players, tournaments, matches and statistics in your own words. Works on ChatGPT's free plan."
+icon: "/images/integrations/openai.svg"
+---
+
+Install the Padel Analyst app in ChatGPT, sign in with your Padel API account, and start asking about professional padel in your own words. It takes a couple of minutes and works on ChatGPT's free plan.
+
+<Note>
+  Developers who prefer to configure the MCP server themselves can follow [Install in ChatGPT via MCP](/padel-analyst/chatgpt).
+</Note>
+
+## Prerequisites
+
+<CardGroup cols={2}>
+  <Card title="ChatGPT Account" icon="user">
+    The free plan is enough, no paid subscription required. Create yours at [chatgpt.com](https://chatgpt.com/) and sign in before you install the app.
+  </Card>
+  <Card title="Padel API Account" icon="key">
+    A [Plus Plan](https://padelapi.org/billing) subscription or higher. You'll sign in with it during the installation to connect both accounts.
+  </Card>
+</CardGroup>
+
+## Installation Steps
+
+<Steps>
+  <Step title="Open the Padel Analyst app page">
+    Go to the [Padel Analyst app in ChatGPT](https://chatgpt.com/plugins/plugin_asdk_app_6970b8cdeb548191ae0bf1a90bf4a5f5) and click **Install plugin**.
+
+    ChatGPT shows you what the app does and what data it can access. Click **Sign in with Padel Analyst** to continue.
+
+    <Frame>
+      <img src="/images/chatgpt-plugin/padel-analyst-chatgpt-install-plugin.webp" alt="Add Padel Analyst to ChatGPT dialog with the Sign in with Padel Analyst button" />
+    </Frame>
+  </Step>
+
+  <Step title="Authorize with your Padel API account">
+    You're redirected to Padel API to sign in. Review the permissions ChatGPT is requesting and click **AUTHORIZE**.
+
+    | Permission | What it allows |
+    |------------|----------------|
+    | Use MCP tools to query padel data | Run queries about players, tournaments, matches and statistics |
+    | Access MCP resources | Read reference data exposed by the server |
+    | Use MCP prompts | Use the pre-configured analysis prompts |
+
+    Once authorized, you're sent back to ChatGPT.
+
+    <Frame>
+      <img src="/images/chatgpt-plugin/padel-analyst-chatgpt-authorize-padel-api.webp" alt="Padel API authorization request screen granting ChatGPT access to MCP tools, resources and prompts" />
+    </Frame>
+  </Step>
+
+  <Step title="Start using Padel Analyst">
+    The app page now shows a **Try in chat** button. Click it to open a conversation with Padel Analyst already enabled.
+
+    From then on you can call it in any chat, as described in [Calling Padel Analyst in a chat](#calling-padel-analyst-in-a-chat).
+
+    <Frame>
+      <img src="/images/chatgpt-plugin/padel-analyst-chatgpt-try-in-chat.webp" alt="Padel Analyst app page in ChatGPT showing the Try in chat button after installation" />
+    </Frame>
+  </Step>
+</Steps>
+
+## Calling Padel Analyst in a chat
+
+The app is available across your whole ChatGPT account: every chat, on every device where you're signed in. You only install it once. There are two ways to call it:
+
+### Mention it by name
+
+Type `@Padel Analyst` in the message box and pick it from the list, then write your question:
+
+<Frame>
+  <img src="/images/chatgpt-plugin/padel-analyst-chatgpt-mention-in-chat.gif" alt="Typing @Padel Analyst in the ChatGPT message box to call the app" />
+</Frame>
+
+### Select it from the + menu
+
+Click the **+** button next to the message box and choose **Padel Analyst** from the list:
+
+<Frame>
+  <img src="/images/chatgpt-plugin/padel-analyst-chatgpt-plus-menu-select-plugin.webp" alt="Selecting Padel Analyst from the plus menu in ChatGPT" />
+</Frame>
+
+## What you can ask
+
+Ask in your own words, there's nothing to memorize. Anything about professional padel is fair game: players, pairs, tournaments, results, rankings, match statistics and predictions.
+
+Some questions to get you started:
+
+- "Who won the last Premier Padel Major?"
+- "Show me the head-to-head between Lebron/Galan and Coello/Tapia"
+- "What are Arturo Coello's statistics this season?"
+- "List all P1 tournaments in 2025"
+- "Simulate a match between the top two ranked pairs"
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="The Install plugin button doesn't appear">
+    Make sure you're signed in to ChatGPT. The button only shows on the app page once you have an active session, and it works on the free plan.
+  </Accordion>
+  <Accordion title="Padel Analyst doesn't answer with data">
+    Check that your Padel API subscription is active on the [billing page](https://padelapi.org/billing). If it is, use **Reconnect** from the app settings to sign in again.
+  </Accordion>
+  <Accordion title="Something else isn't working">
+    Write to [ferran@padelapi.org](mailto:ferran@padelapi.org) with a description of what you were doing and we'll take a look.
+  </Accordion>
+</AccordionGroup>
+
+## Manage or remove the app
+
+Open **Settings → Plugins** in ChatGPT and select **Padel Analyst**. From there you can review the connection, adjust when ChatGPT asks for permission, and see every read action the app can perform, with the description of each tool.
+
+The **···** menu in the top-right corner gives you three options:
+
+| Option | What it does |
+|--------|--------------|
+| **View plugin detail** | Opens the Padel Analyst app page |
+| **Reconnect** | Signs in again with your Padel API account, useful if the connection stops working |
+| **Disconnect** | Removes the app from your ChatGPT account. You can install it again at any time |
+
+<Frame>
+  <img src="/images/chatgpt-plugin/padel-analyst-chatgpt-plugin-settings-disconnect.webp" alt="Padel Analyst plugin settings in ChatGPT with the View plugin detail, Reconnect and Disconnect options" />
+</Frame>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="Available Tools" icon="wrench" href="/padel-analyst/index#available-tools">
+    See all 16 tools available for querying padel data
+  </Card>
+  <Card title="Access Padel API" icon="server" href="https://padelapi.org/explore">
+    Explore the full REST API behind Padel Analyst
+  </Card>
+</CardGroup>
