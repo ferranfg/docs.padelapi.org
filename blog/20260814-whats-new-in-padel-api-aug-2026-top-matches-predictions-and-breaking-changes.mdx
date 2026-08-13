@@ -1,0 +1,53 @@
+---
+title: "What's new in Aug 2026"
+description: "The new watchability index that ranks every match before it is played, public Elo ratings with calibrated match predictions, and two breaking changes coming on 14 September 2026."
+---
+![Padel API Aug 2026](https://ik.imagekit.io/ferranfigueredo/tr:w-1920,h-1080/padelapi/clark-van-der-beken-xApC8DIiD54-unsplash_HhH2UjDON.jpg)
+
+**Hello developers,**
+
+Two new things worth building on, and one you need to read before September. Here's what's new:
+
+## 1. Watchability: best match of the day
+
+Every match now carries a **watchability** field: an integer from 0 to 100 that rates how much a fixture is worth watching, before a single point is played. It combines how good the four players are, how close the match should be, and what is at stake in that round.
+
+Sort a day by it and the best match comes out on top. It is set as soon as both pairs are known, so it works for previews and alerts days in advance, and it never changes once the match is played.
+
+![Padel API Watchability](https://ik.imagekit.io/ferranfigueredo/padelapi/padelapi-watchability_8MkG2U0r8.png)
+
+Match of the day widgets, push alerts, stream guides, automated previews. One request, one match, no editor picking it. The field is available on paid plans, and returns the text hidden_free_plan on the Free plan.
+
+[Read the Match Watchability Index guide](https://padelapi.org/docs/guides/match-watchability-index)
+
+## 2. Elo ratings and match predictions
+
+The **elo** field on every player answers what the ranking cannot: how strong is this player right now, updated after every completed match. Sort the player list by it and you get the rating table itself.
+
+Send four player IDs to the simulate endpoint and you get a win probability for a matchup that has never happened, with the favourite and the rating gap included. Those probabilities are **calibrated** against more than 7,500 professional matches: when the model says 78%, the favourite really wins about 78% of the time.
+
+![Padel API Simulation](https://ik.imagekit.io/ferranfigueredo/padelapi/padel-simulation_uZVOQgSGK.png)
+
+[Padel Elo Rating](https://padelapi.org/docs/guides/padel-elo-rating) · [Padel Match Prediction Model](https://padelapi.org/docs/guides/padel-match-prediction)
+
+## 3. Breaking changes on 14 September
+
+Two changes to which plan gets what, effective on **14 September**.
+
+**If you are on Free or Plus**, three endpoints move to Pro or higher and will start returning a 402 error: [simulate match](https://padelapi.org/docs/api-reference/match/simulate-match), [head to head by match](https://padelapi.org/docs/api-reference/match/show-match-head-to-head) and [head to head by players](https://padelapi.org/docs/api-reference/match/search-head-to-head-matches). This is the one to check: if your integration calls any of them, it will stop working that day.
+
+**If you are on Free**, three more fields move behind a paid plan and will return the text hidden_free_plan: duration, started_time and started_time_local. This one does not change the shape of the JSON.
+
+**If you are on Pro or Business**, nothing changes for you.
+
+Everything else stays as it is: tournaments, player profiles, current Elo, seeds, rounds, draw structure and estimated schedules. If the change is a problem for what you are building, reply to this email before 14 September and we will sort something out.
+
+[See pricing plans](https://padelapi.org#pricing)
+
+---
+
+Thank you for being part of the Padel API community.
+
+Your feedback drives what we build next. Feel free to share your thoughts or suggestions at [ferran@padelapi.org](mailto:ferran@padelapi.org).
+
+Best regards,

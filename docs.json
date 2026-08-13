@@ -100,6 +100,7 @@
             "group": "News",
             "icon": "newspaper",
             "pages": [
+              "blog/20260814-whats-new-in-padel-api-aug-2026-top-matches-predictions-and-breaking-changes",
               "blog/20260728-building-a-padel-prediction-model",
               "blog/20260601-whats-new-in-padel-api-jun-2026-webhooks-rankings-and-more",
               "blog/20260202-whats-new-in-padel-api-feb-2026-ai-integration-new-analyst-plan-and-more",
