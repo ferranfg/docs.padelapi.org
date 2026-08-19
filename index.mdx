@@ -27,56 +27,56 @@ To guarantee the highest data quality and consistency, Padel API currently focus
 
 This ensures comprehensive and timely coverage of draws, schedules, matches, results, and statistics.
 
-Feature availability varies by tournament level. Refer to the tables below for the current availability of Results, Stats, and Live coverage. For guidance on keeping your local data up to date, see the [Data Synchronization](/guides/data-synchronization) guide.
+Feature availability varies by tournament level. Refer to the tables below for the current availability of Score, Qualy, Live, and Stats coverage. For guidance on keeping your local data up to date, see the [Data Synchronization](/guides/data-synchronization) guide.
 
 ### Padel FIP & Premier Padel
 
-Lower-tier events (such as FIP Rise, FIP Promises, national or exhibition events, and qualifiers) may have incomplete or inconsistent data at the source, so we cannot guarantee the same quality.
+Lower-tier events (such as FIP Rise, FIP Promises, and national or exhibition events) may have incomplete or inconsistent data at the source, so we cannot guarantee the same quality.
 
 ![Padel API](https://raw.githubusercontent.com/ferranfg/docs.padelapi.org/refs/heads/master/images/padelapi-padelfip-2.jpeg)
 
-| Level           | Score | Stats   | Point by point |
-|-----------------|-------|---------|----------------|
-| `major`         |✅     |✅       |✅               |
-| `p1`            |✅     |✅       |✅               |
-| `p2`            |✅     |✅       |✅               |
-| `finals`        |✅     |✅       |✅               |
-| `fip_platinum`  |✅     |✅       |✅               |
-| `fip_gold`      |✅     |❌       |❌               |
-| `fip_silver`    |✅     |❌       |❌               |
-| `fip_other`*    |✅     |❓       |❓               |
+| Level           | Score | Qualy | Live  | Stats |
+|-----------------|-------|-------|-------|-------|
+| `major`         |✅     |✅     |✅     |✅     |
+| `p1`            |✅     |✅     |✅     |✅     |
+| `p2`            |✅     |✅     |✅     |✅     |
+| `finals`        |✅     |✅     |✅     |✅     |
+| `fip_platinum`  |✅     |✅     |✅     |✅     |
+| `fip_gold`      |✅     |❌     |❌     |❌     |
+| `fip_silver`    |✅     |❌     |❌     |❌     |
+| `fip_other`*    |✅     |❓     |❓     |❓     |
 
 *Other tournaments may include manually curated individual FIP events of particular relevance, such as the FIP World Cup Pairs.
 
 ### World Padel Tour
 
-The World Padel Tour (WPT) was the leading professional circuit until 2023. We provide scores for its main event categories. Stats and point-by-point data are not available at this level.
+The World Padel Tour (WPT) was the leading professional circuit until 2023. We provide scores for its main event categories. Qualy, Live and Stats data are not available at this level.
 
-| Level           | Score | Stats   | Point by point |
-|-----------------|-------|---------|----------------|
-| `wpt_master`    |✅     |❌       |❌               |
-| `wpt_1000`      |✅     |❌       |❌               |
-| `wpt_500`       |✅     |❌       |❌               |
-| `wpt_final`     |✅     |❌       |❌               |
+| Level           | Score | Qualy | Live  | Stats |
+|-----------------|-------|-------|-------|-------|
+| `wpt_master`    |✅     |❌     |❌     |❌     |
+| `wpt_1000`      |✅     |❌     |❌     |❌     |
+| `wpt_500`       |✅     |❌     |❌     |❌     |
+| `wpt_final`     |✅     |❌     |❌     |❌     |
 
 ### Padel Pro Tour
 
-The Padel Pro Tour (PPT) was the main professional circuit in Spain and the predecessor of the World Padel Tour. We provide scores for its full range of event categories. Stats and point-by-point data are not available at this level.
+The Padel Pro Tour (PPT) was the main professional circuit in Spain and the predecessor of the World Padel Tour. We provide scores for its full range of event categories. Qualy, Live and Stats data are not available at this level.
 
-| Level               | Score | Stats   | Point by point |
-|---------------------|-------|---------|----------------|
-| `ppt_master`        |✅     |❌       |❌               |
-| `ppt_international`  |✅     |❌       |❌               |
-| `ppt_final`         |✅     |❌       |❌               |
-| `ppt_promotional`   |✅     |❌       |❌               |
-| `ppt_other`         |✅     |❌       |❌               |
+| Level               | Score | Qualy | Live  | Stats |
+|---------------------|-------|-------|-------|-------|
+| `ppt_master`        |✅     |❌     |❌     |❌     |
+| `ppt_international`  |✅     |❌     |❌     |❌     |
+| `ppt_final`         |✅     |❌     |❌     |❌     |
+| `ppt_promotional`   |✅     |❌     |❌     |❌     |
+| `ppt_other`         |✅     |❌     |❌     |❌     |
 
 ### Historical Coverage
 
 Our historical depth varies by season, and we are continuously expanding it as more data meets our quality standards.
 
 <Note>
-  **From 2023 onwards**, we provide **complete draws** for the covered tournament levels — every round, from qualifiers and early rounds through to the final.
+  **From 2023 onwards**, we provide **complete draws** for the covered tournament levels — every round, from the opening round through to the final.
 
   **From 2006 to 2023**, we currently provide **finals only**. We are actively reconstructing the earlier rounds of these events and will add them as they become available.
 </Note>
