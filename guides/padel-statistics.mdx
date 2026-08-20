@@ -79,6 +79,10 @@ A match stats response includes overall totals plus per-set breakdowns:
 
 Career-level aggregates for any player. Useful for comparing trajectories, building rankings models, or analyzing form over specific periods. Endpoint: [`GET /api/players/{player_id}/stats`](/api-reference/player/show-player-stats).
 
+<Note>
+  Player and pair statistics are computed over **main draw matches only**. Qualification rounds are excluded from every metric, so a win percentage is not diluted by the matches a pair played to enter the tournament. The [Elo rating](/guides/padel-elo-rating) works the other way: it counts every settled match, qualification included, because a result against a strong opponent is informative wherever it happens. To read the qualification matches themselves, use the `draw` filter on the [match listings](/api-reference/match/list-matches).
+</Note>
+
 ```bash
 curl -X GET \
   'https://padelapi.org/api/players/{player_id}/stats' \
