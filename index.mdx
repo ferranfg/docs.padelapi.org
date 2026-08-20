@@ -120,9 +120,9 @@ By default, the **Padel API** only returns the first 15 results for those endpoi
 
 ## Status Codes
 
-The **Padel API** uses conventional [HTTP response codes](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) to indicate whether a request was successful (`2XX` codes) or resulted in an error (`4XX` and `5XX` codes).
+The **Padel API** uses conventional HTTP response codes to indicate whether a request was successful (`2XX` codes) or resulted in an error (`4XX` and `5XX` codes).
 
-See the [Error Codes](/error-codes) page for details on each status code.
+See the [Padel API Response Codes](/error-codes) page for what each code means and how to handle it.
 
 ## Roadmap & Issues
 

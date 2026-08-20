@@ -1,6 +1,6 @@
 ---
-title: "Error Codes"
-description: "Complete reference for Padel API HTTP status codes and error responses. Learn how to handle 401, 402, 404, 422, 429, and 500 errors in your application."
+title: "Response Codes"
+description: "Complete reference for Padel API HTTP response codes. What every success, redirect and error code means, and how to handle 401, 402, 404, 422, 429, and 500 in your application."
 ---
 
 The Padel API uses conventional HTTP response codes to indicate the success or failure of an API request.
@@ -82,7 +82,7 @@ curl -X GET 'https://padelapi.org/api/seasons' \
 
 ### 402 - Payment Required
 
-Your current subscription plan does not include access to this resource or you have exceeded your plan limits.
+Your current subscription plan does not include access to this resource.
 
 **How to fix:**
 1. Check your current plan at [padelapi.org/billing](https://padelapi.org/billing)
@@ -140,7 +140,7 @@ The request parameters failed validation. The response includes details about wh
 
 ### 429 - Too Many Requests
 
-You have exceeded the API rate limit.
+You have exceeded the API rate limit. There are two, requests per minute and requests per day, and both return this same code.
 
 ```json
 {
@@ -150,8 +150,9 @@ You have exceeded the API rate limit.
 
 **How to handle:**
 1. Wait until the next minute before retrying
-2. Monitor the `X-RateLimit-Remaining` header to avoid hitting the limit
-3. Implement request throttling in your application
+2. If the 429s keep coming after a couple of minutes at a low rate, you are against the daily limit rather than the per-minute one, and waiting a minute will not clear it. The [Logs & Quota](https://padelapi.org/explore/resources/logs) page shows which of the two you have hit
+3. Monitor the `X-RateLimit-Remaining` header to avoid hitting the limit
+4. Implement request throttling in your application
 
 See [Rate Limits](/#rate-limits) for details on limits and available headers.
 
