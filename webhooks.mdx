@@ -283,11 +283,18 @@ You can list every webhook you own with [`GET /api/webhooks`](/api-reference/web
 | `match.created` | A new match is scheduled (typically when a draw is published). |
 | `match.updated` | A match changes — score, status, court, schedule, players, or any other field. |
 | `match.deleted` | A match is removed (cancellations, walkovers, draw corrections). |
+| `match.qualy.created` | A new qualification match is scheduled. |
+| `match.qualy.updated` | A qualification match changes — score, status, court, schedule, players, or any other field. |
+| `match.qualy.deleted` | A qualification match is removed. |
 | `player.created` | A new player profile is added. |
 | `player.updated` | A player's profile changes — ranking, country, image, name, etc. |
 | `player.deleted` | A player profile is removed (typically merge of duplicates). |
 
 The `data` field of each event contains the **same shape** as the corresponding REST resource — see the [API Reference](/index) for the exact schema of each one.
+
+<Note>
+  The `match.*` events cover the **main draw only**. Qualification matches are delivered through the separate `match.qualy.*` events, mirroring the way listings return the main draw unless you ask for `?draw=qualy`. Subscribe to both families if you want every match of a tournament.
+</Note>
 
 ---
 
