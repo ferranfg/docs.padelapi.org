@@ -13,11 +13,11 @@ However, padel data is not static. Tournaments get cancelled or rescheduled, pla
 
 ## Sync frequency
 
-| Data type     | Recommended frequency         | Key endpoints | Webhook events |
+| Data type     | Frequency                     | Key endpoints | Webhook events |
 |---------------|-------------------------------|---------------|----------------|
-| Tournaments   | Weekly                        | [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments) | `tournament.created`, `tournament.updated`, `tournament.deleted` |
-| Players       | After each tournament week    | [`/players/{player}`](/api-reference/player/show-player) | `player.created`, `player.updated`, `player.deleted` |
-| Matches       | After each tournament         | [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) | `match.created`, `match.updated`, `match.deleted` (add `match.qualy.*` for the qualification draw) |
+| Tournaments   | Weekly                        | [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments) | `tournament.created` `tournament.updated` `tournament.deleted` |
+| Players       | After each tournament week    | [`/players/{player}`](/api-reference/player/show-player) | `player.created` `player.updated` `player.deleted` |
+| Matches       | After each tournament         | [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) | `match.created` `match.updated` `match.deleted` `match.qualy.created` `match.qualy.updated` `match.qualy.deleted` |
 
 ## Tournaments
 
