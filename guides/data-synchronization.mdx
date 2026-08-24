@@ -15,9 +15,9 @@ However, padel data is not static. Tournaments get cancelled or rescheduled, pla
 
 | Data type     | Frequency                     | Key endpoints | Webhook events |
 |---------------|-------------------------------|---------------|----------------|
-| Tournaments   | Weekly                        | [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments) | `tournament.created` `tournament.updated` `tournament.deleted` |
+| Tournaments   | Weekly                        | [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments) | `tournament.created` `tournament.backfilled` `tournament.updated` `tournament.deleted` |
 | Players       | After each tournament week    | [`/players/{player}`](/api-reference/player/show-player) | `player.created` `player.updated` `player.deleted` |
-| Matches       | After each tournament         | [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) | `match.created` `match.updated` `match.deleted` `match.qualy.created` `match.qualy.updated` `match.qualy.deleted` |
+| Matches       | After each tournament         | [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) | `match.created` `match.backfilled` `match.updated` `match.deleted` `match.qualy.created` `match.qualy.backfilled` `match.qualy.updated` `match.qualy.deleted` |
 
 ## Tournaments
 
@@ -25,7 +25,7 @@ Tournaments, especially at lower levels like FIP Gold, FIP Silver, or regional e
 
 We recommend implementing a **weekly synchronization process** using the [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments) endpoint as your starting point. Your sync logic should account for:
 
-- **New tournaments**: New events may appear in the calendar throughout the season. Your sync should detect and store any tournaments not previously seen.
+- **New tournaments**: New events may appear in the calendar throughout the season. Past seasons can also gain tournaments as historical coverage grows, so a season you fetched once is not necessarily complete for good. Your sync should detect and store any tournaments not previously seen.
 - **Tournament status changes**: Some events may transition to `cancelled` during the season. Cancelled tournaments are excluded from list endpoints ([`/tournaments`](/api-reference/tournament/list-tournaments) and [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments)) but remain accessible via the [tournament detail endpoint](/api-reference/tournament/show-tournament) with their `cancelled` status visible. If you have previously stored a tournament, you can check its current status by fetching it directly by ID.
 - **Redirections (merged tournaments)**: When a tournament has been merged into another event, the API will respond with a `302` redirect pointing to the new resource. Your sync process should follow these redirects and update any stored references.
 
