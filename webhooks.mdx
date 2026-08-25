@@ -296,7 +296,7 @@ You can list every webhook you own with [`GET /api/webhooks`](/api-reference/web
 The `data` field of each event contains the **same shape** as the corresponding REST resource — see the [API Reference](/index) for the exact schema of each one.
 
 <Note>
-  The `match.*` events cover the **main draw only**. Qualification matches are delivered through the separate `match.qualy.*` events, mirroring the way listings return the main draw unless you ask for `?draw=qualy`. Subscribe to both families if you want every match of a tournament.
+  The `match.*` events cover the **main draw only**. Qualification matches are delivered through the separate `match.qualy.*` events, mirroring the way listings return the main draw unless you ask for `?draw=qualy` or `?draw=all`. Subscribe to both families if you want every match of a tournament.
 </Note>
 
 ---
