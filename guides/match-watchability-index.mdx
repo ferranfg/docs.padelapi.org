@@ -93,10 +93,10 @@ Three things, and nothing else. Each is a number the API already publishes, so t
 
 <Steps>
   <Step title="How good the players are" icon="chart-line">
-    The average [Elo rating](/guides/padel-elo-rating) of the four players on court, read against the range the professional tour actually occupies. This is the heaviest ingredient: a final between two mid-table pairs is not the same event as a final between the top two.
+    The [Elo rating](/guides/padel-elo-rating) of the players on court, read against the range the professional tour actually occupies, and leaning towards the stronger of the two pairs: seeing one of the best pairs on tour is a draw in itself. This is the heaviest ingredient: a final between two mid-table pairs is not the same event as a final between the top two.
   </Step>
   <Step title="How close it should be" icon="scale-balanced">
-    The [calibrated win probability](/guides/padel-match-prediction) for the matchup. A 50/50 contributes everything it can, a 95/5 contributes almost nothing. This is what stops a superstar-against-a-qualifier fixture from ranking above a real contest.
+    The [calibrated win probability](/guides/padel-match-prediction) for the matchup. A 50/50 contributes everything it can, a 95/5 contributes almost nothing. It is what separates a genuine contest from a formality between the same names.
   </Step>
   <Step title="What is at stake" icon="trophy">
     The round. A final counts for more than a semi-final, which counts for more than a quarter-final, down to the opening rounds. Enough to break ties between comparable matches, not enough to push a dull final above a great quarter-final.
@@ -137,7 +137,7 @@ The index is built from level, closeness and round, so anything outside those th
 - **Rivalry and narrative.** A grudge match, a former partnership meeting for the first time, a player's last tournament. None of it reaches the number. If your audience cares, layer [head to head records](/api-reference/match/search-head-to-head-matches) and [pair stats](/api-reference/pair/show-pair-stats) on top.
 - **Home players.** A local wildcard in an opening round can be the match of the day for that crowd and rate in the twenties.
 - **Form and fitness.** Elo does not decay with inactivity and does not know who retired mid-match last week. See [what the prediction model does not know](/guides/padel-match-prediction#what-the-model-does-not-know).
-- **New pairs.** Ratings are individual and averaged, so a pair playing together for the first time reads the same as one with two seasons of joint titles.
+- **New pairs.** Ratings are individual, so a pair playing together for the first time reads the same as one with two seasons of joint titles.
 - **What actually happened.** A 90 can end 6-1 6-2 and a 30 can go to a third set tie-break. Padel still gets to decide.
 
 Treat it as a shortlist, not a verdict. Its job is to cut forty matches down to three worth a human look, and it is very good at that.
@@ -190,6 +190,9 @@ A practical pattern for a live product: sort the day by `watchability`, take the
   </Accordion>
   <Accordion title="Does a high value guarantee a good match?">
     No. It rates the setup: two strong pairs, evenly matched, late in a draw. A great fixture can still end in straight sets. Over many matches the high values are clearly better watches than the low ones, which is all an ordinal index claims.
+  </Accordion>
+  <Accordion title="Why does a top pair against a weaker side still rate reasonably?">
+    Because level and closeness are weighed against each other, rather than one cancelling the other out. A one sided fixture gives up most of what the closeness component has to offer, but having one of the best pairs on tour on court is worth something on its own, and the index says so. It will still sit clearly below an even match between comparable pairs in the same round.
   </Accordion>
   <Accordion title="Why is the value of a played match different from what I would compute today?">
     Because it was frozen when the match was played, using the ratings as they stood then. Recomputing it now with today's ratings would give a different number and would quietly rewrite history, so we do not. Historical matches keep the value they carried into the court.
