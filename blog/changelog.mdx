@@ -4,6 +4,26 @@ description: "Stay up-to-date with Padel API releases, new features, bug fixes, 
 rss: true
 ---
 
+<Update label="August 2026" description="Watchability Index, Qualification Draws & Past-Date Simulations">
+  - **Coming 14 September:** [Simulate Match](/api-reference/match/simulate-match) and both head-to-head endpoints move to Pro, and `duration`, `started_time` and `started_time_local` are hidden on Free. Details in the [August newsletter](/blog/20260814-whats-new-in-padel-api-aug-2026-top-matches-predictions-and-breaking-changes)
+  - **New:** [`watchability`](/guides/match-watchability-index) field on matches: a 0-100 score of how good a match promises to be, set as soon as both pairs are known, with sorting by it on the matches endpoint (paid plans)
+  - **New:** Qualification draws: `draw` field on matches (`main` or `qualy`), plus `draw=qualy` and `draw=all` filters on listings and on the live feed (paid plans)
+  - **New:** `match.qualy.*` [webhook events](/webhooks) for qualification matches
+  - **New:** `tournament.backfilled` and `match.backfilled` webhook events for tournaments added to the calendar after they were played
+  - **New:** `played_at` on [Simulate Match](/api-reference/match/simulate-match), to replay a match-up with the Elo ratings in force on that day
+  - **New:** `after_date` and `before_date` filters on the head-to-head endpoints
+  - **New:** 302 redirects on removed and merged matches, resolving to the canonical match
+  - Terms updated to state explicitly that commercial use of the API is permitted
+  - Fixed pagination links dropping the parameters of the original query
+  - Fixed a 500 when `sort_by` or `order_by` were sent empty
+  - **MCP:** `draw` filter, `watchability` sorting and head-to-head date filters on the match tools
+  - **Docs:** Added the [Match Watchability Index](/guides/match-watchability-index) guide
+  - **Docs:** Added the [ChatGPT app](/padel-analyst/chatgpt-plugin) installation guide
+  - **Docs:** Renamed Error Codes to [Response Codes](/error-codes), correcting 402 and telling the per-minute and per-day rate limits apart
+  - **Docs:** Added qualification draw coverage to the tournament level tables and clarified that player and pair stats cover the main draw only
+  - **Docs:** Added StudyPadel, La Chiquita Pádel and an Other Directories section to the [use cases showcase](/guides/use-cases-showcase)
+</Update>
+
 <Update label="July 2026" description="Elo Ratings, Match Predictions & Schedule Estimates">
   - **New:** [Tournament editions endpoint](/api-reference/tournament/list-tournament-editions) linking editions of the same event across seasons
   - **New:** `elo` field on players — Elo ratings are now public, with `elo` sorting on the players endpoint and MCP tool
