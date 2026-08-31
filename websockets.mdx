@@ -84,7 +84,7 @@ curl -X GET \
   "self": "/api/matches/7243/live",
   "status": "live",
   "coverage": "full",
-  "channel": "matches.7243",
+  "channel": "matches.9f2a1c8e4b6d0a53",
   "sets": [
     {
       "set_number": 1,
@@ -129,7 +129,7 @@ curl -X GET \
 |---|---|
 | `status` | Match status in a live context: `live`, `ended`, or `finished`. See [Match Statuses](/statuses#match-statuses) for all possible values. |
 | `coverage` | Data completeness: `tracking` (collecting data), `full` (all games tracked), `partial` (some gaps), or `null` (no data) |
-| `channel` | Pusher channel name for real-time updates |
+| `channel` | Pusher channel name for real-time updates. Issued per match, so read it from the response |
 | `sets[].set_number` | Set number (1, 2, or 3) |
 | `sets[].set_score` | Final set score (e.g. `"6-2"`) when complete, `null` while in progress |
 | `sets[].games[].game_number` | Game number within the set |
@@ -154,11 +154,11 @@ Instead of polling the REST endpoint repeatedly, subscribe to WebSocket updates 
 | **Provider** | [Pusher](https://pusher.com) |
 | **App Key** | `0ffbefeb945e4e466065` |
 | **Cluster** | `eu` |
-| **Channel format** | `matches.{matchId}` |
+| **Channel name** | The `channel` field returned by the live endpoints |
 | **Event name** | `App\PadelApi\Events\MatchLiveUpdated` |
 
 <Note>
-  Channels are **public** — no authentication handshake is required to subscribe. You only need the Pusher app key and cluster.
+  No authentication handshake is required to subscribe. You need the Pusher app key, the cluster and the `channel` name returned by the live endpoints — channel names are issued per match and cannot be built from the match id.
 </Note>
 
 ### Install a Pusher client
@@ -187,7 +187,7 @@ const pusher = new Pusher('0ffbefeb945e4e466065', {
 });
 
 // Subscribe using the "channel" field from the live endpoint
-const channel = pusher.subscribe('matches.7243');
+const channel = pusher.subscribe('matches.9f2a1c8e4b6d0a53');
 
 channel.bind('App\\PadelApi\\Events\\MatchLiveUpdated', (data) => {
   console.log('Match update:', data.status);
@@ -209,7 +209,7 @@ pusher = pysher.Pusher(key='0ffbefeb945e4e466065', cluster='eu')
 pusher.connection.bind('pusher:connection_established', lambda _: None)
 pusher.connect()
 
-channel = pusher.subscribe('matches.7243')
+channel = pusher.subscribe('matches.9f2a1c8e4b6d0a53')
 channel.bind('App\\PadelApi\\Events\\MatchLiveUpdated', on_event)
 ```
 
@@ -239,7 +239,7 @@ channel.bind('App\\PadelApi\\Events\\MatchLiveUpdated', (data) => {
   }
 
   if (data.status === 'finished') {
-    pusher.unsubscribe('matches.7243');
+    pusher.unsubscribe('matches.9f2a1c8e4b6d0a53');
     console.log('Match finished, unsubscribed');
   }
 });
@@ -254,7 +254,7 @@ def on_event(data):
         print('Match ended, waiting for final confirmation...')
 
     if match['status'] == 'finished':
-        pusher.unsubscribe('matches.7243')
+        pusher.unsubscribe('matches.9f2a1c8e4b6d0a53')
         print('Match finished, unsubscribed')
 ```
 
@@ -266,7 +266,7 @@ def on_event(data):
 
 1. **Find live matches** — [`GET /api/live`](/api-reference/live/list-live-matches)
 2. **Get initial state** — [`GET /api/matches/{id}/live`](/api-reference/match/show-match-point-by-point)
-3. **Subscribe to updates** — Connect to Pusher channel `matches.{id}`
+3. **Subscribe to updates** — Connect to the Pusher channel named in the `channel` field
 4. **Detect match end** — When `status` changes to `ended` (match over) and then `finished` (results confirmed), unsubscribe from the channel
 
 ---
