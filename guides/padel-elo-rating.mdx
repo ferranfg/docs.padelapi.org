@@ -1,6 +1,6 @@
 ---
 title: "Padel Elo Rating"
-description: "What an Elo rating is in padel, how the Padel API rates every professional player, how to read the numbers and how to get them from the player profile."
+description: "What an Elo rating is in padel, how the Padel API rates every professional player, how to read the numbers and how to get the Elo leaderboard and its weekly history."
 ---
 
 The official ranking answers one question: **who has collected the most points this season**. It is a great answer, but it is not the only one. It says nothing about who is playing best right now, it ignores who you beat to get there, and it resets with the calendar.
@@ -47,16 +47,76 @@ curl 'https://padelapi.org/api/players/65' \
 
 The same field is included everywhere a player appears: [the player list](/api-reference/player/list-players), [match line-ups](/api-reference/tournament/list-tournament-matches) and the [simulate endpoint](/api-reference/match/simulate-match).
 
-To pull the rating table itself, sort the player list by `elo`:
+<Tip>
+  You can also ask for it in plain English through **[Padel Analyst](/padel-analyst/index)**: *"who are the top 10 men's players by Elo?"* or *"is Tapia's Elo higher than Galán's?"*.
+</Tip>
+
+---
+
+## The Elo leaderboard
+
+The `elo` field tells you how strong one player is. To read the whole table at once, ask the [rankings endpoint](/api-reference/ranking/list-rankings) for `type=elo`:
+
+```bash
+curl 'https://padelapi.org/api/rankings?type=elo&category=men' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+```json
+{
+  "data": [
+    {
+      "id": 65,
+      "self": "/api/players/65",
+      "name": "Arturo Coello",
+      "category": "men",
+      "nationality": "ES",
+      "type": "elo",
+      "ranking": 1,
+      "ranking_diff": 0,
+      "points": 2136,
+      "points_diff": 18,
+      "date": "2026-08-31",
+      "connections": {
+        "rankings": "/api/players/65/rankings"
+      }
+    },
+    "..."
+  ]
+}
+```
+
+It is the same payload as the `official` and `race` lists, so anything you already built on top of them works unchanged: `ranking` is the position, `points` carries the Elo rating, and `points_diff` is how much the rating moved since the previous published snapshot. Every filter still applies — `category`, `nationality`, `date`, `sort_by` and `order_by` — so `sort_by=points_diff&order_by=desc` gives you the biggest risers of that snapshot. A player who was missing from the preceding snapshots re-enters with no movement, instead of a diff spanning the whole absence.
+
+The Elo list is published as a **weekly snapshot**. The official and race lists follow the tournament calendar and can skip a week, so whenever both carry the same date you can plot position by points and position by rating side by side and see where they disagree.
+
+If you want the live table instead of the weekly photo, sort the player list by rating — it reflects every match played since the last snapshot:
 
 ```bash
 curl 'https://padelapi.org/api/players?sort_by=elo&order_by=desc&category=men' \
   -H 'Authorization: Bearer YOUR_API_TOKEN'
 ```
 
-<Tip>
-  You can also ask for it in plain English through **[Padel Analyst](/padel-analyst/index)**: *"who are the top 10 men's players by Elo?"* or *"is Tapia's Elo higher than Galán's?"*.
-</Tip>
+<Note>
+  To appear on the Elo leaderboard a player needs **at least 5 rated matches in the last 12 months**. The window is there because a rating does not expire: without it a retired player would sit at the top forever and push the active field down. The minimum is there because a rating built on one or two matches has barely moved from the entry level, and a table full of them swings hundreds of positions on any result. Nothing is done to the rating itself: it stays on the player profile, and the player re-enters the list with it intact once they play again. A match that never produced a rating, such as a walkover or a bye, does not count towards the minimum.
+</Note>
+
+---
+
+## Rating evolution over time
+
+Every weekly snapshot is kept, so the history of a rating comes from the [player rankings endpoint](/api-reference/player/list-player-rankings) with the same `type=elo`:
+
+```bash
+curl 'https://padelapi.org/api/players/65/rankings?type=elo&after_date=2026-01-01' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+Without `after_date` or `before_date` you get the latest entry for each type. With either of them you get the chronological series inside that range: one entry per week, ready to plot as a line.
+
+<Info>
+  On the free plan only each player's current entry is visible; older entries return `hidden_free_plan` in place of the values. Paid plans include the full history.
+</Info>
 
 ---
 
@@ -95,6 +155,7 @@ Both numbers are in the API, and they are useful for different things.
 | **Not playing** | Points drop off as the period rolls | The rating stays where it was |
 | **Across seasons** | Resets with the calendar | Continuous, it carries over |
 | **API field** | `ranking`, `points` | `elo` |
+| **Leaderboard** | `/rankings?type=official` | `/rankings?type=elo` |
 
 A practical way to use them together: **the ranking tells you the seeding, the rating tells you the danger.** An unseeded pair with two 1900 rated players is the draw's problem, and only one of the two numbers says so.
 
