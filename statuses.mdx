@@ -10,7 +10,7 @@ Resources in the Padel API include a `status` field that reflects their current 
     3 possible statuses
   </Card>
   <Card title="Tournaments" icon="trophy">
-    4 possible statuses
+    5 possible statuses
   </Card>
   <Card title="Matches" icon="table-tennis-paddle-ball">
     7 possible statuses
@@ -33,7 +33,7 @@ Indicates whether a season is yet to start, currently active, or complete.
 
 ## Tournament Statuses
 
-Tournaments progress from `pending` through `finished`, unless cancelled. See the [Data Synchronization](/guides/data-synchronization#tournaments) guide for best practices on keeping your data up to date.
+Tournaments progress from `pending` through `finished`, unless cancelled or postponed. See the [Data Synchronization](/guides/data-synchronization#tournaments) guide for best practices on keeping your data up to date.
 
 | Status | Description |
 |--------|-------------|
@@ -41,6 +41,7 @@ Tournaments progress from `pending` through `finished`, unless cancelled. See th
 | `live` | Tournament is currently in progress |
 | `finished` | Tournament has concluded |
 | `cancelled` | Tournament was cancelled |
+| `postponed` | Tournament was postponed; dates are the last announced |
 
 ---
 
