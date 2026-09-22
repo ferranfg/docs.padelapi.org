@@ -1,0 +1,50 @@
+---
+title: "Ready for the World Cup"
+og:title: "Update your app for the FIP World Cup - support for team tournaments"
+description: "The Padel API now supports tournaments played by teams, where every meeting between two teams is three matches. These are the minimum changes your app needs before the FIP World Cup."
+---
+![Padel API Sep 2026](REPLACE_WITH_HEADER_IMAGE_URL)
+
+**Hello developers,**
+
+The **FIP World Cup** is in Doha from **2 to 7 November**, and the Padel API now supports the format it is played in: teams instead of pairs, where every meeting between two teams is decided over three pair matches.
+
+It arrives through the endpoints you already call, so nothing breaks. These are the minimum changes your app needs to support it.
+
+## 1. Detect the format
+
+Tournaments carry a new **format** field, `pairs` or `teams`. Branch on it. Everything below only applies when it is `teams`.
+
+## 2. Group the matches by tie
+
+A team tournament returns **three matches where a regular one returns one**. Each carries a new `tie` object:
+
+```json
+"tie": { "group": "A", "team_1": "AR", "team_2": "ES", "rubber": 1 }
+```
+
+The three matches of a tie share `draw`, `round`, `index` and `category`. Group by those four, count `winner` across them, and the team with two rubbers wins the tie. Store the tie as its own entity: keyed only by bracket position, three matches collapse into one.
+
+## 3. Accept two new draws
+
+Besides `main` and `qualy`, matches can be `draw=group` (the round robin, with `round` at `0`) and `draw=placement` (the ties played for a position rather than the title). Listings still return the main draw by default, so ask for `?draw=group` or `?draw=placement` if you want them, and add the `match.group.*` and `match.placement.*` events if you use webhooks.
+
+## 4. Handle not_played
+
+When a team wins the first two rubbers, the third is not played: the match exists, with both pairs, and nobody won it. Its status is **`not_played`**. Handle it next to `bye` and `walkover`.
+
+## 5. Do not assume two champions
+
+`winners` holds the three pairs of the winning team, six players per category instead of two. A team can win a tie while losing a match, so a player can be a champion having lost their rubber.
+
+[Read the Team Tournaments guide](https://padelapi.org/docs/guides/team-tournaments)
+
+The 2024 edition is already in the API, complete, so you can build against it today and be ready before the first ball is hit in Doha.
+
+---
+
+Thank you for being part of the Padel API community.
+
+Your feedback drives what we build next. Feel free to share your thoughts or suggestions at [ferran@padelapi.org](mailto:ferran@padelapi.org).
+
+Best regards,

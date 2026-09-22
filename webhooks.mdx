@@ -285,10 +285,7 @@ You can list every webhook you own with [`GET /api/webhooks`](/api-reference/web
 | `match.backfilled` | A match of a tournament that finished in the past is added. |
 | `match.updated` | A match changes — score, status, court, schedule, players, or any other field. |
 | `match.deleted` | A match is removed (cancellations, walkovers, draw corrections). |
-| `match.qualy.created` | A new qualification match is scheduled. |
-| `match.qualy.backfilled` | A qualification match of a tournament that finished in the past is added. |
-| `match.qualy.updated` | A qualification match changes — score, status, court, schedule, players, or any other field. |
-| `match.qualy.deleted` | A qualification match is removed. |
+| `match.*.created` `match.*.backfilled` `match.*.updated` `match.*.deleted` | The same four events for matches outside the main draw, where `*` is the `draw` they belong to: `qualy`, `group` or `placement`. |
 | `player.created` | A new player profile is added. |
 | `player.updated` | A player's profile changes — ranking, country, image, name, etc. |
 | `player.deleted` | A player profile is removed (typically merge of duplicates). |
@@ -296,7 +293,7 @@ You can list every webhook you own with [`GET /api/webhooks`](/api-reference/web
 The `data` field of each event contains the **same shape** as the corresponding REST resource — see the [API Reference](/index) for the exact schema of each one.
 
 <Note>
-  The `match.*` events cover the **main draw only**. Qualification matches are delivered through the separate `match.qualy.*` events, mirroring the way listings return the main draw unless you ask for `?draw=qualy` or `?draw=all`. Subscribe to both families if you want every match of a tournament.
+  The `match.*` events cover the **main draw only**, mirroring the way listings return the main draw unless you ask for `?draw=qualy`, `?draw=group`, `?draw=placement` or `?draw=all`. Subscribe to every family you want to store, spelling out the draw: `match.qualy.updated`, `match.group.updated` and so on. `*` is a placeholder in this table, not a wildcard you can register.
 </Note>
 
 ---

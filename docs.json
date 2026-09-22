@@ -75,6 +75,7 @@
               "guides/padel-elo-rating",
               "guides/padel-match-prediction",
               "guides/match-watchability-index",
+              "guides/team-tournaments",
               "guides/vs-scraping",
               "guides/vs-padel-intelligence",
               "guides/best-padel-player",
@@ -100,6 +101,7 @@
             "group": "News",
             "icon": "newspaper",
             "pages": [
+              "blog/20260922-update-your-app-for-the-fip-world-cup",
               "blog/20260814-whats-new-in-padel-api-aug-2026-top-matches-predictions-and-breaking-changes",
               "blog/20260728-building-a-padel-prediction-model",
               "blog/20260601-whats-new-in-padel-api-jun-2026-webhooks-rankings-and-more",

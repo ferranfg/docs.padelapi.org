@@ -17,7 +17,7 @@ However, padel data is not static. Tournaments get cancelled or rescheduled, pla
 |---------------|-------------------------------|---------------|----------------|
 | Tournaments   | Weekly                        | [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments) | `tournament.created` `tournament.backfilled` `tournament.updated` `tournament.deleted` |
 | Players       | After each tournament week    | [`/players/{player}`](/api-reference/player/show-player) | `player.created` `player.updated` `player.deleted` |
-| Matches       | After each tournament         | [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) | `match.created` `match.backfilled` `match.updated` `match.deleted` `match.qualy.created` `match.qualy.backfilled` `match.qualy.updated` `match.qualy.deleted` |
+| Matches       | After each tournament         | [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) | `match.created` `match.backfilled` `match.updated` `match.deleted` `match.qualy.*` `match.group.*` `match.placement.*` |
 
 ## Tournaments
 
@@ -61,6 +61,8 @@ For each match, consider storing:
 Match IDs are stable and safe to use as your primary key. If two records for the same draw position are ever consolidated into one, the deprecated match ID responds with a `302` redirect pointing to the canonical match, the same way merged tournaments and players do. Follow the redirect, update your stored ID, and re-fetch. Upserting by match ID without following redirects is the most common cause of duplicated matches in a local copy.
 
 <Tip>See [Redirection Codes](/error-codes#redirection-codes) for details on how to handle these responses. A `404` on a match you had stored means the record was removed without a replacement.</Tip>
+
+Listings return the main draw unless you ask otherwise, so a full sync means walking the draws you care about with `?draw=qualy`, `?draw=group` or `?draw=placement`, or `?draw=all` for everything in one list.
 
 Avoid re-syncing match data for tournaments that concluded several weeks ago unless you have a specific reason to. Results for completed events rarely change.
 
