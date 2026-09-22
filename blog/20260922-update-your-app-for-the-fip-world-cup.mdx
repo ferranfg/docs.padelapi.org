@@ -1,9 +1,9 @@
 ---
 title: "Ready for the World Cup"
 og:title: "Update your app for the FIP World Cup - support for team tournaments"
-description: "The Padel API now supports tournaments played by teams, where every meeting between two teams is three matches. These are the minimum changes your app needs before the FIP World Cup."
+description: "The FIP World Cup is about to start and the Padel API is already ready for it, with full support for tournaments played by teams. Now is the moment to update your app."
 ---
-![Padel API Sep 2026](REPLACE_WITH_HEADER_IMAGE_URL)
+![Padel API FIP World Cup 2026](https://ik.imagekit.io/ferranfigueredo/tr:w-1920,h-1080/padelapi/FIPWPC2026_Poster@05x-horizontal_W1vvseEb1.png)
 
 **Hello developers,**
 
@@ -11,13 +11,9 @@ The **FIP World Cup** is in Doha from **2 to 7 November**, and the Padel API now
 
 It arrives through the endpoints you already call, so nothing breaks. These are the minimum changes your app needs to support it.
 
-## 1. Detect the format
+## 1. Read the format, group by tie
 
-Tournaments carry a new **format** field, `pairs` or `teams`. Branch on it. Everything below only applies when it is `teams`.
-
-## 2. Group the matches by tie
-
-A team tournament returns **three matches where a regular one returns one**. Each carries a new `tie` object:
+Tournaments carry a new **format** field, `pairs` or `teams`. Branch on it, because a team tournament returns **three matches where a regular one returns one**. Each carries a new `tie` object:
 
 ```json
 "tie": { "group": "A", "team_1": "AR", "team_2": "ES", "rubber": 1 }
@@ -25,17 +21,15 @@ A team tournament returns **three matches where a regular one returns one**. Eac
 
 The three matches of a tie share `draw`, `round`, `index` and `category`. Group by those four, count `winner` across them, and the team with two rubbers wins the tie. Store the tie as its own entity: keyed only by bracket position, three matches collapse into one.
 
-## 3. Accept two new draws
+## 2. Accept two new draws
 
 Besides `main` and `qualy`, matches can be `draw=group` (the round robin, with `round` at `0`) and `draw=placement` (the ties played for a position rather than the title). Listings still return the main draw by default, so ask for `?draw=group` or `?draw=placement` if you want them, and add the `match.group.*` and `match.placement.*` events if you use webhooks.
 
-## 4. Handle not_played
+## 3. Drop two assumptions
 
-When a team wins the first two rubbers, the third is not played: the match exists, with both pairs, and nobody won it. Its status is **`not_played`**. Handle it next to `bye` and `walkover`.
+**Every scheduled match gets played.** Not here: when a team wins the first two rubbers, the third no longer decides anything and is not played. The match is still on the sheet, with both pairs and no result, under the new status **`not_played`**. Handle it next to `bye` and `walkover`.
 
-## 5. Do not assume two champions
-
-`winners` holds the three pairs of the winning team, six players per category instead of two. A team can win a tie while losing a match, so a player can be a champion having lost their rubber.
+**Winning the last match makes you the champion.** Not here either: the final is three matches and the title goes to the team that wins two of them, so a pair can lose the final rubber and still be champion. `winners` holds the three pairs of the winning team, six players per category instead of two.
 
 [Read the Team Tournaments guide](https://padelapi.org/docs/guides/team-tournaments)
 

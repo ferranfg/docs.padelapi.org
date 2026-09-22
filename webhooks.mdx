@@ -293,7 +293,7 @@ You can list every webhook you own with [`GET /api/webhooks`](/api-reference/web
 The `data` field of each event contains the **same shape** as the corresponding REST resource — see the [API Reference](/index) for the exact schema of each one.
 
 <Note>
-  The `match.*` events cover the **main draw only**, mirroring the way listings return the main draw unless you ask for `?draw=qualy`, `?draw=group`, `?draw=placement` or `?draw=all`. Subscribe to every family you want to store, spelling out the draw: `match.qualy.updated`, `match.group.updated` and so on. `*` is a placeholder in this table, not a wildcard you can register.
+  The `match.*` events cover the **main draw only**. Subscribe to every family you want to store, spelling out the draw: `match.qualy.updated`, `match.group.updated` and so on. `*` is a placeholder in this table, not a wildcard you can register.
 </Note>
 
 ---
