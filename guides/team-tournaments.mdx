@@ -51,8 +51,8 @@ This is the part to model carefully, and it works the same way in every phase. O
   "draw": "group",
   "tie": {
     "group": "A",
-    "team_1": "AR",
-    "team_2": "IT",
+    "team_1": "Argentina",
+    "team_2": "Italy",
     "rubber": 2
   },
   "round": 0,
@@ -69,7 +69,7 @@ This is the part to model carefully, and it works the same way in every phase. O
 | Field | What it means |
 |---|---|
 | `tie.group` | The group this tie is played in. `null` outside the group stage |
-| `tie.team_1`, `tie.team_2` | The two teams meeting each other. National teams are identified by their ISO 3166-1 alpha-2 code |
+| `tie.team_1`, `tie.team_2` | The names of the two teams meeting each other (e.g. `Spain`) |
 | `tie.rubber` | Which of the three matches this is, `1` to `3` |
 | `index` | Identifies the tie inside its round. The three rubbers of a tie share it |
 | `players.team_1` | The pair representing `tie.team_1`, always. `winner`, `score` and `seeds` refer to the same two sides |
@@ -89,7 +89,7 @@ When a team takes the first two rubbers, the third no longer decides anything an
 ```json
 {
   "draw": "group",
-  "tie": { "group": "A", "team_1": "AR", "team_2": "IT", "rubber": 3 },
+  "tie": { "group": "A", "team_1": "Argentina", "team_2": "Italy", "rubber": 3 },
   "status": "not_played",
   "score": null,
   "winner": null,
@@ -162,9 +162,9 @@ The 2024 men's final, Argentina against Spain, came back as these three matches:
 
 | `tie.rubber` | Match | `winner` | Tie |
 |---|---|---|---|
-| 1 | Stupaczuk/Di Nenno – Coello/Nieto | `team_2` | ES leads 1–0 |
+| 1 | Stupaczuk/Di Nenno – Coello/Nieto | `team_2` | Spain leads 1–0 |
 | 2 | Tapia/Chingotto – Lebron/Galan | `team_1` | 1–1 |
-| 3 | Augsburger/Libaak – Yanguas/Navarro | `team_1` | **AR wins 2–1** |
+| 3 | Augsburger/Libaak – Yanguas/Navarro | `team_1` | **Argentina wins 2–1** |
 
 Argentina lost the opening rubber and still took the title. **A team can win a tie while losing a match, and a player can be a champion having lost their rubber.**
 
@@ -216,7 +216,7 @@ curl 'https://padelapi.org/api/tournaments/258/matches?draw=all&per_page=50' \
   -H 'Authorization: Bearer YOUR_API_TOKEN'
 ```
 
-With `?draw=all&sort_by=round`, the main draw is ordered first and the other draws follow. `tie.rubber` is the last tiebreaker of the sort, so the three matches of a tie, which share a date and a round, come back as rubber 1, 2 and 3.
+With `?draw=all&sort_by=round`, the main draw is ordered first and the other draws follow. `tie.rubber` is the last tiebreaker of the sort, so it only orders matches that are otherwise equal: it does not group a tie, and the three rubbers do not come back next to each other. To rebuild a tie, group by `draw`, `round`, `index` and `category`.
 
 The tournament matches endpoint also filters on the parts of a tie:
 
@@ -226,11 +226,11 @@ curl 'https://padelapi.org/api/tournaments/258/matches?draw=group&tie[group]=A' 
   -H 'Authorization: Bearer YOUR_API_TOKEN'
 
 # Every rubber a team played as the first side of a tie
-curl 'https://padelapi.org/api/tournaments/258/matches?draw=all&tie[team_1]=AR' \
+curl 'https://padelapi.org/api/tournaments/258/matches?draw=all&tie[team_1]=Argentina' \
   -H 'Authorization: Bearer YOUR_API_TOKEN'
 ```
 
-`tie[team_1]` and `tie[team_2]` match one side of the tie, so a team's full campaign is the union of both. Identifiers are matched uppercase.
+`tie[team_1]` and `tie[team_2]` match one side of the tie, so a team's full campaign is the union of both. Team names are matched case-insensitively.
 
 ---
 
