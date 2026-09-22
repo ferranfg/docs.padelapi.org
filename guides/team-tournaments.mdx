@@ -79,7 +79,7 @@ So **the three rubbers of a tie are the matches that share `draw`, `round`, `ind
 The `tie` key is only present when the tournament is `format: "teams"`; on any other tournament it is absent from the payload, not `null`.
 
 <Warning>
-  Read the team from `tie`, never from the `country` of the players. The team a pair represents is what decides the tie, and it is not always the same as the country on a player's profile.
+  Read the team from `tie`, not from the `country` of the players. A team is not necessarily a country: in a franchise competition the four players on court can hold four different passports. `tie.team_1` and `tie.team_2` are the two sides the tie is decided between.
 </Warning>
 
 ### The third rubber is not always played
