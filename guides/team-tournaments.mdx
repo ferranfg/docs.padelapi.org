@@ -12,7 +12,7 @@ A team tournament is played in three phases, and that is how the API serves it. 
     `draw: "group"`. Teams are drawn into groups and play a round robin of ties.
   </Card>
   <Card title="Main draw" icon="trophy">
-    `draw: "main"`. The knockout for the title: quarterfinals, semifinals, final.
+    `draw: "main"`. The knockout for the title, from the first bracket round to the final.
   </Card>
   <Card title="Placement" icon="list-ol">
     `draw: "placement"`. Every other knockout tie, played for a position.
@@ -220,7 +220,7 @@ curl 'https://padelapi.org/api/tournaments/258/matches?draw=all&per_page=50' \
   -H 'Authorization: Bearer YOUR_API_TOKEN'
 ```
 
-With `?draw=all&sort_by=round`, the main draw is ordered first and the other draws follow. `tie.rubber` is the last tiebreaker of the sort, so it only orders matches that are otherwise equal: it does not group a tie, and the three rubbers do not come back next to each other. To rebuild a tie, group by `tie.id`.
+With `?draw=all&sort_by=round`, the draws come back in the order the tournament plays them, group stage, then main draw, then placement, and the default `order_by=desc` walks each one chronologically; `order_by=asc` reverses the whole list, final first. Within a team tournament the three rubbers of a tie always come back together and in `tie.rubber` order, whatever you sort by, unless a page boundary splits them, so still group by `tie.id` when you paginate.
 
 The tournament matches endpoint also filters on the parts of a tie:
 
@@ -271,7 +271,7 @@ Everything you already do with a tournament keeps working. What a team tournamen
 | `index` | match | Position of the tie inside its round, shared by its three rubbers. Group by `tie.id` instead |
 | `tie` | match | `{ id, group, team_1, team_2, rubber, score, winner }`. **Absent**, not `null`, on pairs tournaments. `id`, `score` and `winner` are the same on the three rubbers; `group` is `null` outside the group stage |
 | `status` | match | Adds `not_played` to the values you already handle |
-| `seeds` | match | No seeding is published for team tournaments, so both sides come back `null` |
+| `seeds` | match | Team tournaments carry no seeding, so both sides come back `null` |
 | `winners` | tournament | Three pairs per category, six players, once the tournament is `finished` |
 
 ### The tie in your model
@@ -296,7 +296,7 @@ curl 'https://padelapi.org/api/tournaments/258/matches?draw=all&per_page=50' \
 ### What not to do
 
 - **Do not add endpoints or a second code path.** Same routes, same authentication, same pagination, same `updated_at` polling. A team tournament is the tournament and match resources you already read.
-- **Do not compute ratings or statistics from rubbers.** A pairing put together for a team lasts one week, so the API leaves team events out of the [Elo](/guides/padel-elo-rating), and player and pair [statistics](/guides/padel-statistics) are computed over main draw matches as everywhere else. Recomputing them locally reintroduces exactly what was excluded on purpose.
+- **Do not compute ratings or statistics from rubbers.** A pairing put together for a team lasts one week, so the API leaves team events out of the [Elo](/guides/padel-elo-rating) and out of player and pair [statistics](/guides/padel-statistics), title bracket included. Recomputing them locally reintroduces exactly what was excluded on purpose.
 - **Do not create pairs from a team line-up.** Those pairings do not appear in [pair listings](/api-reference/pair/list-pairs) or in a player's partner list, and they never become a player's current partner. You can still request one by id with [`/api/pairs/{player_1}-{player_2}`](/api-reference/pair/show-pair).
 - **Do not require `tie`.** It is absent on every pairs tournament, which is most of the calendar.
 - **Do not expect three results per tie.** A tie settled 2–0 has one rubber with no winner.
@@ -323,7 +323,7 @@ curl 'https://padelapi.org/api/tournaments/258/matches?draw=all&per_page=50' \
     Yes. The tie is decided on rubbers won and nothing below that counts, so a 2–1 in straight sets and a 2–1 from a set down are the same result.
   </Accordion>
   <Accordion title="Why are the seeds null?">
-    No seeding information is published for team tournaments, so both sides of every match come back `null`.
+    Team tournaments carry no seeding, so both sides of every match come back `null`.
   </Accordion>
   <Accordion title="Do team matches have live scores and stats?">
     They follow the coverage of the tournament, exactly like any other match. Where the event has detailed coverage, rubbers carry `stats` and `live` connections and stream point by point over the [WebSocket channel](/websockets). A rubber that was never played has nothing to stream.
