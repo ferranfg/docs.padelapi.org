@@ -1,35 +1,35 @@
 ---
 title: "The FIP World Cup is coming"
 og:title: "The FIP World Cup is coming, it's time to update your app"
-description: "The FIP World Cup is about to start and the Padel API is already ready for it, with full support for tournaments played by teams. Now is the moment to update your app."
+description: "The FIP World Cup is about to start and the Padel API is ready, with full support for team tournaments. Now is the time to update your app."
 ---
 ![Padel API FIP World Cup 2026](https://ik.imagekit.io/ferranfigueredo/tr:w-1920,h-1080/padelapi/padelapi-fip-world-cup-2026_yyY76i2pn.png)
 
 **Hello developers,**
 
-The **FIP World Cup** is in Doha from **2 to 7 November**: sixteen nations per category, six days and two titles. It is the best week of the year to have a padel app, and the Padel API is ready for it.
+The **FIP World Cup** starts in Doha on **2 November**. Sixteen nations per category, six days, two titles. It is the best week of the year to have a padel app.
 
-If you already read tournaments and matches from the API, adapting is a small job. Paste this into your AI code agent and let it do the update:
+The Padel API is ready. Your app can be too, in one prompt. Paste this into your AI code agent:
 
 ```
 Read https://padelapi.org/docs/guides/team-tournaments.md and update our Padel API integration to support team tournaments.
 ```
 
-Or go through the three points yourself.
+That is the whole update. If you prefer to see what changes, here are the three points.
 
 ## 1. How it is played
 
-The entrants are teams, not pairs. They are drawn into groups and play a round robin, and then the whole field moves into a knockout. Every meeting between two teams, from the first day to the final, is played as **three pair matches**, and the first team to win two of them wins the meeting. The third one is not played when the first two have already decided it.
+Teams, not pairs. They play a round robin in groups, then a knockout. Every tie between two teams is **three pair matches**, and the first team to win two takes it. If the first two decide it, the third is not played.
 
-You can tell these tournaments apart with the new **format** field: `pairs` on everything you read today, `teams` on these. One field, one branch, and the rest of your calendar is untouched.
+A new **format** field tells these tournaments apart: `pairs` on everything you read today, `teams` on these. One field, one branch. The rest of your calendar stays the same.
 
 ![Padel API Team Tournaments](https://ik.imagekit.io/ferranfigueredo/tr:w-1200/padelapi/padelapi-tournament-teams_Sztvjxw90.png)
 
 ## 2. Draws and ties
 
-Each phase of the event is a value of the `draw` filter you already use for qualification: `?draw=group` gives you the round robin, `?draw=main` the knockout for the title, quarterfinals to final. Add `?draw=placement` if you also want the ties played for the positions below the podium.
+Each phase is a value of the `draw` filter you already use. `?draw=group` gives you the round robin. `?draw=main` gives you the knockout, quarterfinals to final. Add `?draw=placement` for the ties below the podium.
 
-Inside a team tournament every match brings a new `tie` object saying which meeting it belongs to:
+Every match in a team tournament brings a new `tie` object:
 
 ```json
 "tie": {
@@ -43,28 +43,23 @@ Inside a team tournament every match brings a new `tie` object saying which meet
 }
 ```
 
-The three matches of one meeting share the same `id`, so grouping by it rebuilds the meeting, and `rubber` orders them. They also share `score` and `winner`, which describe the meeting and not the match, so you never have to count rubbers yourself.
+The three matches of a tie share the same `id`. Group by it and you have the tie, with `rubber` giving the order. `score` and `winner` belong to the tie, not the match, so you never count rubbers yourself.
 
 ![Padel API Team Tournament Draws](https://ik.imagekit.io/ferranfigueredo/tr:w-1200/padelapi/padelapi-tournament-tiers_4pblDZC4r.png)
 
 ## 3. What changes
 
-Three details worth a look before November:
+Three details to check before November:
 
-- A match can now come back as **`not_played`**, with both pairs on the sheet and no result, when the third one no longer decides anything. Handle it next to `bye` and `walkover`.
-- Winning the final match is not winning the title. The final is three matches and the title goes to the team that takes two, so a pair can lose its match and still be champion. Read `tie.winner`, not the match's `winner`.
-- `winners` on the tournament holds the three pairs of the winning team, six players per category instead of two.
+- A match can come back as **`not_played`**: both pairs on the sheet, no result. Handle it next to `bye` and `walkover`.
+- Winning the final match is not winning the title. A pair can lose its match and still be champion. Read `tie.winner`, not the match's `winner`.
+- `winners` on the tournament holds the whole winning team: six players per category instead of two.
 
 The [Team Tournaments guide](https://padelapi.org/docs/guides/team-tournaments) has the rest: the full field reference, a worked example that rebuilds a group table and the details that are easy to miss.
 
-You do not have to wait until November to test any of this. The 2024 edition is already in the API, complete with its group stage and every knockout tie, as **tournament `258`**:
+No need to wait until November. The 2024 edition is already in the API as [FIP World Padel Championships Qatar 2024](https://padelapi.org/explore/resources/tournaments/258), group stage and every knockout tie included.
 
-```bash
-curl 'https://padelapi.org/api/tournaments/258/matches?draw=all&per_page=50' \
-  -H 'Authorization: Bearer YOUR_API_TOKEN'
-```
-
-Point your integration at it today and you will be ready before the first ball is hit in Doha.
+Point your integration at it now and you will be ready before the first ball in Doha.
 
 ---
 
