@@ -17,7 +17,7 @@ However, padel data is not static. Tournaments get cancelled or rescheduled, pla
 |---------------|-------------------------------|---------------|----------------|
 | Tournaments   | Weekly                        | [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments) | `tournament.created` `tournament.backfilled` `tournament.updated` `tournament.deleted` |
 | Players       | After each tournament week    | [`/players/{player}`](/api-reference/player/show-player) | `player.created` `player.updated` `player.deleted` |
-| Matches       | After each tournament         | [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) | `match.created` `match.backfilled` `match.updated` `match.deleted` `match.qualy.created` `match.qualy.backfilled` `match.qualy.updated` `match.qualy.deleted` |
+| Matches       | After each tournament         | [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) | `match.created` `match.backfilled` `match.updated` `match.deleted` `match.qualy.*` `match.group.*` `match.placement.*` |
 
 ## Tournaments
 

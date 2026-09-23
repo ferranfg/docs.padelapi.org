@@ -1,0 +1,350 @@
+---
+title: "Team Tournaments"
+description: "How a team padel tournament is played and how it is served by the Padel API: the tie of three matches, the group stage, the main draw and the placement ties."
+---
+
+In a normal tournament the entrants are pairs, and a match is a knockout: two pairs walk on court, one of them goes through. In a **team tournament** the entrants are teams, whether they are national teams or franchises, and a team never plays a single match. It plays a **tie**: three pair matches, called **rubbers**, played one after the other. The team that wins two of them wins the tie.
+
+A team tournament is played in three phases, and that is how the API serves it. Each phase is a value of `draw` on the match:
+
+<CardGroup cols={3}>
+  <Card title="Group stage" icon="table-list">
+    `draw: "group"`. Teams are drawn into groups and play a round robin of ties.
+  </Card>
+  <Card title="Main draw" icon="trophy">
+    `draw: "main"`. The knockout for the title, from the first bracket round to the final.
+  </Card>
+  <Card title="Placement" icon="list-ol">
+    `draw: "placement"`. Every other knockout tie, played for a position.
+  </Card>
+</CardGroup>
+
+Tournaments played this way carry `format: "teams"`, and it is also a filter:
+
+```bash
+curl 'https://padelapi.org/api/tournaments?format=teams' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+Every regular tournament is `format: "pairs"`, so a single equality check tells you which of the two models applies.
+
+---
+
+## The tie
+
+This is the part to model carefully, and it works the same way in all three phases. One meeting between two teams comes back as **three matches**, and each one carries a `tie` object saying which meeting it belongs to:
+
+```json
+{
+  "category": "men",
+  "draw": "group",
+  "tie": {
+    "id": "men-group-0-3",
+    "group": "A",
+    "team_1": "Argentina",
+    "team_2": "Italy",
+    "rubber": 2,
+    "score": { "team_1": 2, "team_2": 0 },
+    "winner": "team_1"
+  },
+  "round": 0,
+  "round_name": "Group stage",
+  "index": 3,
+  "status": "finished",
+  "score": [{ "team_1": "6", "team_2": "3" }, { "team_1": "6", "team_2": "4" }],
+  "winner": "team_1",
+  "players": { "team_1": ["..."], "team_2": ["..."] },
+  "...": "..."
+}
+```
+
+| Field | What it means |
+|---|---|
+| `tie.id` | Identifies the tie within the tournament. The three rubbers carry the same one |
+| `tie.group` | The group this tie is played in. `null` outside the group stage |
+| `tie.team_1`, `tie.team_2` | The names of the two teams meeting each other (e.g. `Spain`) |
+| `tie.rubber` | Which of the three matches this is, `1` to `3` |
+| `tie.score` | Rubbers won by each side of the tie so far |
+| `tie.winner` | The side that took the tie, `null` until one of them wins two rubbers |
+| `players.team_1` | The pair representing `tie.team_1`, always. The match's own `winner`, `score` and `seeds` refer to the same two sides |
+
+So **the three rubbers of a tie are the matches that share a `tie.id`**, and `tie.score` and `tie.winner` describe the tie rather than the match, so all three carry the same values and one of them is enough to know how the meeting went.
+
+Do not confuse them with the match's own `winner`, which says who won that rubber: it is `team_1` or `team_2`, the same two sides as in `tie`, so a rubber with `winner: "team_2"` was won by the team in `tie.team_2`.
+
+The `tie` key is only present when the tournament is `format: "teams"`; on any other tournament it is absent from the payload, not `null`.
+
+<Warning>
+  Read the team from `tie`, not from the `country` of the players. A team is not necessarily a country: in a franchise competition the four players on court can hold four different passports. `tie.team_1` and `tie.team_2` are the two sides the tie is decided between.
+</Warning>
+
+### The rubber that is not played
+
+When a team takes the first two rubbers, the third no longer decides anything and is not played. The match still exists, with both pairs listed, and carries the status **`not_played`**: no score, no winner and no court.
+
+```json
+{
+  "draw": "group",
+  "tie": {
+    "id": "men-group-0-3",
+    "group": "A",
+    "team_1": "Argentina",
+    "team_2": "Italy",
+    "rubber": 3,
+    "score": { "team_1": 2, "team_2": 0 },
+    "winner": "team_1"
+  },
+  "status": "not_played",
+  "score": null,
+  "winner": null,
+  "...": "..."
+}
+```
+
+At 1–1 the third rubber is the decider and is played normally. Count a tie on rubbers actually won, not on the three slots, and both cases take care of themselves.
+
+---
+
+## The three phases
+
+### Group stage
+
+The tournament opens with a round robin. Teams are split into groups, and each team meets every other team in its group once. There is no bracket here, so a result is only worth what it does to the table.
+
+In the API this is `draw: "group"`, with `round: 0` and `round_name: "Group stage"`, and it is requested explicitly because listings return the main draw by default:
+
+```bash
+curl 'https://padelapi.org/api/tournaments/258/matches?draw=group&category=men&per_page=50' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+Every rubber carries the state of its tie, so a group table is a pass over the ties rather than over the matches: keep one rubber per `tie.id` and read `score` and `winner` off it.
+
+```javascript
+const res = await fetch(
+  'https://padelapi.org/api/tournaments/258/matches?draw=group&category=men&per_page=50',
+  { headers: { Authorization: 'Bearer YOUR_API_TOKEN' } }
+);
+
+const { data: matches } = await res.json();
+
+// The three rubbers of a tie carry the same tie, so one of them is enough
+const ties = new Map();
+
+for (const match of matches) ties.set(match.tie.id, match.tie);
+
+const standings = {};
+
+for (const tie of ties.values()) {
+  // A tie still being played has no winner yet
+  if ( ! tie.winner) continue;
+
+  for (const side of ['team_1', 'team_2']) {
+    const team = tie[side];
+
+    standings[team] ??= { group: tie.group, played: 0, won: 0, rubbers: 0 };
+    standings[team].played++;
+    standings[team].rubbers += tie.score[side];
+
+    if (tie.winner === side) standings[team].won++;
+  }
+}
+```
+
+A category's group stage runs to more than one page, and the rubbers of a tie do not necessarily land on the same one, so walk every page before building the table.
+
+Rubbers won is the usual tiebreaker between teams level on ties, which is why it is worth accumulating in the same pass. Beyond that, tiebreak rules belong to the competition's own regulations and the API does not rank the groups for you.
+
+### Main draw
+
+Once the groups are done the tournament becomes a knockout, and the ties that lead to the title are `draw: "main"`, the same value a regular tournament uses for its main draw. `round` means what it always means: `4` quarterfinals, `2` semifinals, `1` final.
+
+```bash
+curl 'https://padelapi.org/api/tournaments/258/matches?draw=main&round=1&category=men' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+The 2024 men's final, Argentina against Spain, came back as these three matches:
+
+| `tie.rubber` | Match | `winner` | How the tie stood |
+|---|---|---|---|
+| 1 | Stupaczuk/Di Nenno – Coello/Nieto | `team_2` | Spain leads 1–0 |
+| 2 | Tapia/Chingotto – Lebron/Galan | `team_1` | 1–1 |
+| 3 | Augsburger/Libaak – Yanguas/Navarro | `team_1` | **Argentina wins 2–1** |
+
+That last column is the story of the evening, not a field: `tie.score` reports the tie as it stands, so all three rubbers now read `2–1` with `tie.winner` on Argentina's side.
+
+Argentina lost the opening rubber and still took the title. **A team can win a tie while losing a match, and a player can be a champion having lost their rubber.**
+
+That is why `winners` on the tournament resource holds six players per category instead of two: the three pairs of the winning team, listed as consecutive pairs and linked one by one through `connections.pair`.
+
+```json
+{
+  "format": "teams",
+  "status": "finished",
+  "winners": {
+    "men": [
+      { "id": 87, "name": "Franco Stupaczuk", "...": "..." },
+      { "id": 103, "name": "Martin Di Nenno", "...": "..." },
+      { "id": 66, "name": "Agustin Tapia", "...": "..." },
+      { "id": 114, "name": "Federico Chingotto", "...": "..." },
+      { "id": 84, "name": "Leo Augsburger", "...": "..." },
+      { "id": 93, "name": "Tino Libaak", "...": "..." }
+    ],
+    "women": ["..."]
+  }
+}
+```
+
+### Placement
+
+A team knocked out of the title bracket does not go home: it keeps playing for a position. Those ties are `draw: "placement"`, and they cover everything that is not the path to the title, from the third place match to the brackets that rank the rest of the field.
+
+```bash
+curl 'https://padelapi.org/api/tournaments/258/matches?draw=placement&per_page=50' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+They are played on the same days as the title ties and use the same `round` values, so **`round` alone does not identify a stage**: a `round: 2` tie is a semifinal of the title bracket when `draw` is `main`, and a semifinal of a placement bracket when `draw` is `placement`. `round_name` reads `Placement` for all of them.
+
+If your app only follows the title race, skipping this draw is enough. If it shows the full standings of the event, this is where every position below the podium is decided.
+
+---
+
+## Working with the API
+
+`draw` takes one phase at a time, or `all` for everything in a single list:
+
+```bash
+curl 'https://padelapi.org/api/tournaments/258/matches?draw=all&per_page=50' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+With `?draw=all&sort_by=round`, the draws come back in the order the tournament plays them, group stage, then main draw, then placement, and the default `order_by=desc` walks each one chronologically; `order_by=asc` reverses the whole list, final first. Within a team tournament the three rubbers of a tie always come back together and in `tie.rubber` order, whatever you sort by, unless a page boundary splits them, so still group by `tie.id` when you paginate.
+
+The tournament matches endpoint also filters on the parts of a tie:
+
+```bash
+# The three rubbers of one tie
+curl 'https://padelapi.org/api/tournaments/258/matches?draw=all&tie[id]=men-main-1-0' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+
+# One group
+curl 'https://padelapi.org/api/tournaments/258/matches?draw=group&tie[group]=A' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+
+# Every rubber a team played as the first side of a tie
+curl 'https://padelapi.org/api/tournaments/258/matches?draw=all&tie[team_1]=Argentina' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+`tie[id]` is the one to reach for from a single match: take the `tie.id` you already have and the request gives you back the rest of the meeting. `tie[team_1]` and `tie[team_2]` match one side of the tie, so a team's full campaign is the union of both. Values are matched case-insensitively.
+
+<Warning>
+  These four filters exist on [`GET /api/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) only. The global [`GET /api/matches`](/api-reference/match/list-matches) listing does not accept them: sent there they are ignored, and the response comes back unfiltered rather than with an error.
+</Warning>
+
+To keep a local copy in sync, remember that each draw has its own webhook family: an existing `match.*` subscription keeps delivering the main draw only, and `match.group.*` and `match.placement.*` carry the rest. Polling works the same on every draw with `updated_after`, as described in [Data Synchronization](/guides/data-synchronization).
+
+---
+
+## Integration recap
+
+Everything you already do with a tournament keeps working. What a team tournament adds is one level of grouping between the draw and the match:
+
+| A pairs tournament | A team tournament |
+|---|---|
+| One match per slot of the draw | Three matches per tie, sharing a `tie.id` |
+| The winner of the match goes through | The team that wins two of the three rubbers goes through |
+| `draw` is `main` or `qualy` | `draw` is also `group` or `placement`, and `round` is `0` in the group stage |
+| A slot is won, lost or pending | A third rubber can be `not_played`, with both pairs and no winner |
+| `winners` holds one pair per category | `winners` holds the three pairs of the champion team |
+
+### The fields and their values
+
+| Field | On | Values |
+|---|---|---|
+| `format` | tournament | `pairs` on every regular tournament, `teams` here. Also a filter |
+| `draw` | match | `main`, `qualy`, `group`, `placement`. Listings return `main` unless you ask |
+| `round` | match | `0` in the group stage; `1` final, `2` semifinals, `4` quarterfinals in the knockouts |
+| `round_name` | match | `Group stage`, `Placement`, or the usual bracket names. Match on `round` and `draw` instead |
+| `index` | match | Position of the tie inside its round, shared by its three rubbers. Group by `tie.id` instead |
+| `tie` | match | `{ id, group, team_1, team_2, rubber, score, winner }`. **Absent**, not `null`, on pairs tournaments. `id`, `score` and `winner` are the same on the three rubbers; `group` is `null` outside the group stage |
+| `status` | match | Adds `not_played` to the values you already handle |
+| `seeds` | match | Team tournaments carry no seeding, so both sides come back `null` |
+| `winners` | tournament | Three pairs per category, six players, once the tournament is `finished` |
+
+### The tie in your model
+
+Give the tie a row of its own, keyed by `tie.id`, holding `group`, `team_1`, `team_2`, `score` and `winner`. Each match then points at it and keeps its `rubber`. Kept as a blob on the match instead, every table, bracket and standings query has to regroup the rubbers in memory first, and a table built from matches rather than from ties reads a 2–1 as a draw.
+
+### Checking it works
+
+Tournament `258`, the 2024 edition, is complete in the API and makes a good fixture to assert against:
+
+```bash
+curl 'https://padelapi.org/api/tournaments/258/matches?draw=all&per_page=50' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+- The tournament is `format: "teams"`, and every match carries a `tie`.
+- Grouping by `tie.id` yields groups of exactly three matches, all carrying the same `tie.score` and `tie.winner`.
+- `?draw=main&round=1&category=men` returns the three rubbers of the final, with `tie.score` at 2–1 and `tie.winner` on Argentina's side.
+- `winners.men` holds six players, three pairs.
+- A tie settled 2–0 leaves its third rubber with `status: "not_played"` and no winner, so the parser has to accept a match with both pairs and no result.
+
+### What not to do
+
+- **Do not add endpoints or a second code path.** Same routes, same authentication, same pagination, same `updated_at` polling. A team tournament is the tournament and match resources you already read.
+- **Do not compute ratings or statistics from rubbers.** A pairing put together for a team lasts one week, so the API leaves team events out of the [Elo](/guides/padel-elo-rating) and out of player and pair [statistics](/guides/padel-statistics), title bracket included. Recomputing them locally reintroduces exactly what was excluded on purpose.
+- **Do not create pairs from a team line-up.** Those pairings do not appear in [pair listings](/api-reference/pair/list-pairs) or in a player's partner list, and they never become a player's current partner. You can still request one by id with [`/api/pairs/{player_1}-{player_2}`](/api-reference/pair/show-pair).
+- **Do not require `tie`.** It is absent on every pairs tournament, which is most of the calendar.
+- **Do not expect three results per tie.** A tie settled 2–0 has one rubber with no winner.
+
+<Tip>
+  The main draw is open to every plan. The group stage and the placement ties, like qualification draws, are part of the paid plans, so if your integration is meant to show the whole event a paid plan is what gives it the complete picture.
+</Tip>
+
+---
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Which competitions are team tournaments?">
+    Any event where the entrants are teams rather than pairs, from national team championships such as the FIP World Cup to franchise competitions. They share the same skeleton: a group stage, then a knockout for the title and a set of ties played for position.
+  </Accordion>
+  <Accordion title="How do I tell a team tournament from a regular one?">
+    `format: "teams"` on the tournament, and a `tie` object on its matches. Both are stable: a tournament does not change format, and the `tie` key never appears on a pairs tournament.
+  </Accordion>
+  <Accordion title="Why are there three matches where I expected one?">
+    Because a tie is three rubbers. Group them by `tie.id` and order them with `tie.rubber`.
+  </Accordion>
+  <Accordion title="Can a team win a tie and lose more sets than its opponent?">
+    Yes. The tie is decided on rubbers won and nothing below that counts, so a 2–1 in straight sets and a 2–1 from a set down are the same result.
+  </Accordion>
+  <Accordion title="Why are the seeds null?">
+    Team tournaments carry no seeding, so both sides of every match come back `null`.
+  </Accordion>
+  <Accordion title="Do team matches have live scores and stats?">
+    They follow the coverage of the tournament, exactly like any other match. Where the event has detailed coverage, rubbers carry `stats` and `live` connections and stream point by point over the [WebSocket channel](/websockets). A rubber that was never played has nothing to stream.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Tournament matches endpoint" icon="table-list" href="/api-reference/tournament/list-tournament-matches">
+    Filters for `draw`, `round`, `category` and the parts of a tie.
+  </Card>
+  <Card title="Match statuses" icon="circle-info" href="/statuses">
+    What `not_played` means, and which statuses are permanent.
+  </Card>
+  <Card title="Webhooks" icon="bell" href="/webhooks">
+    The event families that deliver each draw.
+  </Card>
+  <Card title="Data synchronization" icon="rotate" href="/guides/data-synchronization">
+    How to keep a local copy in sync across every draw.
+  </Card>
+</CardGroup>
