@@ -283,18 +283,28 @@ You can list every webhook you own with [`GET /api/webhooks`](/api-reference/web
 | `tournament.deleted` | A tournament is removed from the calendar. |
 | `match.created` | A new match is scheduled (typically when a draw is published). |
 | `match.backfilled` | A match of a tournament that finished in the past is added. |
-| `match.updated` | A match changes — score, status, court, schedule, players, or any other field. |
+| `match.updated` | Any field of a match changes (score, status, court, schedule, players…). |
 | `match.deleted` | A match is removed (cancellations, walkovers, draw corrections). |
-| `match.*.created` `match.*.backfilled` `match.*.updated` `match.*.deleted` | The same four events for matches outside the main draw, where `*` is the `draw` they belong to: `qualy`, `group` or `placement`. |
 | `player.created` | A new player profile is added. |
 | `player.updated` | A player's profile changes — ranking, country, image, name, etc. |
 | `player.deleted` | A player profile is removed (typically merge of duplicates). |
 
 The `data` field of each event contains the **same shape** as the corresponding REST resource — see the [API Reference](/index) for the exact schema of each one.
 
-<Note>
-  The `match.*` events cover the **main draw only**. Subscribe to every family you want to store, spelling out the draw: `match.qualy.updated`, `match.group.updated` and so on. `*` is a placeholder in this table, not a wildcard you can register.
-</Note>
+---
+
+## Other Available Events
+
+The `match.*` events above cover the **main draw only**. Every other draw has the same four events in a family of its own, where `*` is the draw the match belongs to:
+
+| Event | Fires when |
+|---|---|
+| `match.*.created` | A new match in that draw is scheduled. |
+| `match.*.backfilled` | A match in that draw, in a tournament that finished in the past, is added. |
+| `match.*.updated` | Any field of a match in that draw changes. |
+| `match.*.deleted` | A match in that draw is removed. |
+
+`*` stands for one of three draws: `qualy`, the qualification draw of a regular tournament, and `group` and `placement`, the group stage and the placement ties of a [team tournament](/guides/team-tournaments). That makes twelve events in total, and you subscribe with the full name of each one: `match.qualy.updated`, `match.group.updated`, `match.placement.created` and so on. `*` is a placeholder in this table, not a wildcard you can register.
 
 ---
 

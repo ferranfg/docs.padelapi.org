@@ -32,10 +32,18 @@ Each phase of the event is a value of the `draw` filter you already use for qual
 Inside a team tournament every match brings a new `tie` object saying which meeting it belongs to:
 
 ```json
-"tie": { "group": "A", "team_1": "Argentina", "team_2": "Spain", "rubber": 1 }
+"tie": {
+  "id": "9f2a7c41e0d3",
+  "group": "A",
+  "team_1": "Argentina",
+  "team_2": "Spain",
+  "rubber": 1,
+  "score": { "team_1": 2, "team_2": 1 },
+  "winner": "team_1"
+}
 ```
 
-The three matches of one meeting share `draw`, `round`, `index` and `category`, and `rubber` orders them. Group by those four fields, count the winners, and you have the result between the two teams.
+The three matches of one meeting share the same `id`, so grouping by it rebuilds the meeting, and `rubber` orders them. They also share `score` and `winner`, which describe the meeting and not the match, so you never have to count rubbers yourself.
 
 ![Padel API Team Tournament Draws](https://ik.imagekit.io/ferranfigueredo/tr:w-1200/padelapi/padelapi-tournament-tiers_4pblDZC4r.png)
 
@@ -44,7 +52,7 @@ The three matches of one meeting share `draw`, `round`, `index` and `category`, 
 Three details worth a look before November:
 
 - A match can now come back as **`not_played`**, with both pairs on the sheet and no result, when the third one no longer decides anything. Handle it next to `bye` and `walkover`.
-- Winning the final match is not winning the title. The final is three matches and the title goes to the team that takes two, so a pair can lose its match and still be champion.
+- Winning the final match is not winning the title. The final is three matches and the title goes to the team that takes two, so a pair can lose its match and still be champion. Read `tie.winner`, not the match's `winner`.
 - `winners` on the tournament holds the three pairs of the winning team, six players per category instead of two.
 
 The [Team Tournaments guide](https://padelapi.org/docs/guides/team-tournaments) has the rest: the full field reference, a worked example that rebuilds a group table and the details that are easy to miss.
