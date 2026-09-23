@@ -39,7 +39,7 @@ This is the part to model carefully, and it works the same way in all three phas
   "category": "men",
   "draw": "group",
   "tie": {
-    "id": "9f2a7c41e0d3",
+    "id": "men-group-0-3",
     "group": "A",
     "team_1": "Argentina",
     "team_2": "Italy",
@@ -60,7 +60,7 @@ This is the part to model carefully, and it works the same way in all three phas
 
 | Field | What it means |
 |---|---|
-| `tie.id` | Identifies the tie. The three rubbers carry the same one |
+| `tie.id` | Identifies the tie within the tournament. The three rubbers carry the same one |
 | `tie.group` | The group this tie is played in. `null` outside the group stage |
 | `tie.team_1`, `tie.team_2` | The names of the two teams meeting each other (e.g. `Spain`) |
 | `tie.rubber` | Which of the three matches this is, `1` to `3` |
@@ -86,7 +86,7 @@ When a team takes the first two rubbers, the third no longer decides anything an
 {
   "draw": "group",
   "tie": {
-    "id": "9f2a7c41e0d3",
+    "id": "men-group-0-3",
     "group": "A",
     "team_1": "Argentina",
     "team_2": "Italy",
@@ -226,7 +226,7 @@ The tournament matches endpoint also filters on the parts of a tie:
 
 ```bash
 # The three rubbers of one tie
-curl 'https://padelapi.org/api/tournaments/258/matches?draw=all&tie[id]=9f2a7c41e0d3' \
+curl 'https://padelapi.org/api/tournaments/258/matches?draw=all&tie[id]=men-main-1-0' \
   -H 'Authorization: Bearer YOUR_API_TOKEN'
 
 # One group
