@@ -94,7 +94,8 @@
             "group": "Changelog",
             "icon": "clock-rotate-left",
             "pages": [
-              "blog/changelog"
+              "blog/changelog",
+              "blog/changelog-2025"
             ]
           },
           {
