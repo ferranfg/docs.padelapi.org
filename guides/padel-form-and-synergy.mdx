@@ -1,0 +1,183 @@
+---
+title: "Player Form and Pair Synergy"
+description: "How the Padel API measures whether a padel player is in form and whether a pair beats the sum of its parts, by comparing actual results against what the Elo ratings predicted."
+---
+
+Win rate tells you what a player or a pair has done. It does not tell you whether that was **more or less than expected**. Winning 70% of your matches is poor form for the world number one and an outstanding run for a pair ranked 40th. What matters is the gap between the results and the strength behind them.
+
+The Padel API measures that gap with one method and publishes it through two endpoints:
+
+<CardGroup cols={2}>
+  <Card title="Player form" icon="user" href="/api-reference/player/show-player-form">
+    `GET /api/players/{id}/form`. How a player is doing lately against what was expected of them.
+  </Card>
+  <Card title="Pair synergy" icon="people-group" href="/api-reference/pair/show-pair-synergy">
+    `GET /api/pairs/{player1}-{player2}/synergy`. Whether two players together win more than their individual strength predicts.
+  </Card>
+</CardGroup>
+
+Same measurement, different subject. Both return the same core fields with the same meaning, so a client that reads one can read the other.
+
+<Note>
+  Both endpoints [require a **Business** subscription](https://padelapi.org/billing).
+</Note>
+
+---
+
+## The measurement
+
+For every match, the API takes the [Elo rating](/guides/padel-elo-rating) of all four players **as it stood right before that match** and turns the gap between both pairs into a [win probability](/guides/padel-match-prediction). Averaging those probabilities over a set of matches gives the win rate the player or the pair was expected to reach. Comparing it with the win rate they actually reached gives the gap.
+
+Because the ratings are taken at the time of each match, the expectation only uses what was known before the ball was served. A player who has since climbed the rankings is not judged retroactively against their current rating.
+
+### Shared fields
+
+| Field | Meaning |
+|---|---|
+| `expected_win_rate` | Win rate predicted from the ratings of the four players at the time of each match, as a percentage. |
+| `actual_win_rate` | Win rate actually achieved over the same matches, as a percentage. |
+| `delta` | `actual_win_rate` minus `expected_win_rate`, in percentage points. Positive means over-performing. |
+| `matches_played` | Matches behind the numbers above. |
+| `by_period` | The same four values over consecutive calendar periods, oldest first, each with its `from` and `to` dates. Periods without matches are left out. |
+| `trend` | Direction of `delta` across `by_period`: `rising`, `stable` or `declining`. |
+
+Both endpoints accept the same filters as the stats endpoints: `after_date`, `before_date`, `level` and `round`.
+
+### How to read `delta`
+
+| `delta` | What it usually means |
+|---|---|
+| **Above +10** | Clearly over-performing. Winning matches the ratings said were close, or beating stronger pairs. |
+| **+3 to +10** | Slightly ahead of expectation. |
+| **-3 to +3** | Performing at their level. The ratings describe them well. |
+| **-10 to -3** | Slightly behind expectation. |
+| **Below -10** | Clearly under-performing: losing matches they were favoured to win. |
+
+`delta` is `null` when there are too few matches for the gap to mean anything. A handful of results is dominated by luck, so the API publishes the rates but withholds the gap. `matches_played` tells you how much evidence is behind any number you do get: a `delta` of +12 over 60 matches is a much stronger statement than the same value over 8.
+
+`trend` looks at how `delta` moves across `by_period`, giving more weight to the periods with more matches. It is `null` when too few periods have a `delta` to tell a direction.
+
+<Info>
+  A good `delta` does not last forever by construction. Every win against expectation lifts the players' ratings, which raises what is expected of them next. Sustained over-performance is what a player or pair on the way up looks like; a `delta` that stays high for a long time is a genuinely remarkable run.
+</Info>
+
+Qualification matches count in both endpoints. Since the expectation already accounts for how strong the opponents are, beating a much weaker pair in qualifying barely moves the gap.
+
+---
+
+## Player form
+
+`GET /api/players/{id}/form` measures a recent window: the last 180 days by default, ending today. Set `after_date` and `before_date` to measure any other window. `by_period` is split by calendar month.
+
+```bash
+curl 'https://padelapi.org/api/players/65/form' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+```json
+{
+  "id": 65,
+  "self": "/api/players/65/form",
+  "from": "2026-04-01",
+  "to": "2026-09-28",
+  "expected_win_rate": 71.85,
+  "actual_win_rate": 80.00,
+  "delta": 8.15,
+  "matches_played": 30,
+  "by_period": [
+    { "from": "2026-04-01", "to": "2026-04-30", "expected_win_rate": 70.12, "actual_win_rate": 66.67, "delta": -3.45, "matches_played": 6 },
+    { "from": "2026-05-01", "to": "2026-05-31", "expected_win_rate": 71.30, "actual_win_rate": 71.43, "delta": 0.13, "matches_played": 7 },
+    { "from": "2026-06-01", "to": "2026-06-30", "expected_win_rate": 72.05, "actual_win_rate": 83.33, "delta": 11.28, "matches_played": 6 },
+    { "from": "2026-07-01", "to": "2026-07-31", "expected_win_rate": 72.61, "actual_win_rate": 100.00, "delta": null, "matches_played": 3 },
+    { "from": "2026-09-01", "to": "2026-09-30", "expected_win_rate": 73.20, "actual_win_rate": 87.50, "delta": 14.30, "matches_played": 8 }
+  ],
+  "trend": "rising",
+  "windows": {
+    "last_7_days": { "expected_win_rate": 73.94, "actual_win_rate": 100.00, "delta": null, "matches_played": 2 },
+    "last_30_days": { "expected_win_rate": 73.20, "actual_win_rate": 87.50, "delta": 14.30, "matches_played": 8 },
+    "last_90_days": { "expected_win_rate": 72.92, "actual_win_rate": 88.89, "delta": 15.97, "matches_played": 18 }
+  },
+  "same_period_last_year": { "expected_win_rate": 68.40, "actual_win_rate": 65.52, "delta": -2.88, "matches_played": 29 },
+  "streak": { "result": "won", "matches": 6 },
+  "third_sets": { "won": 5, "lost": 2 },
+  "tiebreaks": { "won": 7, "lost": 4 },
+  "connections": {
+    "player": "/api/players/65"
+  }
+}
+```
+
+On top of the shared fields, form adds:
+
+| Field | Meaning |
+|---|---|
+| `from`, `to` | The window actually measured, so you know what the defaults resolved to. |
+| `windows` | Overlapping zooms of 7, 30 and 90 days ending on `to`, each with the shared core. They are not periods: they all end on the same day and each contains the shorter ones. Use them for "how is this player doing right now". |
+| `same_period_last_year` | The shared core over the same window one year earlier, to compare a player against themselves. |
+| `streak` | Current run of consecutive wins or losses up to `to`. `result` is `won` or `lost`, `matches` its length. |
+| `third_sets` | Deciding sets won and lost within the window. Retirements are left out, since the third set was never completed. |
+| `tiebreaks` | Sets settled 7-6 won and lost within the window. |
+
+<Tip>
+  Keep the two time axes apart. `by_period` is a series of consecutive, non-overlapping months: plot it, and read `trend` from it. `windows` is three nested zooms that all end today: show them side by side, never on the same line.
+</Tip>
+
+Form is measured for the player, whoever they played with. A player who changed partners mid-season carries the same form across both partnerships, and each partner's rating is part of the expectation.
+
+---
+
+## Pair synergy
+
+`GET /api/pairs/{player1}-{player2}/synergy` measures every match the pair has played together by default, because a partnership is judged over its whole life, not the last few weeks. `by_period` is split by calendar quarter, so you can see a pair settling in or wearing out.
+
+```bash
+curl 'https://padelapi.org/api/pairs/65-66/synergy' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+```json
+{
+  "id": "65-66",
+  "self": "/api/pairs/65-66/synergy",
+  "expected_win_rate": 69.43,
+  "actual_win_rate": 78.13,
+  "delta": 8.70,
+  "matches_played": 96,
+  "by_period": [
+    { "from": "2025-01-01", "to": "2025-03-31", "expected_win_rate": 66.80, "actual_win_rate": 64.29, "delta": -2.51, "matches_played": 14 },
+    { "from": "2025-04-01", "to": "2025-06-30", "expected_win_rate": 67.95, "actual_win_rate": 76.47, "delta": 8.52, "matches_played": 17 },
+    { "from": "2025-07-01", "to": "2025-09-30", "expected_win_rate": 69.10, "actual_win_rate": 80.00, "delta": 10.90, "matches_played": 15 },
+    { "from": "2025-10-01", "to": "2025-12-31", "expected_win_rate": 70.24, "actual_win_rate": 81.25, "delta": 11.01, "matches_played": 16 },
+    { "from": "2026-01-01", "to": "2026-03-31", "expected_win_rate": 70.66, "actual_win_rate": 83.33, "delta": 12.67, "matches_played": 12 },
+    { "from": "2026-04-01", "to": "2026-06-30", "expected_win_rate": 71.02, "actual_win_rate": 84.62, "delta": 13.60, "matches_played": 13 },
+    { "from": "2026-07-01", "to": "2026-09-30", "expected_win_rate": 71.50, "actual_win_rate": 77.78, "delta": 6.28, "matches_played": 9 }
+  ],
+  "trend": "rising",
+  "connections": {
+    "pair": "/api/pairs/65-66"
+  }
+}
+```
+
+The expectation for a pair is built from each player's own rating, and those ratings come from every match they play, with this partner or any other. So a positive `delta` says the two of them together win more than their individual strength predicts: the partnership adds something. A negative one says they are worth less together than apart.
+
+The endpoint returns `404` when the two players have never played together.
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Elo rating" icon="chart-line" href="/guides/padel-elo-rating">
+    How the rating behind the expectation is built and updated.
+  </Card>
+  <Card title="Match prediction model" icon="scale-balanced" href="/guides/padel-match-prediction">
+    How a rating gap becomes a calibrated win probability.
+  </Card>
+  <Card title="Padel statistics" icon="chart-bar" href="/guides/padel-statistics">
+    Career win rate, titles and set and game tallies, to put next to form and synergy.
+  </Card>
+  <Card title="Pairs endpoint" icon="people-group" href="/api-reference/pair/show-pair">
+    Profile of a pair, with links to its matches, stats and synergy.
+  </Card>
+</CardGroup>
