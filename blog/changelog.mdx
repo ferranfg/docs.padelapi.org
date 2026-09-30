@@ -4,8 +4,9 @@ description: "Stay up-to-date with Padel API releases, new features, bug fixes, 
 rss: true
 ---
 
-<Update label="September 2026" description="Team Tournaments, Elo Leaderboard & Tournament Posters">
-  - **New:** [Team tournaments](/guides/team-tournaments), ready for the FIP World Cup: `format` field and filter on tournaments (`pairs` or `teams`, also on the MCP), a `tie` object on their matches with the teams, group, rubber order and the tie's own `score` and `winner`, `group` and `placement` draws with `tie[...]` filters, the `not_played` match status and `match.group.*` and `match.placement.*` [webhook events](/webhooks). Details in the [September newsletter](/blog/20260924-the-fip-world-cup-is-coming-its-time-to-update-your-app)
+<Update label="September 2026" description="Team Tournaments, Player Form & Elo Leaderboard">
+  - **New:** [Team tournaments](/guides/team-tournaments), ready for the FIP World Cup: `format` field and filter on tournaments, a `tie` object on their matches, `group` and `placement` draws, the `not_played` match status and new [webhook events](/webhooks). Details in the [September newsletter](/blog/20260924-the-fip-world-cup-is-coming-its-time-to-update-your-app)
+  - **New:** [Player form and pair synergy](/guides/padel-form-and-synergy): `/players/{id}/form` and `/pairs/{player1}-{player2}/synergy` compare actual results against what the Elo ratings predicted, with the gap by period and its trend (Business plan)
   - **New:** [Elo leaderboard](/guides/padel-elo-rating#the-elo-leaderboard): `type=elo` on the rankings endpoint, published as a weekly snapshot, with the full rating history on the player rankings endpoint
   - **New:** `photo_url` field on tournaments with the event poster
   - **New:** `postponed` tournament [status](/statuses)
