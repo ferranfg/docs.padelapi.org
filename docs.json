@@ -103,6 +103,7 @@
             "group": "News",
             "icon": "newspaper",
             "pages": [
+              "blog/20261002-built-with-padel-api-1-padel-earnings-padel-nachos-and-more",
               "blog/20260924-the-fip-world-cup-is-coming-its-time-to-update-your-app",
               "blog/20260814-whats-new-in-padel-api-aug-2026-top-matches-predictions-and-breaking-changes",
               "blog/20260728-building-a-padel-prediction-model",
