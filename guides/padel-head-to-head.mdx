@@ -1,0 +1,209 @@
+---
+title: "Padel Head to Head API"
+description: "Get the head to head (H2H) record between two padel pairs or two players with the Padel API: every previous meeting, filters by date and draw, and how to turn the matches into a win-loss record."
+---
+
+In tennis a head to head is simple: two players, every match they have played against each other. In padel it is not. Pairs split and reform every season, so the record between two **exact** pairs is often a handful of matches, while the real rivalry between two **players** runs across several partnerships and many years.
+
+The Padel API serves both head to head (H2H) views. You choose who sits on each side, a pair or a single player, and you get back every finished match where those sides met.
+
+<CardGroup cols={2}>
+  <Card title="Head to head of a match" icon="calendar-day" href="/api-reference/match/show-match-head-to-head">
+    `GET /api/matches/{id}/headtohead`. Previous meetings between the two pairs of a match. Built for match previews.
+  </Card>
+  <Card title="Head to head search" icon="magnifying-glass" href="/api-reference/match/search-head-to-head-matches">
+    `POST /api/matches/headtohead`. Any combination of pairs and players. Built for rivalry pages and comparisons.
+  </Card>
+</CardGroup>
+
+<Note>
+  Both endpoints [require a **Pro** subscription](https://padelapi.org/billing).
+</Note>
+
+---
+
+## Who you can compare
+
+The search endpoint takes `team_1` and `team_2`, each a list of one or two player IDs. The number of IDs on each side decides what the head to head means:
+
+| `team_1` | `team_2` | What you get |
+|---|---|---|
+| 2 players | 2 players | Every match between those two exact pairs. |
+| 1 player | 1 player | Every match where the two players were on opposite sides, whoever their partners were. |
+| 2 players | 1 player | Every match between that pair and the player, with any partner. |
+| 1 or 2 players | *omitted* | Every match of that pair or player, against anyone. |
+
+The player against player head to head is usually the one worth showing. Two players who have faced each other twenty times may have done it with four or five different partners, and the pair against pair query only sees the meetings where both partnerships were the same.
+
+```bash
+# Player against player: every meeting, with any partners
+curl -X POST 'https://padelapi.org/api/matches/headtohead' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{"team_1": [65], "team_2": [12]}'
+
+# Pair against pair: only the meetings between these two partnerships
+curl -X POST 'https://padelapi.org/api/matches/headtohead' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{"team_1": [65, 66], "team_2": [12, 34]}'
+```
+
+---
+
+## The head to head of a match
+
+When you already have a match, you do not need to look up the players. `GET /api/matches/{id}/headtohead` takes the two pairs of that match and returns their previous meetings, the same as a pair against pair search. The match itself is left out, so you can call it on a scheduled match to build its preview, or on a finished one to put the result in context.
+
+Every match in the API links to it from `connections.headtohead`.
+
+```bash
+curl 'https://padelapi.org/api/matches/48210/headtohead' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+---
+
+## What the response contains
+
+Both endpoints return a paginated list of [matches](/api-reference/match/show-match), with the same fields as any other match listing:
+
+- Only matches with a result count: `finished` and `retired`. A `retired` match counts as a win for the pair that stayed on court. Walkovers are left out, since nothing was played. See [statuses](/statuses#match-statuses).
+- Matches are sorted by `played_at`, most recent first.
+- Results are paginated with the usual `page` and `per_page` parameters.
+- When the sides have never met, you get an empty page (`data: []`), not a `404`.
+
+### Filters
+
+| Parameter | Meaning |
+|---|---|
+| `after_date` | Only matches played on or after this day, as `YYYY-MM-DD`. |
+| `before_date` | Only matches played on or before this day, as `YYYY-MM-DD`. |
+| `draw` | `main` (default), `qualy`, `group`, `placement` or `all`. Set `all` to include qualifying and [team tournament](/guides/team-tournaments) matches. |
+
+On the search endpoint the filters go in the JSON body next to `team_1` and `team_2`. On the match endpoint they go in the query string.
+
+```bash
+# Meetings in the main draw since the start of 2025
+curl -X POST 'https://padelapi.org/api/matches/headtohead' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{"team_1": [65], "team_2": [12], "after_date": "2025-01-01"}'
+```
+
+---
+
+## Turning matches into a record
+
+The endpoints return the matches, not a tally. Building the win-loss record is up to you, and there is one trap: **`team_1` in a returned match is not necessarily your `team_1`**. Each match keeps the sides as they were on the draw, so the player you sent in `team_1` may appear under `players.team_2` in half of the results. `winner`, `score` and `seeds` all refer to the match's own sides.
+
+Find which side your player is on in each match before you read `winner`:
+
+```javascript
+async function headToHead(token, team1, team2) {
+  const record = { won: 0, lost: 0, setsWon: 0, setsLost: 0, matches: [] };
+  let page = 1;
+  let lastPage = 1;
+
+  do {
+    const response = await fetch(`https://padelapi.org/api/matches/headtohead?page=${page}&per_page=50`, {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ team_1: team1, team_2: team2 }),
+    });
+    const { data, meta } = await response.json();
+
+    for (const match of data) {
+      // Which side of this match is "us"?
+      const ours = match.players.team_1.some((p) => p.id === team1[0]) ? 'team_1' : 'team_2';
+      const theirs = ours === 'team_1' ? 'team_2' : 'team_1';
+
+      if (match.winner === ours) record.won++;
+      else record.lost++;
+
+      for (const set of match.score ?? []) {
+        if (parseInt(set[ours]) > parseInt(set[theirs])) record.setsWon++;
+        else record.setsLost++;
+      }
+
+      record.matches.push(match);
+    }
+
+    lastPage = meta.last_page;
+    page++;
+  } while (page <= lastPage);
+
+  return record;
+}
+
+const record = await headToHead('YOUR_API_TOKEN', [65], [12]);
+console.log(`${record.won}-${record.lost} in matches, ${record.setsWon}-${record.setsLost} in sets`);
+```
+
+<Tip>
+  `parseInt` handles tiebreak sets, which carry the points in parentheses (`"7(5)"`), and a `retired` match may have an unfinished last set. If you need exact set counts, skip sets where neither side reached six games.
+</Tip>
+
+---
+
+## Head to head and the prediction model
+
+A head to head is history; a [prediction](/guides/padel-match-prediction) is the current strength of both sides. They answer different questions and often disagree. A pair that leads a head to head 5-1 may be the underdog today, because those wins came two seasons ago, with other partners, or before one of the opponents reached their peak.
+
+The [prediction model](/guides/padel-match-prediction#what-the-model-does-not-know) deliberately ignores head to head records. If you want to show both, put them side by side rather than mixing them: "Leads the head to head 5-1, 38% to win today" tells the reader more than any blend of the two.
+
+To explain a head to head rather than just count it, pair it with:
+
+- [Pair stats](/api-reference/pair/show-pair-stats), to see how each pair wins its matches.
+- [Pair synergy](/guides/padel-form-and-synergy#pair-synergy), to see whether a partnership is worth more than its two players.
+- [Player form](/guides/padel-form-and-synergy#player-form), to see who arrives in better shape.
+
+---
+
+## What people build with it
+
+- **Match previews.** Call the match endpoint for every scheduled match of the day and show the record next to the order of play.
+- **Rivalry pages.** A player against player head to head, with the record over time and the list of meetings, is a page fans look for before every big final.
+- **"Best ever" arguments.** When two candidates have faced each other, the head to head is the strongest evidence there is. See [who is the best padel player](/guides/best-padel-player).
+- **Partner history.** Omit `team_2` to list every match a pair has played together, or every match of a single player.
+
+---
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Why does the head to head between two pairs have so few matches?">
+    Because pairs change often. The pair against pair head to head only counts the meetings where both partnerships were exactly the same. Send one player on each side to get every meeting between the two players, whoever they played with.
+  </Accordion>
+  <Accordion title="Are qualifying matches included?">
+    Not by default. Both endpoints return main draw matches unless you set `draw`. Use `draw=all` to include qualifying, group stage and placement matches.
+  </Accordion>
+  <Accordion title="Does a retirement count?">
+    Yes. A `retired` match has a winner and counts as a win for the pair that stayed on court. Walkovers are left out because no match was played.
+  </Accordion>
+  <Accordion title="Does the match endpoint include the match itself?">
+    No. It returns the meetings before and after that match, never the match you asked about.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Match prediction model" icon="scale-balanced" href="/guides/padel-match-prediction">
+    Calibrated win probabilities from the Elo ratings of both pairs.
+  </Card>
+  <Card title="Player form and pair synergy" icon="arrow-trend-up" href="/guides/padel-form-and-synergy">
+    Whether a player is in form and whether a pair beats the sum of its parts.
+  </Card>
+  <Card title="Padel statistics" icon="chart-bar" href="/guides/padel-statistics">
+    Match, player and pair stats to explain what the head to head shows.
+  </Card>
+  <Card title="Search head to head" icon="code" href="/api-reference/match/search-head-to-head-matches">
+    Full parameter and response reference.
+  </Card>
+</CardGroup>
