@@ -1,100 +1,81 @@
 ---
 title: "Install in Claude"
-description: "Install Padel Analyst in Claude.ai to query professional padel data directly in conversations. Step-by-step setup guide for Claude Pro and Team users."
+description: "Connect Padel Analyst from the Claude connectors directory in a few clicks and ask about players, tournaments, matches and statistics in your own words. Works on Claude's free plan."
 icon: "/images/integrations/claude.svg"
 ---
 
-This guide shows you how to install Padel Analyst as a connector in [Claude.ai](https://claude.ai), allowing you to query professional padel data directly in your conversations.
+Connect Padel Analyst from the Claude connectors directory, sign in with your Padel API account, and start asking about professional padel in your own words. It takes a couple of minutes and works on Claude's free plan.
+
+<Note>
+  Prefer to set up the connector yourself? Follow [Install in Claude via MCP](/padel-analyst/claude-custom-connector).
+</Note>
 
 ## Prerequisites
 
-Before you begin, make sure you have:
-
 <CardGroup cols={2}>
-  <Card title="Claude Pro/Team Account" icon="user">
-    Connectors require a Claude Pro or Team subscription
+  <Card title="Claude Account" icon="user">
+    The free plan is enough, no paid subscription required. Create yours at [claude.ai](https://claude.ai/) and sign in before you connect Padel Analyst.
   </Card>
-  <Card title="Padel API Token" icon="key">
-    Get your token from the [API Tokens](https://padelapi.org/user/api-tokens) page
+  <Card title="Padel API Account" icon="key">
+    A [Plus Plan](https://padelapi.org/billing) subscription or higher. You'll sign in with it during the installation to connect both accounts.
   </Card>
 </CardGroup>
 
 ## Installation Steps
 
 <Steps>
-  <Step title="Open Claude Settings">
-    Click on your profile icon in the bottom-left corner of Claude and select **Settings** from the menu.
+  <Step title="Open Padel Analyst in the Claude directory">
+    Go to [Padel Analyst in the Claude directory](https://claude.ai/directory/padel-analyst) and click **Connect**.
 
     <Frame>
-      <img src="/images/claude/claude-step-1.webp" alt="Claude settings menu" />
+      <img src="/images/claude-directory/padel-analyst-claude-directory-connect.webp" alt="Padel Analyst page in the Claude connectors directory with its description, tools and connector details" />
     </Frame>
   </Step>
 
-  <Step title="Navigate to Connectors">
-    In the Settings panel, click on **Connectors** in the left sidebar. Then click the **Add custom connector** button.
+  <Step title="Authorize with your Padel API account">
+    You're redirected to Padel API to sign in. Review the permissions Claude is requesting and click **AUTHORIZE**.
+
+    | Permission | What it allows |
+    |------------|----------------|
+    | Use MCP tools to query padel data | Run queries about players, tournaments, matches and statistics |
+    | Access MCP resources | Read reference data exposed by the server |
+    | Use MCP prompts | Use the pre-configured analysis prompts |
+
+    Once authorized, you're sent back to Claude.
 
     <Frame>
-      <img src="/images/claude/claude-step-2.webp" alt="Connectors settings page" />
+      <img src="/images/claude-directory/padel-analyst-claude-authorize-padel-api.webp" alt="Padel API authorization request screen granting Claude access to MCP tools, resources and prompts" />
     </Frame>
   </Step>
 
-  <Step title="Add Padel Analyst">
-    In the "Add custom connector" dialog, enter the following details:
+  <Step title="Start using Padel Analyst">
+    Padel Analyst now appears in your connectors. Open a new chat and ask your first question.
 
-    | Field | Value |
-    |-------|-------|
-    | **Name** | `Padel Analyst` |
-    | **URL** | `https://padelapi.org/mcp?token=YOUR_API_TOKEN` |
-
-    Replace `YOUR_API_TOKEN` with your actual API token from the [API Tokens page](https://padelapi.org/user/api-tokens).
-
-    Click **Add** to save the connector.
+    From then on you can use it in any chat, as described in [Using Padel Analyst in a chat](#using-padel-analyst-in-a-chat).
 
     <Frame>
-      <img src="/images/claude/claude-step-3.webp" alt="Add custom connector dialog" />
-    </Frame>
-  </Step>
-
-  <Step title="Configure Permissions (Optional)">
-    After adding the connector, you can configure tool permissions. Click on **Padel Analyst** in your connectors list to see all available tools.
-
-    Select **Always allow** from the dropdown to skip permission prompts for each tool, or leave the default settings to approve tools individually.
-
-    <Frame>
-      <img src="/images/claude/claude-optional-4.webp" alt="Tool permissions configuration" />
-    </Frame>
-  </Step>
-
-  <Step title="Start Using Padel Analyst">
-    In any chat, click the **+** button and hover over **Add from Padel Analyst** to enable the connector. Make sure the **Padel Analyst** toggle is turned on.
-
-    <Frame>
-      <img src="/images/claude/claude-step-5.webp" alt="Enable Padel Analyst in chat" />
+      <img src="/images/claude-directory/padel-analyst-claude-ask-in-chat.gif" alt="Asking Claude who won the last Premier Padel tournament and getting the answer from Padel Analyst" />
     </Frame>
   </Step>
 </Steps>
 
-## Using Padel Analyst
+## Using Padel Analyst in a chat
 
-Once installed, you can ask Claude questions about professional padel. When Claude needs to fetch data, you'll see a permission request (unless you enabled "Always allow").
+The connector is available across your whole Claude account: claude.ai, the desktop app and the mobile apps. You only connect it once.
 
-<Frame>
-  <img src="/images/claude/claude-optional-6.webp" alt="Permission request for Padel Analyst" />
-</Frame>
-
-Click **Allow once** or **Always allow** to let Claude access the padel data.
-
-### Example Response
-
-Here's an example of Claude analyzing a match using Padel Analyst:
+Click the **+** button next to the message box, open **Connectors** and make sure the **Padel Analyst** toggle is on:
 
 <Frame>
-  <img src="/images/claude/claude-finish-7.webp" alt="Example match analysis response" />
+  <img src="/images/claude-directory/padel-analyst-claude-plus-menu-enable-connector.webp" alt="Enabling the Padel Analyst connector from the Connectors submenu of the plus menu in a Claude chat" />
 </Frame>
 
-## Example Questions
+When Claude needs padel data, it asks for permission before calling a Padel Analyst tool. Click **Allow once** or **Always allow**.
 
-Try asking Claude questions like:
+## What you can ask
+
+Ask in your own words, there's nothing to memorize. Anything about professional padel is fair game: players, pairs, tournaments, results, rankings, match statistics and predictions.
+
+Some questions to get you started:
 
 - "Who won the last Premier Padel Major?"
 - "Show me the head-to-head between Lebron/Galan and Coello/Tapia"
@@ -105,22 +86,28 @@ Try asking Claude questions like:
 ## Troubleshooting
 
 <AccordionGroup>
-  <Accordion title="Connector not appearing">
-    Make sure you have a Claude Pro or Team subscription. Free accounts don't have access to custom connectors.
+  <Accordion title="Claude doesn't use Padel Analyst">
+    Check that the **Padel Analyst** toggle is on in the **+** → **Connectors** menu of your chat. You can also mention it in your question, for example "Using Padel Analyst, who won the last Major?".
   </Accordion>
-  <Accordion title="Authentication errors">
-    Verify that your API token is correct and that you have an active Plus plan subscription.
+  <Accordion title="Padel Analyst doesn't answer with data">
+    Check that your Padel API subscription is active on the [billing page](https://padelapi.org/billing). If it is, disconnect Padel Analyst and connect it again to sign in once more.
   </Accordion>
-  <Accordion title="Tools not working">
-    Check that the connector is enabled in your chat (the toggle should be on). Also verify your token hasn't expired.
+  <Accordion title="Something else isn't working">
+    Write to [ferran@padelapi.org](mailto:ferran@padelapi.org) with a description of what you were doing and we'll take a look.
   </Accordion>
 </AccordionGroup>
+
+## Manage or remove the connector
+
+Open **Settings → Connectors** in Claude and select **Padel Analyst**. From there you can review every tool the connector can use and choose, tool by tool, whether Claude should ask for permission or always allow it.
+
+To remove it, click **Disconnect**. You can connect it again at any time from the [Claude directory](https://claude.ai/directory/padel-analyst).
 
 ## Next Steps
 
 <CardGroup cols={2}>
   <Card title="Available Tools" icon="wrench" href="/padel-analyst/index#available-tools">
-    See all 12 tools available for querying padel data
+    See all the custom tools available for querying padel data
   </Card>
   <Card title="Access Padel API" icon="server" href="https://padelapi.org/explore">
     Explore the full REST API behind Padel Analyst

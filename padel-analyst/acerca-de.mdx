@@ -64,40 +64,41 @@ Padel Analyst convierte tu asistente de IA en un analista de pádel para cualqui
 
 ## Empieza en 3 pasos
 
-Padel Analyst es un servidor **MCP (Model Context Protocol)** que conecta tu asistente de IA con datos profesionales de pádel, para que le preguntes en lenguaje natural sin escribir código. Conéctalo en tres pasos:
-
-<Tip>
-  **¿Usas ChatGPT? Hay un camino más corto.** [Instala la app de Padel Analyst](/padel-analyst/chatgpt-plugin) desde ChatGPT e inicia sesión con tu cuenta de Padel API: sin token de API y sin configuración. Funciona con el plan gratuito de ChatGPT.
-</Tip>
+Padel Analyst es un servidor **MCP (Model Context Protocol)** que conecta tu asistente de IA con datos profesionales de pádel, para que le preguntes en lenguaje natural sin escribir código. Instálalo desde el directorio de tu asistente e inicia sesión con tu cuenta de Padel API: sin token de API y sin configuración.
 
 <Steps>
   <Step title="Suscríbete al Plan Plus">
     Regístrate en el [Plan Plus](https://padelapi.org/billing) (19€/mes) que incluye:
     - Hasta 50K peticiones/mes
     - Acceso al servidor MCP
-    - Funciona con ChatGPT
+    - Funciona con ChatGPT y Claude
     - Consultas en lenguaje natural
     - Soporte básico
   </Step>
-  <Step title="Crea un Token de API">
-    Genera tu token personal de API desde la página de [Tokens de API](https://padelapi.org/user/api-tokens). Lo necesitarás para autenticar las peticiones MCP.
-  </Step>
-  <Step title="Conecta tu asistente de IA">
-    Elige tu asistente y sigue la guía de instalación para empezar a preguntar:
+  <Step title="Instala Padel Analyst en tu asistente de IA">
+    Padel Analyst está disponible en los directorios de Claude y ChatGPT, sin necesidad de pagar una suscripción de Claude o ChatGPT:
     <CardGroup cols={2}>
-      <Card title="Conéctalo a ChatGPT" icon="comments" href="/padel-analyst/chatgpt">
-        Añade Padel Analyst en el modo Desarrollador de ChatGPT.
+      <Card title="Instálalo en Claude" icon="/images/integrations/claude.svg" href="/padel-analyst/claude">
+        Conéctalo desde el directorio de Claude en unos pocos clics.
       </Card>
-      <Card title="Conéctalo a Claude" icon="robot" href="/padel-analyst/claude">
-        La forma más fácil — añádelo como conector, sin archivos de configuración.
+      <Card title="Instálalo en ChatGPT" icon="/images/integrations/openai.svg" href="/padel-analyst/chatgpt-plugin">
+        Instala la app de Padel Analyst desde ChatGPT.
       </Card>
     </CardGroup>
+  </Step>
+  <Step title="Inicia sesión con tu cuenta de Padel API">
+    Tu asistente te redirige a Padel API. Inicia sesión, haz clic en **AUTHORIZE** y empieza a preguntar por jugadores, torneos, partidos y estadísticas.
   </Step>
 </Steps>
 
 ### Conectar otros clientes
 
+Las herramientas de desarrollo y las plataformas de automatización se conectan al mismo servidor MCP con un token de API personal. Genera el tuyo desde la página de [Tokens de API](https://padelapi.org/user/api-tokens) y úsalo en lugar de `TU_TOKEN_DE_API` en los ejemplos.
+
 <AccordionGroup>
+  <Accordion title="Claude Code">
+    Sigue la [guía de instalación de Claude Code](/padel-analyst/claude-code) para añadir Padel Analyst con un solo comando.
+  </Accordion>
   <Accordion title="Cursor">
     Haz clic en el botón de abajo para instalar el servidor MCP de Padel API en Cursor:
 
@@ -161,43 +162,8 @@ Padel Analyst es un servidor **MCP (Model Context Protocol)** que conecta tu asi
 
     También puedes instalarlo desde el MCP Marketplace: abre Windsurf Settings → Cascade → MCP Servers, y busca "Padel API".
   </Accordion>
-  <Accordion title="Claude Desktop">
-    Añade lo siguiente a tu archivo de configuración de Claude Desktop:
-
-    <Tabs>
-      <Tab title="macOS">
-        Edita `~/Library/Application Support/Claude/claude_desktop_config.json`:
-        ```json
-        {
-          "mcpServers": {
-            "padel-api": {
-              "type": "http",
-              "url": "https://padelapi.org/mcp",
-              "headers": {
-                "Authorization": "Bearer TU_TOKEN_DE_API"
-              }
-            }
-          }
-        }
-        ```
-      </Tab>
-      <Tab title="Windows">
-        Edita `%APPDATA%\Claude\claude_desktop_config.json`:
-        ```json
-        {
-          "mcpServers": {
-            "padel-api": {
-              "type": "http",
-              "url": "https://padelapi.org/mcp",
-              "headers": {
-                "Authorization": "Bearer TU_TOKEN_DE_API"
-              }
-            }
-          }
-        }
-        ```
-      </Tab>
-    </Tabs>
+  <Accordion title="n8n">
+    Sigue la [guía de instalación de n8n](/padel-analyst/n8n) para que tus workflows con AI Agent accedan a Padel Analyst.
   </Accordion>
   <Accordion title="Otros clientes MCP">
     Para cualquier cliente compatible con MCP, usa estos datos de conexión:
@@ -212,7 +178,7 @@ Padel Analyst es un servidor **MCP (Model Context Protocol)** que conecta tu asi
 
 ## Herramientas Disponibles
 
-El servidor MCP de Padel Analyst proporciona 16 herramientas para consultar datos de pádel:
+El servidor MCP de Padel Analyst proporciona estas herramientas para consultar datos de pádel:
 
 | Herramienta | Descripción |
 |-------------|-------------|

@@ -55,6 +55,7 @@
               "padel-analyst/chatgpt-plugin",
               "padel-analyst/claude",
               "padel-analyst/chatgpt",
+              "padel-analyst/claude-custom-connector",
               "padel-analyst/claude-code",
               "padel-analyst/n8n"
             ]
