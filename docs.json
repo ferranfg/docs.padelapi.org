@@ -148,18 +148,22 @@
     },
     "links": [
       {
-        "header": "Legal",
+        "header": "Company",
         "items": [
           {
-            "label": "About Us",
+            "label": "About",
             "href": "https://padelapi.org/docs/about"
           },
           {
-            "label": "Privacy Policy",
+            "label": "Privacy",
             "href": "https://padelapi.org/privacy-policy"
           },
           {
-            "label": "Terms of Service",
+            "label": "Cookies",
+            "href": "https://padelapi.org/cookies-policy"
+          },
+          {
+            "label": "Terms",
             "href": "https://padelapi.org/terms-of-service"
           },
           {
