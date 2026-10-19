@@ -1,6 +1,6 @@
 ---
 title: "Data Synchronization"
-description: "Learn how to keep your local data in sync with the Padel API, handling new tournaments, cancellations, redirects, and player identity changes."
+description: "Learn how to keep your local data in sync with the Padel API, polling for changes with updated_after and handling new tournaments, cancellations, redirects, and player identity changes."
 ---
 
 If you are building an application on top of the Padel API, you will likely want to store data locally rather than fetching it on every request. This reduces latency, avoids hitting [rate limits](/index#rate-limits), and gives you more control over your data model.
@@ -18,6 +18,14 @@ However, padel data is not static. Tournaments get cancelled or rescheduled, pla
 | Tournaments   | Weekly                        | [`/seasons/{id}/tournaments`](/api-reference/season/list-season-tournaments) | `tournament.created` `tournament.backfilled` `tournament.updated` `tournament.deleted` |
 | Players       | After each tournament week    | [`/players/{player}`](/api-reference/player/show-player) | `player.created` `player.updated` `player.deleted` |
 | Matches       | After each tournament         | [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) | `match.created` `match.backfilled` `match.updated` `match.deleted` `match.qualy.*` `match.group.*` `match.placement.*` |
+
+## Polling for changes
+
+Without webhooks, poll for what changed since your last sync instead of re-downloading everything. [`/tournaments`](/api-reference/tournament/list-tournaments), [`/seasons`](/api-reference/season/list-seasons), [`/matches`](/api-reference/match/list-matches), [`/tournaments/{tournament}/matches`](/api-reference/tournament/list-tournament-matches) and [`/players`](/api-reference/player/list-players) accept `updated_after` and return the records whose `updated_at` is on or after that time.
+
+Every change you need to react to bumps `updated_at`, status transitions included: a tournament moving from `pending` to `live` to `finished` shows up in the next poll.
+
+<Tip>Use the time your sync *started* as the next cursor, not the time it finished. A record updated while your sync was running is then picked up again on the next run instead of being skipped.</Tip>
 
 ## Tournaments
 
