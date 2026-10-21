@@ -1,0 +1,293 @@
+---
+title: "Padel Betting Data"
+description: "Pre-match padel data for prediction sites, tipsters, affiliates and betting models: calibrated win probabilities, Elo ratings, head to head, recent form and historical rankings through one API."
+---
+
+Professional padel is part of regulated betting, with official in-play data and streaming distributed through the tour's official betting partner and integrity monitoring in place. That covers what happens **during** a match.
+
+Everything that happens **before** a match is a different job. A prediction site, a tipster, an affiliate page or a betting model needs to know who is stronger, who is in form, how the two sides have done against each other and how the field has moved over the season. That is the pre-match layer, and it is what the Padel API is built for.
+
+<CardGroup cols={3}>
+  <Card title="Probabilities" icon="percent">
+    A calibrated win probability for any matchup, from Elo ratings rebuilt over every match since 2023.
+  </Card>
+  <Card title="Context" icon="layer-group">
+    Head to head, recent form, pair synergy and career stats on the same player and pair IDs.
+  </Card>
+  <Card title="History" icon="clock-rotate-left">
+    Results, draws and rankings from past seasons to build and backtest your own models.
+  </Card>
+</CardGroup>
+
+---
+
+## Pre-match, not in-play
+
+This guide is about pre-match data, and the line is worth drawing clearly.
+
+| | Official in-play betting data | Padel API |
+|---|---|---|
+| **When** | During the match | Before the match, and after it for history |
+| **What** | Official point-by-point data and streaming for settling live markets | Ratings, probabilities, head to head, form, stats, results and rankings |
+| **Who it is for** | Licensed sportsbooks offering in-play markets | Prediction sites, tipsters, affiliates, media and anyone building their own model |
+
+The Padel API is **not** an official betting data feed and is not a source for settling in-play markets. If you operate live markets, the official data comes through the tour's official betting partner. The API sits next to it: it gives you the context to understand a match before it starts, which is what most of the content and models around betting actually run on.
+
+---
+
+## Who this is for
+
+<CardGroup cols={2}>
+  <Card title="Prediction websites" icon="newspaper">
+    A preview page for every match on the order of play: probability, head to head, form, ranking. Generated automatically, every day of every tournament.
+  </Card>
+  <Card title="Affiliates" icon="link">
+    Padel content that ranks and converts: match previews, tournament outright odds, "who will win" pages, updated as the draw moves.
+  </Card>
+  <Card title="Tipsters" icon="lightbulb">
+    A calibrated baseline to compare against. When your pick disagrees with the model, you know it is a call worth explaining.
+  </Card>
+  <Card title="Models and bots" icon="robot">
+    Clean historical results and features with stable IDs, ready to train, backtest and run every morning against the next day's matches.
+  </Card>
+</CardGroup>
+
+---
+
+## Win probabilities: the core signal
+
+Every professional player carries an [Elo rating](/guides/padel-elo-rating), updated after each completed match. The [prediction model](/guides/padel-match-prediction) turns the rating gap between two pairs into a win probability, calibrated so that when it says 75%, the favourite really wins about 75% of the time. It has been validated against more than 7,500 professional matches.
+
+[`POST /api/matches/simulate`](/api-reference/match/simulate-match) takes any two pairs and returns the probability, whether or not they have ever met:
+
+```bash
+curl -X POST 'https://padelapi.org/api/matches/simulate' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{
+    "team_1": [65, 66],
+    "team_2": [115, 114]
+  }'
+```
+
+```json
+{
+  "data": {
+    "name": "Coello/Tapia - Chingotto/Galan",
+    "probability": {
+      "team_1": 73.48,
+      "team_2": 26.52
+    },
+    "favorite": "team_1",
+    "elo_diff": 89,
+    "players": { "...": "..." }
+  }
+}
+```
+
+<Info>
+  Calibration is what makes a probability usable in a betting context. Comparing a model's number with a market's implied probability only makes sense if the model's 70% means 70%. The [prediction guide](/guides/padel-match-prediction) publishes the calibration table, the accuracy figures and the band where the model is weakest.
+</Info>
+
+Because any combination of players is a valid input, the same endpoint covers draws that have not been played yet. Simulate a bracket round by round and you get each pair's chances of reaching the final, which is the raw material for tournament outright previews.
+
+---
+
+## Head to head
+
+[`GET /api/matches/{id}/headtohead`](/api-reference/match/show-match-head-to-head) returns every previous meeting between the two pairs of a match. [`POST /api/matches/headtohead`](/api-reference/match/search-head-to-head-matches) does the same for any combination of pairs and players, which matters in padel: partnerships change every season, so the rivalry between two **players** usually runs across several partners.
+
+```bash
+# Every meeting between two players, whoever their partners were
+curl -X POST 'https://padelapi.org/api/matches/headtohead' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN' \
+  -H 'Content-Type: application/json' \
+  -d '{"team_1": [65], "team_2": [114], "after_date": "2025-01-01"}'
+```
+
+Show it next to the probability rather than blending them. "Leads the head to head 5-1, 38% to win today" tells your reader more than either number alone. The [head to head guide](/guides/padel-head-to-head) covers how to turn the matches into a win-loss record.
+
+---
+
+## Recent form and pair synergy
+
+The rating says how strong a player is. Form says whether they are winning **more or less than that strength predicts** lately.
+
+- [`GET /api/players/{id}/form`](/api-reference/player/show-player-form): expected against actual win rate over a recent window, with 7, 30 and 90 day zooms, the current streak and deciding sets won and lost.
+- [`GET /api/pairs/{player1}-{player2}/synergy`](/api-reference/pair/show-pair-synergy): whether two players together win more than their individual ratings predict.
+
+```bash
+curl 'https://padelapi.org/api/players/65/form' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+```json
+{
+  "id": 65,
+  "expected_win_rate": 71.85,
+  "actual_win_rate": 80.00,
+  "delta": 8.15,
+  "matches_played": 30,
+  "trend": "rising",
+  "streak": { "result": "won", "matches": 6 },
+  "third_sets": { "won": 5, "lost": 2 },
+  "tiebreaks": { "won": 7, "lost": 4 },
+  "...": "..."
+}
+```
+
+These are the two things the probability deliberately leaves out, which makes them natural features to layer on top of it. The [form and synergy guide](/guides/padel-form-and-synergy) explains how to read `delta` and when it is too early to trust it.
+
+---
+
+## Pair and player statistics
+
+For markets beyond the winner, such as sets, tiebreaks or a match going the distance, the stats endpoints aggregate the full match history:
+
+- [`/players/{id}/stats`](/api-reference/player/show-player-stats): career win rate, titles, finals and best round, filterable by date and round.
+- [`/pairs/{p1}-{p2}/stats`](/api-reference/pair/show-pair-stats): the same for a specific partnership.
+- [`/matches/{id}/stats`](/api-reference/match/show-match-stats): serve, return, break point and streak metrics for a finished match, set by set.
+
+See [padel statistics](/guides/padel-statistics) for the full list of fields.
+
+---
+
+## Historical rankings and ratings
+
+A model needs to know where a player stood at the time of each match, not just today. The [player rankings endpoint](/api-reference/player/list-player-rankings) returns the weekly history of the official ranking, the race and the Elo rating:
+
+```bash
+curl 'https://padelapi.org/api/players/65/rankings?type=elo&after_date=2026-01-01' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+Combined with historical results (complete draws from 2023, finals going back to 2006), that is enough to rebuild the state of the field on any past date and backtest a strategy against what was known at the time.
+
+<Tip>
+  Results and draws use stable numeric IDs across seasons and competitions, with redirects when two records turn out to be the same player or tournament. A training set built on IDs does not break when a name changes. See [data synchronization](/guides/data-synchronization).
+</Tip>
+
+---
+
+## A daily preview pipeline
+
+Most prediction sites run the same job every day: take tomorrow's matches, enrich each one, publish. With the API it is a short loop:
+
+```javascript
+const API = 'https://padelapi.org/api';
+const headers = {
+  Authorization: 'Bearer YOUR_API_TOKEN',
+  'Content-Type': 'application/json',
+};
+
+async function previews(date) {
+  const { data: matches } = await fetch(
+    `${API}/matches?after_date=${date}&before_date=${date}&per_page=50`,
+    { headers },
+  ).then((r) => r.json());
+
+  const result = [];
+
+  for (const match of matches) {
+    const team_1 = match.players.team_1.map((p) => p.id);
+    const team_2 = match.players.team_2.map((p) => p.id);
+
+    if (team_1.length === 0 || team_2.length === 0) continue;
+
+    const [simulation, h2h] = await Promise.all([
+      fetch(`${API}/matches/simulate`, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ team_1, team_2 }),
+      }).then((r) => r.json()),
+      fetch(`${API}/matches/${match.id}/headtohead`, { headers }).then((r) => r.json()),
+    ]);
+
+    result.push({
+      match: match.name,
+      round: match.round_name,
+      scheduled: match.schedule_label,
+      probability: simulation.data.probability,
+      favorite: simulation.data.favorite,
+      previous_meetings: h2h.meta.total,
+    });
+  }
+
+  return result;
+}
+
+const tomorrow = new Date(Date.now() + 86400000).toISOString().slice(0, 10);
+
+console.log(await previews(tomorrow));
+```
+
+From there you add whatever makes your previews yours: form, synergy, stats, your own model. Matches whose pairs are not known yet (a draw still waiting for an earlier round) are skipped and picked up on the next run.
+
+---
+
+## Use it responsibly
+
+A calibrated probability describes many matches, not one. Even a 90% favourite loses one match in ten, and the [prediction guide](/guides/padel-match-prediction#what-the-model-does-not-know) lists what the model cannot see: injuries, conditions, motivation, a long match the night before. Present numbers as probabilities, not certainties, and follow the gambling advertising rules of every market you publish in.
+
+---
+
+## Which plan you need
+
+| What you use | Plan |
+|---|---|
+| Ratings on player profiles, results, draws and the Elo leaderboard | Free |
+| Full historical archive, ranking and rating history | Plus |
+| `simulate`, head to head, player, pair and match stats | Pro |
+| Form, synergy, webhooks and higher rate limits | Business |
+
+A prediction site publishing previews for every match usually fits in **Pro**. Models and bots that need form and synergy, run large backfills or want changes pushed instead of polled are a **Business** use case.
+
+<CardGroup cols={2}>
+  <Card title="Choose a plan" icon="credit-card" href="https://padelapi.org/billing">
+    Compare plans and subscribe. Upgrade or cancel at any time.
+  </Card>
+  <Card title="Talk to us about Business" icon="envelope" href="mailto:ferran@padelapi.org">
+    Building a betting product or a model at scale? Tell us what you need.
+  </Card>
+</CardGroup>
+
+---
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Is the Padel API an official betting data provider?">
+    No. The API provides pre-match and historical data: ratings, probabilities, head to head, form, stats, results and rankings. Official in-play data for settling live betting markets is distributed by the tour's official betting partner.
+  </Accordion>
+  <Accordion title="Can I use the probabilities as odds?">
+    You can compare them with odds. A probability converts to fair decimal odds as `100 / probability`, without any margin. Whether the gap between that and a market price is an edge is a question the model alone cannot answer: it does not see injuries, conditions or team news.
+  </Accordion>
+  <Accordion title="How far back does the data go?">
+    Complete draws from 2023 onwards, and finals from 2006. Ratings are built over the complete draws, so every player active since 2023 has one.
+  </Accordion>
+  <Accordion title="Does it cover women's padel?">
+    Yes. Ratings, probabilities, head to head, form and stats are computed the same way for both categories.
+  </Accordion>
+  <Accordion title="How quickly do ratings update after a match?">
+    New results are applied daily, so a simulation run the morning after a match already includes it.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Match prediction model" icon="scale-balanced" href="/guides/padel-match-prediction">
+    How the probabilities are built, calibrated and validated.
+  </Card>
+  <Card title="Head to head" icon="people-arrows" href="/guides/padel-head-to-head">
+    Every previous meeting between two pairs or two players.
+  </Card>
+  <Card title="Form and synergy" icon="arrow-trend-up" href="/guides/padel-form-and-synergy">
+    Who arrives in form and which pairs beat the sum of their parts.
+  </Card>
+  <Card title="Your first API call" icon="rocket" href="/guides/your-first-api-call">
+    Get a token and make your first request in a couple of minutes.
+  </Card>
+</CardGroup>
