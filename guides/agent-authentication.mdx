@@ -1,0 +1,61 @@
+---
+title: "Agent Authentication"
+description: "How coding agents and CLI tools obtain a Padel API token for the user through a browser login."
+noindex: true
+---
+
+Coding agents and CLI tools can obtain an API token on the user's behalf with an OAuth 2.0 authorization code flow with PKCE, instead of asking the user to create one and paste it. The user signs in (or creates an account) in the browser and approves the request, and the agent receives a token identical to one created on the [API Tokens](https://padelapi.org/user/api-tokens) page, with no expiration.
+
+## Prerequisites
+
+- A local HTTP listener the browser can redirect to (`localhost` or `127.0.0.1`)
+- A way to open a URL in the user's browser, or to show it to the user
+
+## Step 1: Register a client
+
+Register a client with a loopback redirect URI. The `client_name` is shown on the consent screen and becomes the token name on the API Tokens page, so use the name of the project the token is for.
+
+```bash
+curl -X POST 'https://padelapi.org/oauth2/register' \
+  -H 'Content-Type: application/json' \
+  -d '{"client_name": "my-padel-app", "redirect_uris": ["http://127.0.0.1:8765/callback"]}'
+```
+
+The response includes the `client_id` used in the next steps.
+
+## Step 2: Send the user to the consent screen
+
+Generate a random `code_verifier` and its `code_challenge` (`BASE64URL(SHA256(code_verifier))`), start the local listener on the redirect URI and open this URL in the user's browser:
+
+```text
+https://padelapi.org/oauth2/authorize?response_type=code&scope=api&client_id=CLIENT_ID&redirect_uri=http%3A%2F%2F127.0.0.1%3A8765%2Fcallback&state=STATE&code_challenge=CODE_CHALLENGE&code_challenge_method=S256
+```
+
+## Step 3: Exchange the code
+
+Once the user approves, the browser is redirected to the redirect URI with `code` and `state`. Keep the listener running until a request with the matching `state` arrives, and ignore any other request (such as `/favicon.ico` or a callback from an earlier attempt). Then exchange the code within 10 minutes:
+
+```bash
+curl -X POST 'https://padelapi.org/oauth2/token' \
+  -d grant_type=authorization_code \
+  -d code=CODE \
+  -d client_id=CLIENT_ID \
+  -d redirect_uri=http://127.0.0.1:8765/callback \
+  -d code_verifier=CODE_VERIFIER
+```
+
+```json
+{
+  "access_token": "1|abc123...",
+  "token_type": "Bearer",
+  "scope": "api"
+}
+```
+
+## Step 4: Store and use the token
+
+Store `access_token` outside version control (for example, as `PADEL_API_KEY` in a git-ignored `.env` file) and send it in the `Authorization` header as described in [Authentication](/#authentication).
+
+<Note>
+  `scope=api` is required to receive an API token. Each completed flow creates a new token and earlier tokens remain valid, so register a new client per project and revoke unused tokens on the API Tokens page.
+</Note>
