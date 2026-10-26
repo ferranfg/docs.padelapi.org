@@ -139,7 +139,10 @@
       "view",
       "chatgpt",
       "grok",
-      "claude"
+      "claude",
+      "mcp",
+      "cursor",
+      "vscode"
     ]
   },
   "footer": {

@@ -120,6 +120,30 @@ By default, the **Padel API** only returns the first 15 results for those endpoi
 | `per_page` | Number of results to return per page (default: 15, min: 1, max: 50). Larger values return 50 |
 | `page`     | Page number to retrieve, starting at 1                              |
 
+## Dates and Time Zones
+
+Date filters use the same names on every endpoint that accepts them:
+
+| Parameter                         | Description |
+|-----------------------------------|-------------|
+| `after_date`, `before_date`       | Day range in `YYYY-MM-DD`, both ends included. On matches they apply to the day played; on tournaments, to the days the event runs, so a tournament in progress matches both |
+| `updated_after`, `updated_before` | Datetime range in ISO 8601 on the last update of the record, for incremental syncs |
+
+Dates without a time, such as `played_at`, are the local day of the tournament. Timestamps are ISO 8601 with their offset, and fields that have a tournament-local version carry it with a `_local` suffix.
+
+## Filtering
+
+Filters share their names and values across endpoints:
+
+| Parameter              | Description |
+|------------------------|-------------|
+| `level`                | One or more level codes from the [coverage tables](#tournaments-coverage), comma-separated (`major,p1`) or repeated (`level[]=major&level[]=p1`) |
+| `category`             | `men` or `women` |
+| `draw`                 | Match listings return the main draw unless you set `draw` (`qualy`, `group`, `placement` or `all`) |
+| `sort_by`, `order_by`  | Field to sort by, from the values listed on each endpoint, and direction, `asc` or `desc` |
+
+Query parameters that an endpoint does not accept are ignored rather than rejected, so a misspelled filter returns unfiltered results. Check the endpoint's reference page for the exact parameter names.
+
 ## Status Codes
 
 The **Padel API** uses conventional HTTP response codes to indicate whether a request was successful (`2XX` codes) or resulted in an error (`4XX` and `5XX` codes).
