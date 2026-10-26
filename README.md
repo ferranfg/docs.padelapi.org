@@ -46,7 +46,7 @@ Lower-tier events (such as FIP Rise, FIP Promises, and national or exhibition ev
 | `fip_silver`    |✅     |❌     |❌     |❌     |
 | `fip_other`*    |✅     |❓     |❓     |❓     |
 
-*Other tournaments may include manually curated individual FIP events of particular relevance, such as the FIP World Cup Pairs.
+*Other tournaments may include manually curated individual FIP events of particular relevance, such as the FIP World Cup Pairs and the FIP World Cup.
 
 ### World Padel Tour
 
@@ -78,7 +78,7 @@ Our historical depth varies by season, and we are continuously expanding it as m
 <Note>
   **From 2023 onwards**, we provide **complete draws** for the covered tournament levels — every round, from the opening round through to the final.
 
-  **From 2006 to 2023**, we currently provide **finals only**. We are actively reconstructing the earlier rounds of these events and will add them as they become available.
+  **From 2006 to 2022**, we currently provide **finals only**. We are actively reconstructing the earlier rounds of these events and will add them as they become available.
 </Note>
 
 
@@ -94,15 +94,17 @@ The **Padel API** limits the number of requests you can make to protect the serv
 
 When you exceed a rate limit, the API returns a [`429 Too Many Requests`](/error-codes#429-too-many-requests) error. Wait until the limit resets before making additional requests.
 
-The API includes the following headers in responses to help you track your usage:
+The API includes the following headers in responses to help you track your usage. They describe whichever limit, per minute or per day, is closest to running out:
 
-| Header                  | Description                                      |
-|-------------------------|--------------------------------------------------|
-| `X-RateLimit-Limit`     | Maximum number of requests allowed per minute    |
-| `X-RateLimit-Remaining` | Number of requests remaining in the current window |
+| Header                  | Description                                                              |
+|-------------------------|--------------------------------------------------------------------------|
+| `X-RateLimit-Limit`     | Maximum number of requests allowed in the window                         |
+| `X-RateLimit-Remaining` | Number of requests remaining in the current window                       |
+| `Retry-After`           | Only on `429` responses. Seconds until the exceeded limit resets         |
+| `X-RateLimit-Reset`     | Only on `429` responses. Unix timestamp at which the exceeded limit resets |
 
 <Tip>
-  Use caching strategies and monitor `X-RateLimit-Remaining` to avoid hitting the limit.
+  Use caching strategies and monitor `X-RateLimit-Remaining` to avoid hitting the limit. After a `429`, stop sending requests until `Retry-After` has passed: error responses are not worth caching, and retrying them in a loop keeps the limit exhausted.
 </Tip>
 
 You can track your API usage at any time from the [Logs & Quota](https://padelapi.org/explore/resources/logs) page. It shows a detailed breakdown of your recent requests, along with your daily and monthly quota consumption, so you always know how much of your plan you've used and how much remains.
@@ -115,8 +117,8 @@ By default, the **Padel API** only returns the first 15 results for those endpoi
 
 | Parameter  | Description                                                         |
 |------------|---------------------------------------------------------------------|
-| `per_page` | Number of results to return per page (default: 15, min: 1, max: 50) |
-| `page`     | Page number to retrieve                                             |
+| `per_page` | Number of results to return per page (default: 15, min: 1, max: 50). Larger values return 50 |
+| `page`     | Page number to retrieve, starting at 1                              |
 
 ## Status Codes
 

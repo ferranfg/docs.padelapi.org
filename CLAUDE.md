@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is the documentation site for [Padel API](https://padelapi.org), built with [Mintlify](https://mintlify.com). The site provides API documentation, guides, and integration instructions for accessing padel tennis tournament data, statistics, and live scoring.
+This is the documentation site for [Padel API](https://padelapi.org), built with [Mintlify](https://mintlify.com). The site provides API documentation, guides, and integration instructions.
 
 ## Development Commands
 
@@ -62,14 +62,6 @@ icon: "optional-icon-name"
 - Add language tags to all code blocks
 - Use relative paths for internal links
 - Match style and formatting of existing pages
-
-## API Coverage
-
-The Padel API covers:
-- **Premier Padel/FIP**: Major, P1, P2, Finals, Platinum, Gold tournaments
-- **World Padel Tour**: 2023 WPT Master, 1000, 500, Final events
-
-API authentication uses Bearer tokens in the `Authorization` header.
 
 ## Git Workflow
 

@@ -89,5 +89,5 @@ Your sync process will encounter errors. Handle these cases explicitly:
 </Warning>
 
 <Tip>
-  A `429` means you have hit a rate limit. Back off and retry after the limit resets. Do not retry immediately in a loop. Monitor the `X-RateLimit-Remaining` header to pace your requests during large sync jobs.
+  A `429` means you have hit a rate limit. Pause your sync for the seconds in the `Retry-After` header, then resume. Do not retry immediately in a loop. Monitor the `X-RateLimit-Remaining` header to pace your requests during large sync jobs.
 </Tip>

@@ -148,11 +148,13 @@ You have exceeded the API rate limit. There are two, requests per minute and req
 }
 ```
 
+The response carries a `Retry-After` header with the seconds until the exceeded limit resets, and `X-RateLimit-Reset` with the same moment as a Unix timestamp. A `Retry-After` of up to 60 seconds means you hit the per-minute limit; a longer one means the daily limit.
+
 **How to handle:**
-1. Wait until the next minute before retrying
-2. If the 429s keep coming after a couple of minutes at a low rate, you are against the daily limit rather than the per-minute one, and waiting a minute will not clear it. The [Logs & Quota](https://padelapi.org/explore/resources/logs) page shows which of the two you have hit
+1. Stop sending requests until `Retry-After` has passed, then resume
+2. Do not retry in a loop: every request made while limited is rejected too, and keeps your client blocked
 3. Monitor the `X-RateLimit-Remaining` header to avoid hitting the limit
-4. Implement request throttling in your application
+4. Implement request throttling in your application. The [Logs & Quota](https://padelapi.org/explore/resources/logs) page shows your daily and monthly consumption
 
 See [Rate Limits](/#rate-limits) for details on limits and available headers.
 
