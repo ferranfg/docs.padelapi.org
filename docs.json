@@ -130,7 +130,7 @@
     "primary": {
       "type": "button",
       "label": "Access Padel API",
-      "href": "https://padelapi.org/explore"
+      "href": "https://padelapi.org/login"
     }
   },
   "contextual": {
