@@ -3,7 +3,7 @@ title: "Data Synchronization"
 description: "Learn how to keep your local data in sync with the Padel API, polling for changes with updated_after and handling new tournaments, cancellations, redirects, and player identity changes."
 ---
 
-If you are building an application on top of the Padel API, you will likely want to store data locally rather than fetching it on every request. This reduces latency, avoids hitting [rate limits](/index#rate-limits), and gives you more control over your data model.
+If you are building an application on top of the Padel API, you will likely want to store data locally rather than fetching it on every request. This reduces latency, avoids hitting [rate limits](/#rate-limits), and gives you more control over your data model.
 
 However, padel data is not static. Tournaments get cancelled or rescheduled, player rankings change after every event, and match results can be corrected after the fact. This guide describes a synchronization strategy to keep your local data consistent with the API.
 
