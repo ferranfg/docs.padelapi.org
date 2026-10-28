@@ -8,6 +8,9 @@
     "dark": "#4f46e5"
   },
   "favicon": "/favicon.ico",
+  "metadata": {
+    "timestamp": true
+  },
   "navigation": {
     "tabs": [
       {
