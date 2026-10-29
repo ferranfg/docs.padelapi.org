@@ -1,11 +1,11 @@
 ---
 title: "Padel Head to Head API"
-description: "Get the head to head (H2H) record between two padel pairs or two players with the Padel API: every previous meeting, filters by date and draw, and how to turn the matches into a win-loss record."
+description: "Get the head to head (H2H) record between two padel pairs or two players with the Padel API: every previous meeting, the most frequent rivals of a player or pair, filters by date and draw, and how to turn the matches into a win-loss record."
 ---
 
 In tennis a head to head is simple: two players, every match they have played against each other. In padel it is not. Pairs split and reform every season, so the record between two **exact** pairs is often a handful of matches, while the real rivalry between two **players** runs across several partnerships and many years.
 
-The Padel API serves both head to head (H2H) views. You choose who sits on each side, a pair or a single player, and you get back every finished match where those sides met.
+The Padel API serves both head to head (H2H) views. You choose who sits on each side, a pair or a single player, and you get back every finished match where those sides met. When you do not know the opponent yet, the rivals endpoints answer the question the other way round: who has a player or a pair faced most, and with what record.
 
 <CardGroup cols={2}>
   <Card title="Head to head of a match" icon="calendar-day" href="/api-reference/match/show-match-head-to-head">
@@ -14,10 +14,16 @@ The Padel API serves both head to head (H2H) views. You choose who sits on each 
   <Card title="Head to head search" icon="magnifying-glass" href="/api-reference/match/search-head-to-head-matches">
     `POST /api/matches/headtohead`. Any combination of pairs and players. Built for rivalry pages and comparisons.
   </Card>
+  <Card title="Player rivals" icon="user-group" href="/api-reference/player/show-player-rivals">
+    `GET /api/players/{id}/rivals`. The players a player has faced most, with the record against each one.
+  </Card>
+  <Card title="Pair rivals" icon="people-arrows" href="/api-reference/pair/show-pair-rivals">
+    `GET /api/pairs/{id}/rivals`. The pairs a pair has faced most, with the record against each one.
+  </Card>
 </CardGroup>
 
 <Note>
-  Both endpoints [require a **Pro** subscription](https://padelapi.org/billing).
+  All four endpoints [require a **Pro** subscription](https://padelapi.org/billing).
 </Note>
 
 ---
@@ -149,6 +155,49 @@ console.log(`${record.won}-${record.lost} in matches, ${record.setsWon}-${record
 
 ---
 
+## Rivals: who they meet most
+
+The head to head endpoints need both sides. The rivals endpoints need only one: give them a player or a pair and they return the 10 opponents faced most, each with the record already counted. Use them to find the rivalries worth a head to head, then fetch the meetings with the [search endpoint](#who-you-can-compare).
+
+```bash
+# The players a player has faced most, whoever the partners were
+curl 'https://padelapi.org/api/players/65/rivals' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+
+# The pairs a pair has faced most, both players together on the other side
+curl 'https://padelapi.org/api/pairs/65-66/rivals' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+A rival of a **player** is anyone who stood on the other side of the net, whoever the partners were on either side. A rival of a **pair** is another pair, with both of its players together. The pair ID is the two player IDs joined by a hyphen, the same as in any other pair endpoint.
+
+### What counts
+
+- Only matches with a result count: `finished` and `retired`, from the main draw of pair tournaments. Qualifying and [team tournament](/guides/team-tournaments) matches are left out.
+- The record spans the whole history covered, so long rivalries show up too, not only this season's. In the seasons where [only finals are covered](/#tournaments-coverage), only finals count.
+- Rivals are sorted by `matches_played`, and then by the most recent meeting.
+
+Each rival comes with the record already counted from the side you asked about, so there is no need to work out which side of each match is yours: matches played and won, win percentage, finals played against them and titles won, and the dates of the first and last meeting. `rivals_count` tells you how many distinct rivals there are within your filters, which can be more than the 10 returned.
+
+### Filters
+
+| Parameter | Meaning |
+|---|---|
+| `after_date` | Only matches played on or after this day, as `YYYY-MM-DD`. |
+| `before_date` | Only matches played before this day, as `YYYY-MM-DD`. |
+| `level` | Tournament level(s), comma separated (e.g. `major,p1`). See the [coverage tables](/#tournaments-coverage). |
+| `round` | Only matches of one round: `1` (final), `2` (semifinal), `4` (quarterfinal), `8`, `16` or `32`. |
+
+The filters are the same as in the [stats endpoints](/guides/padel-statistics), so a rivals list and a stats page with the same filters describe the same matches. Ask for `round=1` to get the rivalries settled in finals.
+
+```bash
+# Rivals met in finals only
+curl 'https://padelapi.org/api/players/65/rivals?round=1' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+---
+
 ## Head to head and the prediction model
 
 A head to head is history; a [prediction](/guides/padel-match-prediction) is the current strength of both sides. They answer different questions and often disagree. A pair that leads a head to head 5-1 may be the underdog today, because those wins came two seasons ago, with other partners, or before one of the opponents reached their peak.
@@ -167,6 +216,7 @@ To explain a head to head rather than just count it, pair it with:
 
 - **Match previews.** Call the match endpoint for every scheduled match of the day and show the record next to the order of play.
 - **Rivalry pages.** A player against player head to head, with the record over time and the list of meetings, is a page fans look for before every big final.
+- **Rivalry sections in profiles.** The rivals of a player or pair give the "most faced" block of a profile in a single call, and tell you which head to heads are worth a page of their own.
 - **"Best ever" arguments.** When two candidates have faced each other, the head to head is the strongest evidence there is. See [who is the best padel player](/guides/best-padel-player).
 - **Partner history.** Omit `team_2` to list every match a pair has played together, or every match of a single player.
 
@@ -183,6 +233,9 @@ To explain a head to head rather than just count it, pair it with:
   </Accordion>
   <Accordion title="Does a retirement count?">
     Yes. A `retired` match has a winner and counts as a win for the pair that stayed on court. Walkovers are left out because no match was played.
+  </Accordion>
+  <Accordion title="What is the difference between rivals and head to head?">
+    The head to head takes both sides and returns every match between them. Rivals take one side and return the opponents it faced most, with the record against each one already counted. Use rivals to find the opponents, and the head to head to list the matches.
   </Accordion>
   <Accordion title="Does the match endpoint include the match itself?">
     No. It returns the meetings before and after that match, never the match you asked about.
