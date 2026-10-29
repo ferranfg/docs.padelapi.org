@@ -1,0 +1,52 @@
+---
+title: "What's new in Oct 2026"
+og:title: "What's new in Padel API Oct 2026 - rivals, qualifying draws and player form"
+description: "The most frequent rivals of every player and pair, qualifying draws now available next to the main draw, and whether a player is in form right now and how well a pair clicks on court."
+---
+![Padel API Oct 2026](https://ik.imagekit.io/ferranfigueredo/tr:w-1920,h-1080/padelapi/padelapi-whats-new-oct-2026_GLUb42CUL.png)
+
+**Hello developers,**
+
+Three new things to build on. Here's what's new:
+
+## 1. Rivals: who they always meet
+
+Every player and every pair now has a list of **rivals**: the ones they have faced most, with the record, finals and titles against each of them.
+
+It covers the whole history, from 2006 onwards, so the long rivalries show up too, not only this season's. Filter by `round=1` and you get the rivalries that were settled in finals.
+
+![Padel API Rivals](https://ik.imagekit.io/ferranfigueredo/padelapi/padelapi-rivals_Gl4Ucq-le.png)
+
+Use it to add a "main rivals" section to a player profile, or to show in a match preview how many times both pairs have met and who usually wins. Available on Pro.
+
+[Player rivals](https://padelapi.org/docs/api-reference/player/show-player-rivals) · [Pair rivals](https://padelapi.org/docs/api-reference/pair/show-pair-rivals)
+
+## 2. Qualifying draws
+
+**Qualifying matches** are now in the API for Premier Padel and FIP Platinum, with their own `match.qualy.*` webhook events.
+
+Tournaments now start where they really start: qualifiers who reach the main draw come with the full path that took them there, and the Elo ratings count those matches too.
+
+Listings still return the main draw by default, so nothing changes until you ask. Set `draw=qualy` or `draw=all` to get the whole tournament in one request. Available on paid plans.
+
+[See coverage by level](https://padelapi.org/docs#tournaments-coverage)
+
+## 3. Player form and pair synergy
+
+Winning 70% of your matches is a poor run for the world number one and an outstanding one for a pair ranked 40th. Win rate alone does not tell them apart.
+
+Two new endpoints compare results against what the Elo ratings predicted: **player form** tells you who is playing above their level, and **pair synergy** whether two players win more together than apart. Both return the gap and its trend.
+
+![Padel API Form](https://ik.imagekit.io/ferranfigueredo/padelapi/padelapi-form_Teo-hE85K.png)
+
+"Who's hot" lists, form badges on player cards, the partnerships that work better than they should. Available on Business.
+
+[Read the Player Form and Pair Synergy guide](https://padelapi.org/docs/guides/padel-form-and-synergy)
+
+---
+
+Thank you for being part of the Padel API community.
+
+Your feedback drives what we build next. Feel free to share your thoughts or suggestions at [ferran@padelapi.org](mailto:ferran@padelapi.org).
+
+Best regards,
