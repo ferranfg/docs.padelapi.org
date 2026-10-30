@@ -4,6 +4,21 @@ description: "Stay up-to-date with Padel API releases, new features, bug fixes, 
 rss: true
 ---
 
+<Update label="October 2026" description="Rivals, Agent Authentication & New Filters">
+  - **New:** Player and pair rivals: [`/players/{id}/rivals`](/api-reference/player/show-player-rivals) and [`/pairs/{player1}-{player2}/rivals`](/api-reference/pair/show-pair-rivals) return the opponents they have faced most, with the record, finals and titles against each, across their whole history and with the same filters as the stats endpoints (Pro plan). Details in the [October newsletter](/blog/20261030-whats-new-in-padel-api-oct-2026-rivals-qualifying-draws-and-player-form)
+  - **New:** [Agent authentication](/guides/agent-authentication): an AI agent can now obtain an API token through the same OAuth flow as the MCP server, and the padelapi.org home has a button to copy the agent setup prompt
+  - **New:** `id` filter on the matches, players, tournaments, seasons and pairs endpoints, accepting up to 100 ids per request
+  - **New:** `level` filter on the head-to-head endpoints and on player and pair matches
+  - **New:** `nationality` and `short_name` on the players of a match, so flags and surnames can be shown without fetching each player
+  - **New:** `order_by` on [tournament editions](/api-reference/tournament/list-tournament-editions) to reverse the date order
+  - **New:** `created_at` and `updated_at` on seasons, with `updated_after` and `updated_before` filters
+  - `after_date` and `before_date` now return every tournament with at least one day inside the range and only pairs with matches inside it, and `before_date` can equal `after_date` to query a single day
+  - Pair stats, synergy and rivals return 404 only when the two players have never played together; otherwise they return empty data
+  - **MCP:** Padel Analyst is now listed in the official MCP Registry
+  - **Docs:** Added the [Padel Head to Head](/guides/padel-head-to-head), [Padel Betting Data](/guides/padel-betting-data) and [Agent Authentication](/guides/agent-authentication) guides
+  - **Docs:** Added the [Claude directory](/padel-analyst/claude) installation guide for Padel Analyst
+</Update>
+
 <Update label="September 2026" description="Team Tournaments, Player Form & Elo Leaderboard">
   - **New:** [Team tournaments](/guides/team-tournaments), ready for the FIP World Cup: `format` field and filter on tournaments, a `tie` object on their matches, `group` and `placement` draws, the `not_played` match status and new [webhook events](/webhooks). Details in the [September newsletter](/blog/20260924-the-fip-world-cup-is-coming-its-time-to-update-your-app)
   - **New:** [Player form and pair synergy](/guides/padel-form-and-synergy): `/players/{id}/form` and `/pairs/{player1}-{player2}/synergy` compare actual results against what the Elo ratings predicted, with the gap by period and its trend (Business plan)
