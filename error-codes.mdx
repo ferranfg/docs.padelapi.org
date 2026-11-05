@@ -82,7 +82,7 @@ curl -X GET 'https://padelapi.org/api/seasons' \
 
 ### 402 - Payment Required
 
-Your current subscription plan does not include access to this resource.
+Your current subscription plan does not include access to this resource. The `message` field names the plan you need.
 
 **How to fix:**
 1. Check your current plan at [padelapi.org/billing](https://padelapi.org/billing)
@@ -91,7 +91,7 @@ Your current subscription plan does not include access to this resource.
 
 ```json
 {
-  "message": "Subscription required.",
+  "message": "Pro subscription or higher required.",
   "contact_email": "ferran@padelapi.org",
   "error_time": "2026-01-19 15:42:31"
 }
