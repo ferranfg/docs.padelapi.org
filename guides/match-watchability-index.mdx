@@ -23,7 +23,7 @@ So every match in the API carries the **Padel API Watchability Index**: an integ
 
 ## Where to find it
 
-Every match resource carries a `watchability` field, and the [match list endpoint](/api-reference/match/list-matches) accepts it as a sort key.
+Every match resource carries a `watchability` field, and both the [match list endpoint](/api-reference/match/list-matches) and the [tournament match list endpoint](/api-reference/tournament/list-tournament-matches) accept it as a sort key.
 
 ```bash
 curl 'https://padelapi.org/api/matches?after_date=2026-08-10&before_date=2026-08-10&sort_by=watchability&order_by=desc' \
@@ -55,7 +55,6 @@ That single request is the whole feature: **the first item is the best match of 
 |---|---|
 | The best match of today | `after_date` and `before_date` set to the same day |
 | The best women's match | `category=women` |
-| The best match on a given court | `court=Centre Court` |
 | The best match of the weekend | a two or three day date range |
 | The best match of a round | `round=4` for quarter-finals |
 
