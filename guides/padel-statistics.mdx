@@ -16,7 +16,7 @@ Professional padel generates detailed statistics for every match. The Padel API 
     Combined performance: how a specific duo performs together.
   </Card>
   <Card title="Tournament Stats" icon="trophy">
-    How a tournament played out: three-set matches, tie-breaks, retirements.
+    How a tournament played out: third sets, tiebreaks, bagels, duration.
   </Card>
 </CardGroup>
 
@@ -210,9 +210,15 @@ curl -X GET \
   "avg_sets_per_match": 2.34,
   "games_played": 1620,
   "avg_games_per_match": 21.89,
-  "three_set_matches": 25,
+  "third_sets": 25,
   "tiebreaks": 19,
-  "retirements": 0,
+  "bagels": 7,
+  "matches_retired": 0,
+  "matches_tracked": 74,
+  "avg_duration_per_match": "01:34",
+  "total_duration": "116:00",
+  "longest_match": "/api/matches/11575",
+  "most_games_match": "/api/matches/11486",
   "connections": {
     "tournament": "/api/tournaments/740"
   }
@@ -224,14 +230,20 @@ Tournament stats accept the same `category`, `draw`, and `round` filters as [`/t
 | Metric | Description |
 |--------|-------------|
 | `coverage` | `full` when the complete draw is available, `finals_only` when only finals are (older editions, or `round=1`) |
-| `matches_played` | Finished matches, including retirements |
-| `sets_played` | Completed sets |
+| `matches_played` | Finished and retired matches |
+| `sets_played` | Sets completed |
 | `avg_sets_per_match` | Average sets per match |
 | `games_played` | Games played, counting both sides |
 | `avg_games_per_match` | Average games per match |
-| `three_set_matches` | Matches that went to a third set |
-| `tiebreaks` | Sets that ended 7-6 |
-| `retirements` | Matches that ended in a retirement |
+| `third_sets` | Deciding sets played (retirements are left out) |
+| `tiebreaks` | Sets settled 7-6 |
+| `bagels` | Sets settled 6-0 |
+| `matches_retired` | Matches with status `retired` |
+| `matches_tracked` | Matches with live tracking, the ones with a `duration` |
+| `avg_duration_per_match` | Average `duration` per match, as `HH:MM`, over `matches_tracked` |
+| `total_duration` | Sum of `duration`, as `HH:MM`, over `matches_tracked` |
+| `longest_match` | Path to the match with the longest `duration` (retirements are left out) |
+| `most_games_match` | Path to the match with the most games played (retirements are left out) |
 
 ---
 
