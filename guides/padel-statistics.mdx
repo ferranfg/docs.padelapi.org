@@ -1,11 +1,11 @@
 ---
 title: "Padel Statistics API"
-description: "Access professional padel statistics through the Padel API: match stats (serve %, break points, streaks), player career stats, and pair performance data."
+description: "Access professional padel statistics through the Padel API: match stats (serve %, break points, streaks), player career stats, pair performance and tournament aggregates."
 ---
 
-Professional padel generates detailed statistics for every match. The Padel API organizes this data at three levels: **match**, **player**, and **pair**. Each level answers different questions.
+Professional padel generates detailed statistics for every match. The Padel API organizes this data at four levels: **match**, **player**, **pair**, and **tournament**. Each level answers different questions.
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card title="Match Stats" icon="chart-bar">
     Point-by-point breakdown: serve %, break points, streaks, set-by-set data.
   </Card>
@@ -14,6 +14,9 @@ Professional padel generates detailed statistics for every match. The Padel API 
   </Card>
   <Card title="Pair Stats" icon="people-group">
     Combined performance: how a specific duo performs together.
+  </Card>
+  <Card title="Tournament Stats" icon="trophy">
+    How a tournament played out: three-set matches, tie-breaks, retirements.
   </Card>
 </CardGroup>
 
@@ -187,6 +190,51 @@ Compare pairs across:
 
 ---
 
+## Tournament statistics
+
+Aggregates over the finished matches of a tournament, to see how it played out without paging through every match. Endpoint: [`GET /api/tournaments/{tournament_id}/stats`](/api-reference/tournament/show-tournament-stats).
+
+```bash
+curl -X GET \
+  'https://padelapi.org/api/tournaments/{tournament_id}/stats' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+```json
+{
+  "id": 740,
+  "self": "/api/tournaments/740/stats",
+  "coverage": "full",
+  "matches_played": 74,
+  "sets_played": 173,
+  "avg_sets_per_match": 2.34,
+  "games_played": 1620,
+  "avg_games_per_match": 21.89,
+  "three_set_matches": 25,
+  "tiebreaks": 19,
+  "retirements": 0,
+  "connections": {
+    "tournament": "/api/tournaments/740"
+  }
+}
+```
+
+Tournament stats accept the same `category`, `draw`, and `round` filters as [`/tournaments/{tournament_id}/matches`](/api-reference/tournament/list-tournament-matches), with the same values. Only the main draw is counted unless you set `draw`, and both categories are combined unless you set `category`. While a tournament is in progress the figures cover the matches finished so far. With no finished matches, counts are `0` and averages are `null`.
+
+| Metric | Description |
+|--------|-------------|
+| `coverage` | `full` when the complete draw is available, `finals_only` when only finals are (older editions, or `round=1`) |
+| `matches_played` | Finished matches, including retirements |
+| `sets_played` | Completed sets |
+| `avg_sets_per_match` | Average sets per match |
+| `games_played` | Games played, counting both sides |
+| `avg_games_per_match` | Average games per match |
+| `three_set_matches` | Matches that went to a third set |
+| `tiebreaks` | Sets that ended 7-6 |
+| `retirements` | Matches that ended in a retirement |
+
+---
+
 ## Common use cases
 
 ### Building a player comparison dashboard
@@ -304,7 +352,7 @@ for (const setKey of ["set_1", "set_2", "set_3"]) {
 
 ## Next steps
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card title="Player Stats Endpoint" icon="user" href="/api-reference/player/show-player-stats">
     Full reference for career win rate, titles and progression
   </Card>
