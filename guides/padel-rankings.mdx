@@ -1,0 +1,236 @@
+---
+title: "Padel Rankings"
+description: "The four professional padel player rankings in the Padel API (official, race, Elo and prize money), how the weekly snapshots work, and how to filter them, measure change over any period and compare one ranking against another."
+---
+
+A ranking is a single list with a single question behind it. The official ranking asks who has collected the most points over the last twelve months. The race asks the same about the current season. The Elo ranking asks who is strongest right now, and the earnings ranking asks who has won the most prize money this year. The same player can sit in very different places on each list, and that is often the most interesting thing about them.
+
+The Padel API publishes all four through one endpoint, with one payload and one set of filters:
+
+<CardGroup cols={2}>
+  <Card title="Official" icon="trophy">
+    `type=official`. The FIP ranking points table, used for seedings and entries.
+  </Card>
+  <Card title="Race" icon="flag-checkered">
+    `type=race`. FIP points earned in the current season only.
+  </Card>
+  <Card title="Elo" icon="chart-line">
+    `type=elo`. Players ranked by their [Elo rating](/guides/padel-elo-rating), a measure of strength rather than points.
+  </Card>
+  <Card title="Earnings" icon="coins">
+    `type=earnings`. Prize money earned in the current season, in euros.
+  </Card>
+</CardGroup>
+
+```bash
+curl 'https://padelapi.org/api/rankings?type=official&category=women' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+Men and women are ranked separately, so positions repeat across categories. Pass `category` to read one table at a time.
+
+---
+
+## Weekly snapshots
+
+Every ranking is stored as a **weekly snapshot**, dated on the Monday of its ISO week. Without `date`, the endpoint returns the latest snapshot. With `date`, it returns the snapshot in effect on that day, so you can read any ranking as it stood at any point in its history.
+
+The Elo and earnings rankings are published every week. The official and race rankings follow the tournament calendar and can skip a week when nothing changed, so a `date` in one of those weeks returns the previous snapshot.
+
+To follow a single player through time, the [player rankings endpoint](/api-reference/player/list-player-rankings) returns their series of weekly entries for any ranking type and date range.
+
+---
+
+## The four rankings
+
+| | Official | Race | Elo | Earnings |
+|---|---|---|---|---|
+| **Measures** | Points over a rolling 12 months | Points in the current season | Strength against the rest of the field | Prize money in the current season |
+| **`points` carries** | Ranking points | Ranking points | Elo rating | Euros, in whole units |
+| **Who is listed** | Every player with ranking points | Every player with points this season | Players with at least 5 rated matches in the last 12 months | Players who earned prize money this season |
+| **Resets** | Never, points drop off as they expire | Every season | Never | Every season |
+
+The race and earnings seasons start on the Monday of the first ISO week of the year. Until the first snapshot of a new season is published, both lists come back empty.
+
+### Official and race
+
+The official ranking and the race are the FIP points tables as published by the circuit. The official ranking decides seedings and entries; the race shows who is having the best season so far, without the weight of last year's results.
+
+### Elo
+
+The Elo ranking orders players by their [Elo rating](/guides/padel-elo-rating) as it stood entering the week. The rating moves after every completed match, so it reacts to a breakthrough long before ranking points do, and it rewards beating strong opponents rather than reaching a round. A player needs at least 5 rated matches in the last 12 months to be listed. The [Elo guide](/guides/padel-elo-rating) explains how the rating is built and why the minimum exists.
+
+### Earnings
+
+The earnings ranking adds up the prize money each player has earned since the start of the season, following the prize distribution tables of the official regulations:
+
+- **Premier Padel** tournaments pay a fixed amount per player for each round reached, by tournament category.
+- **FIP Tour** tournaments share their published prize fund between their main draws, and each round's share between the pairs that went out in it.
+
+A tournament adds to the ranking once its finals are decided. Each player is paid for the furthest round they reached, a player who retires is paid for the round they retired in, and a player whose tournament held no played match, only byes or walkovers, earns nothing. The `currency` field states the currency `points` is expressed in, and it is `EUR` on every entry.
+
+---
+
+## What every entry returns
+
+```json
+{
+  "data": [
+    {
+      "id": 65,
+      "self": "/api/players/65",
+      "name": "Arturo Coello",
+      "short_name": "Coello",
+      "category": "men",
+      "nationality": "ES",
+      "side": "backhand",
+      "type": "elo",
+      "ranking": 1,
+      "ranking_diff": 0,
+      "points": 2136,
+      "points_diff": 18,
+      "currency": null,
+      "rated_matches": 61,
+      "gap_ranking": 1,
+      "ranking_gap": 0,
+      "date": "2026-11-16",
+      "connections": {
+        "rankings": "/api/players/65/rankings"
+      }
+    },
+    "..."
+  ]
+}
+```
+
+| Field | Meaning |
+|---|---|
+| `type` | The ranking this entry belongs to. |
+| `ranking` | Position in the ranking. |
+| `points` | Ranking points, Elo rating or prize money, depending on `type`. |
+| `ranking_diff` | Positions moved since the previous snapshot, or since `after_date`. Negative means the player climbed. |
+| `points_diff` | Points, rating or prize money gained since the previous snapshot, or since `after_date`. |
+| `currency` | `EUR` on the earnings ranking, `null` on the others. |
+| `rated_matches` | Rated matches the player played in the 12 months before the snapshot. A walkover or a bye never produces a rating and does not count. |
+| `gap_ranking` | Position of the player in the `gap_type` ranking in effect the same week. `null` when they are not listed there. |
+| `ranking_gap` | `gap_ranking` minus `ranking`. Positive when the player sits higher in this ranking than in the other one. |
+| `date` | Monday of the ISO week the snapshot belongs to. |
+
+---
+
+## Change over any period
+
+By default `ranking_diff` and `points_diff` compare each entry with the previous weekly snapshot: they answer "who moved this week". Set `after_date` and both measure the change since the snapshot in effect on that day instead, so the same list answers "who has moved the most this season" or "since the last major".
+
+```bash
+curl 'https://padelapi.org/api/rankings?type=elo&category=men&after_date=2026-01-01&sort_by=points_diff&order_by=desc' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+`date` still sets the end of the period, so `after_date` and `date` together measure any window in the history. On the official and Elo rankings, a player who was not listed on the starting snapshot carries no movement, rather than a diff against a position they never held. The race and earnings count up from zero every season, so a player missing from the starting snapshot, or an `after_date` before the season started, measures `points_diff` from zero, while `ranking_diff` stays at `0`.
+
+<Tip>
+  To surface the biggest climbers, sort by `points_diff` descending or by `ranking_diff` ascending: a climb is a negative change in position.
+</Tip>
+
+---
+
+## Filtering players
+
+All filters combine with each other and with any ranking type:
+
+| Parameter | Keeps |
+|---|---|
+| `category` | `men` or `women`. |
+| `nationality` | Players of a country, as a 2-letter code. |
+| `min_age`, `max_age` | Players within an age range, in years, both bounds included. Players without a known date of birth are left out when either bound is set. |
+| `min_matches` | Players with at least that many rated matches in the 12 months before the snapshot, the same count returned in `rated_matches`. |
+
+Positions are not recalculated after filtering: a player keeps the `ranking` they hold in the full table, so a filtered list shows where each player stands on the whole circuit.
+
+`min_matches` is the way to tell a solid number from a noisy one. A rating or a points total built on a handful of matches can swing a long way on a single result, while one built on dozens is an established level.
+
+---
+
+## Comparing two rankings
+
+Each entry also carries the player's position in a second ranking, the one in effect the same week, chosen with `gap_type`. It defaults to `official`, or to `elo` when the list itself is the official one.
+
+```bash
+curl 'https://padelapi.org/api/rankings?type=elo&gap_type=official&category=women&sort_by=ranking_gap&order_by=desc' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+`ranking_gap` is the difference between both positions, and sorting by it brings the biggest disagreements to the top. Some readings worth knowing:
+
+| `type` vs `gap_type` | A large positive `ranking_gap` usually means |
+|---|---|
+| `elo` vs `official` | The player is stronger than their points say: a breakthrough season, a return from injury, or a schedule that has not yet turned results into points. |
+| `race` vs `official` | A much better season than the previous one. |
+| `earnings` vs `official` | More prize money than their ranking would suggest, usually from deep runs at the biggest events. |
+| `official` vs `elo` | Points that run ahead of current level, often a strong previous season still counting. |
+
+Players missing from the `gap_type` ranking that week return `null` in `gap_ranking` and `ranking_gap`, and they go to the end of the list when sorting by `ranking_gap`.
+
+---
+
+## Combining everything
+
+Filters, period and comparison all apply to the same request, so a shortlist that would otherwise take a profile, a stats and a history request per candidate comes back in one call. For example, women aged 23 or under with at least 15 rated matches, ordered by how much their Elo rating has grown since the start of the season:
+
+```bash
+curl 'https://padelapi.org/api/rankings?type=elo&category=women&max_age=23&min_matches=15&after_date=2026-01-01&sort_by=points_diff&order_by=desc&per_page=20' \
+  -H 'Authorization: Bearer YOUR_API_TOKEN'
+```
+
+The same entries carry `gap_ranking` against the official ranking, so the list also shows which of those players have not yet seen their rise reflected in ranking points.
+
+---
+
+## Plans
+
+The latest snapshot of every ranking is available on every plan. On the free plan, values from older snapshots and the change measured with `after_date` return `hidden_free_plan`, and sorting by `ranking_diff` or `points_diff` with `after_date` falls back to sorting by `ranking`. [Paid plans](https://padelapi.org/billing) include the full ranking history.
+
+---
+
+## In Padel Analyst
+
+The `list-rankings` tool in [Padel Analyst](/padel-analyst) accepts the same ranking types, filters, period and comparison, so an AI assistant can build the same lists from a question in plain language.
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="List rankings" icon="list-ol" href="/api-reference/ranking/list-rankings">
+    Endpoint reference, with every parameter and field.
+  </Card>
+  <Card title="Player rankings" icon="chart-line" href="/api-reference/player/list-player-rankings">
+    The weekly history of a single player in every ranking.
+  </Card>
+  <Card title="Elo rating" icon="ranking-star" href="/guides/padel-elo-rating">
+    How the rating behind the Elo ranking is built and updated.
+  </Card>
+  <Card title="Player form and pair synergy" icon="arrow-trend-up" href="/guides/padel-form-and-synergy">
+    Whether a player is winning more or less than their rating predicts.
+  </Card>
+</CardGroup>
+
+---
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="How often are padel rankings updated?">
+    The Elo and earnings rankings are published every week. The official and race rankings follow the circuit's publication, which tracks the tournament calendar and can skip a week. Every snapshot is kept, so any ranking can be read as it stood on any past date.
+  </Accordion>
+  <Accordion title="What is the difference between the official ranking and the race?">
+    The official ranking counts the points of the last twelve months, so last season's results still weigh on it. The race only counts points earned in the current season, and it starts from zero every year.
+  </Accordion>
+  <Accordion title="Why is a player high in the Elo ranking but low in the official one?">
+    Points reward the round reached and accumulate over a year; the rating rewards who you beat and reacts to every match. A player who has just started beating top pairs, or who is coming back from a long absence, climbs the Elo ranking first and the official one later. Sorting the Elo ranking by `ranking_gap` against `official` lists exactly those players.
+  </Accordion>
+  <Accordion title="Does the earnings ranking include sponsorship or bonuses?">
+    No. It only counts official prize money from tournaments, following the prize distribution of each circuit's regulations.
+  </Accordion>
+</AccordionGroup>
