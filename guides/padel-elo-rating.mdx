@@ -55,7 +55,7 @@ The same field is included everywhere a player appears: [the player list](/api-r
 
 ## The Elo leaderboard
 
-The `elo` field tells you how strong one player is. To read the whole table at once, ask the [rankings endpoint](/api-reference/ranking/list-rankings) for `type=elo`:
+The `elo` field tells you how strong one player is. To read the whole table at once, ask the [rankings endpoint](/api-reference/ranking/list-rankings) for `type=elo` (the [rankings guide](/guides/padel-rankings) covers every filter it accepts):
 
 ```bash
 curl 'https://padelapi.org/api/rankings?type=elo&category=men' \
@@ -191,7 +191,7 @@ That last one is deliberate, and it is also a limitation. A rating is a record o
     Altitude, indoor or outdoor, heat, night sessions, a marathon quarter-final the day before. None of it reaches the rating.
   </Accordion>
   <Accordion title="Injuries and form" icon="notes-medical">
-    A player who retired mid-match last week carries the same rating into tomorrow. Combine it with [recent results](/api-reference/player/list-player-matches) if you need current form.
+    A player who retired mid-match last week carries the same rating into tomorrow. Combine it with [recent results](/api-reference/player/list-player-matches) if you need current form, or the [player form](/guides/padel-form-and-synergy) to compare them with what the rating expected.
   </Accordion>
 </AccordionGroup>
 
@@ -207,7 +207,7 @@ That last one is deliberate, and it is also a limitation. A rating is a record o
     Spot the quarter of the bracket where the seeding and the actual level disagree.
   </Card>
   <Card title="Match previews" icon="newspaper">
-    A rating gap is a headline: two numbers explain a fixture in one line.
+    A rating gap is a headline: two numbers explain a fixture in one line, and the [head-to-head record](/guides/padel-head-to-head) adds the history behind it.
   </Card>
   <Card title="Predictions" icon="percent">
     The rating gap is the input to the [prediction model](/guides/padel-match-prediction), available as a single endpoint.

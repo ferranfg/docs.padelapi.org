@@ -55,11 +55,11 @@ The biggest gap between a scraper and this API is **normalization**: the work of
 - A tournament gets renamed → same ID.
 - Two tournaments merge → the deprecated one returns `302` pointing at the canonical one.
 - Two player records turn out to be the same person → the deprecated player returns `302`, and match history is consolidated under the surviving ID.
-- A tournament is cancelled → it disappears from list endpoints but remains addressable by ID with `status: "cancelled"`.
+- A tournament is cancelled → it disappears from list endpoints but remains addressable by ID with [`status: "cancelled"`](/statuses#tournament-statuses).
 
 Your sync job follows redirects and updates a foreign key. Compare to maintaining a fuzzy-matching layer over a stream of name strings. See [Data Synchronization](/guides/data-synchronization) for the recommended sync strategy.
 
-**Computed endpoints.** Some of the most interesting questions in padel (head-to-head records, pair chemistry, win rate in finals, season-on-season form) are aggregations over the entire match history, not facts you can scrape. The API ships them as endpoints:
+**Computed endpoints.** Some of the most interesting questions in padel ([head-to-head records](/guides/padel-head-to-head), [pair chemistry](/guides/padel-form-and-synergy), win rate in finals, season-on-season form) are aggregations over the entire match history, not facts you can scrape. The API ships them as endpoints:
 
 - [`/players/{id}/stats`](/api-reference/player/show-player-stats): career win rate, titles, finals, best round, with `after_date` / `before_date` / `round` filters.
 - [`/pairs/{p1}-{p2}/stats`](/api-reference/pair/show-pair-stats): how a specific duo performs together.

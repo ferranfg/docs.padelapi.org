@@ -56,7 +56,7 @@ Matches progress through the following statuses. See the [Data Synchronization](
 | Status | Description |
 |--------|-------------|
 | `scheduled` | Match has not started yet |
-| `live` | Match is in progress with real-time point-by-point data available |
+| `live` | Match is in progress with real-time point-by-point data available through [WebSockets](/websockets) |
 | `ended` | Match has ended but the score is not yet confirmed |
 | `finished` | Match completed with confirmed score |
 | **Other statuses** | |
@@ -82,7 +82,7 @@ Matches progress through the following statuses. See the [Data Synchronization](
 
 ## Point-by-Point Coverage
 
-Matches with point-by-point data include a `coverage` field available in the `/live` endpoint, indicating how complete the tracking is.
+Matches with point-by-point data include a `coverage` field available in the [`/live` endpoint](/api-reference/live/list-live-matches), indicating how complete the tracking is.
 
 | Coverage | Description |
 |----------|-------------|

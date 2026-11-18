@@ -154,7 +154,7 @@ See [padel statistics](/guides/padel-statistics) for the full list of fields.
 
 ## Historical rankings and ratings
 
-A model needs to know where a player stood at the time of each match, not just today. The [player rankings endpoint](/api-reference/player/list-player-rankings) returns the weekly history of the official ranking, the race and the Elo rating:
+A model needs to know where a player stood at the time of each match, not just today. The [player rankings endpoint](/api-reference/player/list-player-rankings) returns the weekly history of the official ranking, the race and the Elo rating. The [rankings guide](/guides/padel-rankings) explains each ranking type:
 
 ```bash
 curl 'https://padelapi.org/api/players/65/rankings?type=elo&after_date=2026-01-01' \
