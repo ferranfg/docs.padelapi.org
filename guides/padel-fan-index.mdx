@@ -1,23 +1,23 @@
 ---
 title: "Padel Fan Index"
-description: "Sponsor-grade popularity metrics for professional padel players, measured from real fan decisions and available through the Padel API audience endpoint."
+description: "Sponsor-grade popularity metrics for professional padel players, measured from real fan behaviour and available through the Padel API audience endpoint."
 ---
 
 <Info>
-  **Padel Fan Index** measures the real popularity of professional padel players among active padel fans. It is available through the API with `GET /api/players/{id}/audience`, and as custom reports for brands, sponsors and players.
+  **Padel Fan Index** measures the real popularity of professional padel players among active padel fans. It is available through the API with `GET /api/players/{id}/audience`, in [Padel Analyst](/padel-analyst) with the `show-player-audience` tool, and as custom reports for brands, sponsors and players.
 </Info>
 
 ## Why It's Different
 
-Traditional sponsorship metrics rely on passive impressions: social media followers, TV viewership estimates, or event attendance. Padel Fan Index measures something far more valuable: **active fan decisions**.
+Traditional sponsorship metrics rely on passive impressions: social media followers, TV viewership estimates, or event attendance. Padel Fan Index measures **active fan behaviour**: which players fans look up and which ones they pick for their teams, inside a game built around the professional tour.
 
-Every data point represents a deliberate action by a fan: choosing a player for their team before a tournament, over every other player available. These are signals of genuine preference that passive metrics cannot capture.
+Both signals come from people who follow the circuit closely, and both are compared with the player's competitive level. That separates the players fans care about from the ones who simply win.
 
 ---
 
 ## Audience Endpoint
 
-`GET /api/players/{id}/audience` returns the popularity of any player at any time: how many fans choose them, how they compare with the rest of the circuit and with their own ranking, and how that popularity evolves.
+`GET /api/players/{id}/audience` returns the popularity of any player over any period: how much of the fans' attention goes to them, where that places them on the circuit, whether that is more or less than their level would predict, and how it evolves.
 
 <Note>
   This endpoint [requires a **Business** subscription](https://padelapi.org/billing).
@@ -28,62 +28,54 @@ Every value is relative: shares, indexes and positions against the rest of the c
 The endpoint measures a window: the last 12 months by default, ending today. Set `after_date` and `before_date` (`YYYY-MM-DD`) to measure any other window. Every value in the response is computed over that same window.
 
 ```bash
-curl 'https://padelapi.org/api/players/65/audience' \
+curl 'https://padelapi.org/api/players/465/audience' \
   -H 'Authorization: Bearer YOUR_API_TOKEN'
 ```
 
 ```json
 {
-  "id": 65,
-  "self": "/api/players/65/audience",
-  "from": "2025-11-18",
-  "to": "2026-11-17",
-  "fan_share": 13.9,
-  "fan_reach": 21.4,
-  "popularity_index": 2.31,
-  "popularity_rank": 9,
-  "popularity_gap": 7,
-  "fan_retention": 88.4,
+  "id": 465,
+  "self": "/api/players/465/audience",
+  "from": "2025-11-19",
+  "to": "2026-11-18",
+  "fan_share": 2.6,
+  "popularity_rank": 14,
+  "popularity_index": 4.33,
   "by_period": [
-    { "from": "2026-07-01", "to": "2026-07-31", "fan_share": 11.9, "new_fan_rate": 9.4, "fan_retention": 86.1 },
-    { "from": "2026-08-01", "to": "2026-08-31", "fan_share": 12.6, "new_fan_rate": 7.3, "fan_retention": 88.8 },
-    { "from": "2026-09-01", "to": "2026-09-30", "fan_share": 13.1, "new_fan_rate": 6.8, "fan_retention": 89.3 },
-    { "from": "2026-10-01", "to": "2026-10-31", "fan_share": 13.9, "new_fan_rate": 6.1, "fan_retention": 90.2 }
+    { "from": "2026-08-01", "to": "2026-08-31", "fan_share": 5.8 },
+    { "from": "2026-09-01", "to": "2026-09-30", "fan_share": 3.6 },
+    { "from": "2026-10-01", "to": "2026-10-31", "fan_share": 3.1 },
+    { "from": "2026-11-01", "to": "2026-11-18", "fan_share": 5.2 }
   ],
   "trend": "rising",
   "connections": {
-    "player": "/api/players/65"
+    "player": "/api/players/465"
   }
 }
 ```
 
 ### Popularity
 
-`fan_share`, `popularity_index` and `popularity_rank` describe the player at the latest tournament of the window, so the most recent entry of `by_period` and the top level tell the same story. `fan_reach` and `fan_retention` cover the whole window.
-
 | Field | Meaning |
 |---|---|
 | `from`, `to` | The window actually measured, so you know what the defaults resolved to. |
-| `fan_share` | Percentage of active fans who chose the player at the latest tournament of the window. |
-| `fan_reach` | Percentage of the fans active during the window who chose the player at least once. Where `fan_share` is a snapshot of one tournament, `fan_reach` is the breadth of the audience over the whole window: a player many fans try for a tournament or two reaches far beyond their share. |
-| `popularity_index` | Player's fans divided by the average of every player chosen at that tournament. `2.0` means twice as popular as the average player. |
-| `popularity_rank` | Position of the player by number of fans at that tournament. |
-| `popularity_gap` | Official ranking minus `popularity_rank`. Positive means the player attracts more fans than their competitive level would predict. |
-| `fan_retention` | Percentage of fans who kept choosing the player from one tournament to the next across the window. |
+| `fan_share` | Percentage of the fans' attention that went to the player over the window: of every time a fan looked up a professional player, the share that was this one. |
+| `popularity_rank` | Position of the player on the circuit by `fan_share`. |
+| `popularity_index` | Fan interest against the interest expected for the player's competitive level. `1.0` is exactly what their level predicts, `2.0` twice as much, `0.5` half. |
 
-`fan_share`, `fan_reach`, `popularity_index`, `popularity_rank` and `fan_retention` are `null` when no fan chose the player within the window. `popularity_gap` is also `null` when the player has no official ranking.
+`fan_share` answers how followed a player is, and `popularity_rank` where that places them. `popularity_index` answers a different question: whether fans follow them more or less than their results alone would explain. A world-class player can be among the most followed on the circuit and still sit near or below `1.0`, because their level already predicts a great deal of attention, while a player outside the top 20 with an index of `3.0` is drawing far more interest than their ranking suggests.
+
+The index combines two signals, how often fans look the player up and how often they pick them, each one compared with players of the same level. A player needs enough attention within the window for the index to be measured.
+
+`fan_share` and `popularity_rank` are `null` when fans paid no attention to the player within the window, and `popularity_index` is also `null` when the sample is too small to measure it.
 
 ### Evolution
 
 | Field | Meaning |
 |---|---|
-| `by_period` | One entry per calendar month within the window, oldest first, each with its `from` and `to` dates. Months where no fan chose the player are left out. |
-| `by_period[].fan_share` | Average share of fans who chose the player across the tournaments of that month. |
-| `by_period[].new_fan_rate` | Percentage of that month's fans who chose the player for the first time ever. High values signal a player who is reaching new audiences. `null` in the month the player first appears, where every fan is new by definition. |
-| `by_period[].fan_retention` | Percentage of fans who kept the player from one tournament to the next within that month. |
+| `by_period` | One entry per calendar month within the window, oldest first, each with its `from` and `to` dates. The first and last entries are trimmed to the window. Months where fans paid no attention to the player are left out. |
+| `by_period[].fan_share` | Percentage of the fans' attention that went to the player within that month. |
 | `trend` | Direction of `fan_share` across `by_period`: `rising`, `stable` or `declining`. It is relative to the player's own level, so a move from 2% to 3% counts as much as one from 20% to 30%. `null` when fewer than three periods are available. |
-
-Retention is measured between consecutive tournaments of the same season. The first tournament of a season has no previous one to compare with, because fans build their teams again when a new season starts.
 
 ---
 
@@ -93,10 +85,10 @@ Padel Fan Index combines two proprietary data sources:
 
 <CardGroup cols={2}>
   <Card title="Fantasy Padel Tour" icon="gamepad" href="https://fantasypadeltour.com">
-    Fantasy sports platform where fans build their own padel teams each tournament. Every player they choose becomes a measurable signal of fan preference.
+    Fantasy sports platform where fans build their own padel teams each tournament and follow every player on the tour. What they look up and who they pick become measurable signals of fan preference.
   </Card>
   <Card title="Padel API" icon="database" href="https://padelapi.org">
-    Comprehensive database of professional padel rankings, match results, and player statistics. Every metric is contextualized with real competitive performance data, such as the official ranking behind `popularity_gap`.
+    Comprehensive database of professional padel rankings, match results, and player statistics. Every metric is contextualized with real competitive performance data, such as the level behind `popularity_index`.
   </Card>
 </CardGroup>
 
@@ -107,6 +99,8 @@ Padel Fan Index combines two proprietary data sources:
 - **Brands and sponsors** evaluating or managing padel player partnerships
 - **Agencies** building sponsorship proposals with data-backed fan engagement metrics
 - **Teams and players** looking to demonstrate their commercial value beyond rankings
+
+To put popularity next to results, exposure and level over time, the [scouting and sponsorship guide](/guides/padel-scouting-and-sponsorship) shows how to evaluate a player before signing or renewing a deal.
 
 ---
 

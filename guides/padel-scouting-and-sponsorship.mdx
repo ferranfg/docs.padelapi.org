@@ -1,0 +1,188 @@
+---
+title: "Padel Scouting and Sponsorship Analytics"
+sidebarTitle: "Scouting and Sponsorship"
+description: "How scouts, racket brands, agencies and academies use Padel Analyst to find emerging padel players before the ranking does, and to evaluate established players before investing in a sponsorship."
+---
+
+Scouting a padel player and evaluating a sponsorship come down to the same question: **is this player worth more than the market thinks?** For a scout, that means a young player whose level runs ahead of their ranking. For a brand, it means a player whose results, exposure and audience justify what the deal costs.
+
+The official ranking answers neither. It rewards the round reached over the last twelve months, so it trails a breakthrough by a season and says nothing about who a player beat, how consistent they are or how many people want to watch them. Padel Analyst connects your AI assistant to the data that does answer it, so you can ask in plain language and get a shortlist back in one question.
+
+<CardGroup cols={2}>
+  <Card title="Scouting" icon="binoculars" href="#finding-emerging-players">
+    Find young players whose level is rising faster than their ranking, with enough matches to trust the number.
+  </Card>
+  <Card title="Sponsorship" icon="handshake" href="#evaluating-a-sponsorship">
+    Measure what an established player brings back: results, exposure, consistency and audience.
+  </Card>
+</CardGroup>
+
+<Note>
+  **Before you start:** you need [Padel Analyst](/padel-analyst) installed in Claude or ChatGPT. The [Plus plan](https://padelapi.org/billing) covers rankings, Elo, results and stats; questions about form, pair synergy and fan popularity need the [Business plan](https://padelapi.org/billing). Every example below is a question you can paste as it is.
+</Note>
+
+---
+
+## Three numbers to read
+
+Every shortlist in this guide is built on three values. Learn to read them and you can judge any list the assistant gives you.
+
+### The Elo rating, and how it moves
+
+The [Elo rating](/guides/padel-elo-rating) measures how strong a player is right now, based on who they beat and by how much. It moves after every completed match, so it picks up a breakthrough months before ranking points do. Every player enters at 1500. The body of the tour sits between 1400 and 1600, main draw regulars and seeds between 1600 and 1800, and the very top above 2000.
+
+For scouting, the level matters less than the slope. A player who has gained 150 points since January is beating opponents they were losing to a year ago. Ask for the change over a period, not only the current value.
+
+### The match sample
+
+A rating built on a handful of matches can swing a long way on one result. A rating built on dozens is an established level. Every ranking entry carries `rated_matches`, the rated matches the player played in the last twelve months, and you can set a minimum so the noise never reaches your list. As a starting point, ask for at least 12 to 15 matches; raise it when you need certainty, lower it when you are hunting very young players who still play few events.
+
+### The gap with the official ranking
+
+Each entry also carries the player's position in a second ranking of the same week, and `ranking_gap` is the difference between both. With the Elo ranking against the official one, a large positive gap means the player is stronger than their points say. That is the scouting signal: a breakthrough season, a return from injury, or a schedule that has not yet turned wins into points.
+
+<Tip>
+  Read the gap together with the sample and the slope. A big gap with few matches and no movement often means a player who plays few ranking events, not a hidden star. A big gap with a solid sample and a rising rating is the profile you are looking for.
+</Tip>
+
+---
+
+## Finding emerging players
+
+### Questions to ask
+
+Each of these is answered with a single call to the rankings, filtered by age and sample and sorted by change or by gap:
+
+<AccordionGroup>
+  <Accordion title="Players stronger than their ranking">
+    - "Which men aged 24 or under, with at least 12 rated matches, sit highest in the Elo ranking compared with the official ranking?"
+    - "List the women under 23 whose Elo ranking is furthest ahead of their FIP ranking, with at least 15 matches"
+  </Accordion>
+  <Accordion title="Fastest risers">
+    - "Which women aged 23 or under, with at least 15 rated matches, have gained the most Elo since January 1st?"
+    - "Who are the 10 men under 21 whose Elo has grown the most in the last three months?"
+  </Accordion>
+  <Accordion title="By country or by season">
+    - "Which Argentine players under 25 have climbed the most in the race this season?"
+    - "Show me the Italian players aged 22 or under with the biggest Elo gain since July 1st"
+  </Accordion>
+</AccordionGroup>
+
+Positions are never recalculated after filtering: each player keeps the position they hold on the whole circuit, so a filtered list still tells you where every name stands against the full field.
+
+### Going deeper on one name
+
+A shortlist tells you who to look at. Follow-up questions tell you why:
+
+- **Trajectory:** "Show me the weekly Elo of this player since January 2025." The series tells a steady climb apart from one lucky tournament.
+- **Form:** "Is she winning more or less than her rating predicts in the last 90 days?" [Form](/guides/padel-form-and-synergy) compares actual results with what the ratings expected, so a player beating expectations is likely to keep climbing.
+- **Partners:** "Who has he played with this year, and how did each partnership do?" A rising player who keeps changing partners and keeps winning is carrying their side of the court.
+
+### A shortlist every week
+
+The rankings are published weekly, so the same question asked every Monday gives you a list that updates itself. Both ChatGPT and Claude can run a prompt on a schedule and send you the result. Create a scheduled task with a prompt like this:
+
+```text
+Every Monday, use Padel Analyst to list the men and women aged 24 or under,
+with at least 12 rated matches, whose Elo has grown the most over the last
+8 weeks. For each player show the Elo rating, the change, the rated matches
+and their position in the official ranking. Flag anyone who is new to the
+list compared with last week.
+```
+
+If your team works in other tools, the [n8n integration](/padel-analyst/n8n) runs the same question inside a workflow and sends the list to a spreadsheet, Slack or email.
+
+---
+
+## Evaluating a sponsorship
+
+An established player is a different bet. You are not looking for a level the market has missed, you are checking that what you pay is backed by what the player delivers: deep runs, matches people want to watch, consistency over a contract, and an audience that cares.
+
+### What a player brings back
+
+| Question | What answers it |
+|---|---|
+| How far do they go? | Titles, finals and semi-finals, best round and win rate by tournament level from player stats |
+| How much exposure do their results generate? | Matches played and rounds reached, since every extra round is one more match in front of the crowd and the cameras |
+| Are their matches the ones people watch? | The [Watchability Index](/guides/match-watchability-index) of their matches, from 0 to 100 |
+| Will they hold their level over the contract? | The Elo trajectory and [form](/guides/padel-form-and-synergy), including the same window one year earlier |
+| Is the partnership stable? | Their pairs, how long each lasted and how each one performed |
+| Does the audience follow them? | The [Padel Fan Index](/guides/padel-fan-index): share of fan attention, position on the circuit and interest compared with their level |
+
+### Questions to ask
+
+<AccordionGroup>
+  <Accordion title="Results and exposure">
+    - "How many finals and semi-finals has this player reached in Premier Padel this season, and how does that compare with last season?"
+    - "Which men under 28 have earned the most prize money this season?"
+    - "What is the average watchability of this player's matches this season?"
+  </Accordion>
+  <Accordion title="Consistency and risk">
+    - "Show me this player's Elo over the last two years and tell me if the trend is rising, stable or declining"
+    - "Compare her form in the last 180 days with the same period last year"
+    - "How many partners has he had in the last two seasons, and what was the record with each?"
+  </Accordion>
+  <Accordion title="Audience">
+    - "Is this player more popular than his ranking suggests?"
+    - "Which of these three players draws the most fan attention over the last 12 months?"
+    - "Is her fan share rising or falling this season?"
+  </Accordion>
+  <Accordion title="Comparing candidates">
+    - "Compare these three players on titles, finals, Elo trend and prize money this season"
+    - "Which players in the official top 30 have improved their Elo the most this season?"
+    - "Rank the players in the women's top 20 by prize money earned this season"
+  </Accordion>
+</AccordionGroup>
+
+### From data to ROI
+
+Sponsorship ROI is the return divided by the cost. The cost is yours: the fee, the product and the activation. Padel Analyst gives you the return side, measured the same way for every candidate, so you can compare deals on equal terms:
+
+- **Cost per result:** what each final, semi-final or title cost you over the last season.
+- **Cost per exposure:** what each match played, or each high-watchability match, cost you.
+- **Return over time:** whether the player's level and audience were rising or falling when you signed, and where they are at renewal.
+- **Audience beyond results:** `popularity_index` flags players who draw more fan interest than their level predicts, the ones whose commercial value runs ahead of their sporting one.
+
+Run the same questions before signing and again before renewing, and the review writes itself: what the player delivered, against what you expected and against the alternatives you passed on.
+
+<Info>
+  Popularity comes from the [Padel Fan Index](/guides/padel-fan-index). For sponsorship proposals and partner reviews, it is also available as custom reports with pair analysis, comparisons against the players you choose and share of fan attention by racket brand.
+</Info>
+
+---
+
+## Frequently asked questions
+
+<AccordionGroup>
+  <Accordion title="Can I scout players outside the top 100?">
+    Yes. The Elo ranking lists every player with at least 5 rated matches in the last twelve months, which covers the main draws and qualifying rounds of the professional tour. Filter by age and sample and the list goes as deep as you need.
+  </Accordion>
+  <Accordion title="Why is a young player high in the Elo ranking but low in the official one?">
+    Ranking points accumulate over a year and reward the round reached. The Elo rating reacts to every match and rewards who you beat. A player who has just started beating established pairs climbs the Elo ranking first and the official one later, and that gap is exactly what a scout is looking for.
+  </Accordion>
+  <Accordion title="Does Padel Analyst calculate the ROI of a sponsorship?">
+    No. It measures what a player returns in sporting terms: results, exposure, consistency and level over time. You combine that with the cost of the deal to get the ROI, and you can compare every candidate on the same measures.
+  </Accordion>
+  <Accordion title="Can I get the shortlist without an AI assistant?">
+    Yes. Every question in this guide is backed by the [rankings endpoint](/api-reference/ranking/list-rankings), so the same filters work directly through the API. The [rankings guide](/guides/padel-rankings) shows the requests.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Next steps
+
+<CardGroup cols={2}>
+  <Card title="Install Padel Analyst" icon="robot" href="/padel-analyst">
+    Connect it to Claude or ChatGPT in a few clicks.
+  </Card>
+  <Card title="Padel rankings" icon="list-ol" href="/guides/padel-rankings">
+    Filters, change over any period and the gap between rankings.
+  </Card>
+  <Card title="Elo rating" icon="ranking-star" href="/guides/padel-elo-rating">
+    How the rating behind every shortlist is built.
+  </Card>
+  <Card title="Padel Fan Index" icon="heart" href="/guides/padel-fan-index">
+    Sponsor-grade popularity metrics from real fan decisions.
+  </Card>
+</CardGroup>
