@@ -109,6 +109,8 @@ The API includes the following headers in responses to help you track your usage
 
 You can track your API usage at any time from the [Logs & Quota](https://padelapi.org/explore/resources/logs) page. It shows a detailed breakdown of your recent requests, along with your daily and monthly quota consumption, so you always know how much of your plan you've used and how much remains.
 
+To check it from your code, call [`GET /me`](/api-reference/you/show-me). It returns your current plan and, for the per-minute, daily and monthly limits, the requests used and remaining and when each window resets. Calls to this endpoint do not count towards the limits.
+
 ## Pagination
 
 Several endpoints return paginated results.

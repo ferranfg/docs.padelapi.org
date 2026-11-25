@@ -85,7 +85,7 @@ curl -X GET 'https://padelapi.org/api/seasons' \
 Your current subscription plan does not include access to this resource. The `message` field names the plan you need.
 
 **How to fix:**
-1. Check your current plan at [padelapi.org/billing](https://padelapi.org/billing)
+1. Check your current plan with [`GET /me`](/api-reference/you/show-me) or at [padelapi.org/billing](https://padelapi.org/billing)
 2. Upgrade your subscription to access premium endpoints
 3. Review the [pricing plans](https://padelapi.org/#pricing) for available features
 
@@ -153,7 +153,7 @@ The response carries a `Retry-After` header with the seconds until the exceeded 
 **How to handle:**
 1. Stop sending requests until `Retry-After` has passed, then resume
 2. Do not retry in a loop: every request made while limited is rejected too, and keeps your client blocked
-3. Monitor the `X-RateLimit-Remaining` header to avoid hitting the limit
+3. Monitor the `X-RateLimit-Remaining` header, or call [`GET /me`](/api-reference/you/show-me), which does not count towards the limits, to see how much of each limit is left
 4. Implement request throttling in your application. The [Logs & Quota](https://padelapi.org/explore/resources/logs) page shows your daily and monthly consumption
 
 See [Rate Limits](/#rate-limits) for details on limits and available headers.
